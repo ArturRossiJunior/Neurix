@@ -4,12 +4,6 @@ import { GameCard } from '../components/GameCard';
 import { colors } from '../components/styles/colors';
 import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
 
-const IconPlaceholder = ({ name, size = 24 }: { name: string; size?: number }) => (
-  <View style={[styles.iconPlaceholder, { width: size, height: size }]}>
-    <Text style={[styles.iconText, { fontSize: size * 0.4 }]}>{name}</Text>
-  </View>
-);
-
 const Home = () => {
   const handleNavigation = (destination: string) => {
     Alert.alert(
@@ -24,7 +18,7 @@ const Home = () => {
       <View style={styles.content}>
         
         <View style={styles.header}>
-          <Text style={styles.welcomeText}>Bem-vindo!</Text>
+          <Text style={styles.welcomeText}>Bem-vindo</Text>
           <Text style={styles.subtitle}>
             Escolha uma das opções abaixo para começar
           </Text>
@@ -101,7 +95,7 @@ const Home = () => {
             onPress={() => handleNavigation('Configurações')}
           >
             <View style={styles.cardContent}>
-              <Text style={styles.cardTitle}>Config</Text>
+              <Text style={styles.cardTitle}>Configurações</Text>
               <Text style={styles.cardDescription}>
                 Ajustes e preferências do aplicativo
               </Text>

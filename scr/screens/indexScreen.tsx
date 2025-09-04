@@ -3,7 +3,7 @@ import { Header } from '../components/Header';
 import { Button } from '../components/Button';
 import { GameCard } from '../components/GameCard';
 import { IndexScreenProps } from '../navigation/types';
-import { styles } from '../components/styles/home.styles';
+import { styles } from '../components/styles/index.styles';
 import { View, Text, ScrollView, Alert } from 'react-native';
 
 const IndexScreen = ({ navigation }: IndexScreenProps) => {

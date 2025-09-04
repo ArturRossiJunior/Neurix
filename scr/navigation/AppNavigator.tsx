@@ -12,14 +12,15 @@ export default function AppNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Index">
-        <Stack.Screen 
-          name="Index" 
-          component={IndexScreen} 
-          options={{ title: 'Bem-vindo' }} 
+        <Stack.Screen
+          name="Index"
+          component={IndexScreen}
+          options={{ headerShown: false }}
         />
         <Stack.Screen 
-          name="Home" 
-          component={HomeScreen} 
+          name="Home"
+          component={HomeScreen}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>
