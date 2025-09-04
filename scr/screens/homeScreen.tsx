@@ -1,7 +1,7 @@
 import React from 'react';
-import { Button } from '../scr/components/Button';
-import { GameCard } from '../scr/components/GameCard';
-import { colors } from '../scr/components/styles/colors';
+import { Button } from '../components/Button';
+import { GameCard } from '../components/GameCard';
+import { colors } from '../components/styles/colors';
 import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
 
 const IconPlaceholder = ({ name, size = 24 }: { name: string; size?: number }) => (
