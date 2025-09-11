@@ -2,10 +2,11 @@ import React from 'react';
 import { Header } from '../components/Header';
 import { Button } from '../components/Button';
 import { GameCard } from '../components/GameCard';
-import { styles } from '../components/styles/home.styles';
+import { IndexScreenProps } from '../navigation/types';
+import { styles } from '../components/styles/index.styles';
 import { View, Text, ScrollView, Alert } from 'react-native';
 
-const Index = () => {
+const IndexScreen = ({ navigation }: IndexScreenProps) => {
   const handleNavigation = (destination: string) => {
     Alert.alert(
       `Navegando para ${destination}`,
@@ -17,12 +18,10 @@ const Index = () => {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <View style={styles.content}>
-
         <Header />
-
         <View style={styles.navigationGrid}>
-          <GameCard 
-            variant="default" 
+          <GameCard
+            variant="default"
             style={styles.navCard}
           >
             <View style={styles.cardContent}>
@@ -32,19 +31,19 @@ const Index = () => {
                   Acesse os jogos educativos e atividades interativas
                 </Text>
               </View>
-              <Button 
-                variant="game" 
-                size="lg" 
+              <Button
+                variant="game"
+                size="lg"
                 style={styles.actionButton}
-                onPress={() => handleNavigation('Início')}
+                onPress={() => navigation.navigate('Home')}
               >
-                🎮 Começar Jogos
+                🎮 Começar
               </Button>
             </View>
           </GameCard>
 
-          <GameCard 
-            variant="default" 
+          <GameCard
+            variant="default"
             style={styles.navCard}
           >
             <View style={styles.cardContent}>
@@ -54,9 +53,9 @@ const Index = () => {
                   Conheça mais sobre nossa ferramenta e metodologia
                 </Text>
               </View>
-              <Button 
-                variant="soft" 
-                size="lg" 
+              <Button
+                variant="soft"
+                size="lg"
                 style={styles.actionButton}
                 onPress={() => handleNavigation('Sobre o App')}
               >
@@ -70,4 +69,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default IndexScreen;

@@ -1,5 +1,4 @@
 import { colors } from './colors';
-import { commonStyles } from './commonStyles';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -9,7 +8,7 @@ export const styles = StyleSheet.create({
   },
   
   contentContainer: {
-    paddingVertical: 32,
+    paddingVertical: 24,
   },
   
   content: {
@@ -17,102 +16,68 @@ export const styles = StyleSheet.create({
     alignSelf: 'center',
     width: '100%',
     paddingHorizontal: 16,
-    gap: 48,
+    gap: 32,
   },
   
-  navigationGrid: {
-    gap: 24,
+  header: {
+    alignItems: 'center',
+    gap: 8,
+    paddingTop: 16,
   },
   
-  navCard: {
+  welcomeText: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: colors.foreground,
+    textAlign: 'center',
+  },
+  
+  subtitle: {
+    fontSize: 16,
+    color: colors.mutedForeground,
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  
+  optionsGrid: {
+    gap: 20,
+  },
+  
+  optionCard: {
     marginVertical: 0,
   },
   
   cardContent: {
-    ...commonStyles.centerContent,
-    gap: 16,
-  },
-  
-  iconContainer: {
-    ...commonStyles.iconContainer,
-    ...commonStyles.iconContainerLarge,
-  },
-  
-  textContainer: {
-    ...commonStyles.centerContent,
-    gap: 8,
-  },
-  
-  cardTitle: {
-    ...commonStyles.cardTitle,
-    color: colors.foreground,
-  },
-  
-  cardDescription: {
-    ...commonStyles.cardDescription,
-    paddingHorizontal: 16,
-  },
-  
-  actionButton: {
-    width: '100%',
-    marginTop: 8,
-  },
-  
-  resourcesSection: {
-    gap: 24,
-  },
-  
-  sectionHeader: {
-    alignItems: 'center',
-    gap: 8,
-  },
-  
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: colors.foreground,
-    textAlign: 'center',
-  },
-  
-  sectionDescription: {
-    fontSize: 16,
-    color: colors.mutedForeground,
-    textAlign: 'center',
-  },
-  
-  resourcesGrid: {
-    gap: 16,
-  },
-  
-  resourceCard: {
-    marginVertical: 0,
-  },
-  
-  resourceContent: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
   },
   
-  smallIconContainer: {
-    ...commonStyles.iconContainer,
-    ...commonStyles.iconContainerSmall,
+  iconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   
-  resourceTextContainer: {
-    ...commonStyles.textContainer,
-  },
-  
-  resourceTitle: {
-    fontSize: 16,
+  cardTitle: {
+    fontSize: 18,
     fontWeight: '600',
     color: colors.foreground,
+    textAlign: 'center',
   },
   
-  resourceDescription: {
-    fontSize: 12,
+  cardDescription: {
+    fontSize: 13,
     color: colors.mutedForeground,
-    lineHeight: 16,
+    textAlign: 'center',
+    lineHeight: 18,
+    paddingHorizontal: 12,
+  },
+  
+  actionButton: {
+    width: '80%',
+    marginTop: 4,
   },
   
   iconPlaceholder: {
