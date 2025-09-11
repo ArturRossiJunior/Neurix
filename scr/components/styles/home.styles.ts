@@ -1,93 +1,93 @@
 import { colors } from './colors';
 import { StyleSheet } from 'react-native';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
-export const styles = StyleSheet.create({
+export const createStyles = (isTablet: boolean) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
   },
   
   contentContainer: {
-    paddingVertical: 24,
+    // Aumentamos o padding para dar mais respiro aos componentes maiores
+    paddingVertical: isTablet ? hp('8%') : hp('4%'),
+    flexGrow: 1,
+    justifyContent: 'center', // Essencial para centralizar na tela grande
   },
   
   content: {
-    maxWidth: 400,
+    // Ocupa mais tela no tablet, com um limite máximo generoso
+    width: isTablet ? wp('90%') : wp('90%'), 
+    maxWidth: isTablet ? 1600 : 500, // Aumentado para telas de alta resolução
     alignSelf: 'center',
-    width: '100%',
-    paddingHorizontal: 16,
-    gap: 32,
+    gap: isTablet ? hp('6%') : hp('5%'), // Mais espaço entre o header e o grid
   },
   
   header: {
     alignItems: 'center',
-    gap: 8,
-    paddingTop: 16,
+    gap: isTablet ? hp('2%') : hp('1.5%'), // Aumenta o espaçamento do cabeçalho
   },
   
+  // --- FONTES MAIORES ---
   welcomeText: {
-    fontSize: 28,
+    fontSize: isTablet ? wp('5.5%') : wp('7%'), // Aumentado de 4% para 5.5%
     fontWeight: '700',
     color: colors.foreground,
     textAlign: 'center',
   },
   
   subtitle: {
-    fontSize: 16,
+    fontSize: isTablet ? wp('2.5%') : wp('4%'), // Aumentado de 2% para 2.5%
     color: colors.mutedForeground,
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: isTablet ? hp('4%') : hp('3%'),
   },
-  
+
+  // --- GRID E CARDS MAIORES ---
   optionsGrid: {
-    gap: 20,
+    flexDirection: isTablet ? 'row' : 'column',
+    flexWrap: isTablet ? 'wrap' : 'nowrap',
+    justifyContent: 'center', // Centraliza os cards no container
+    // Gap maior para dar mais espaço entre os cards grandes
+    gap: isTablet ? wp('4%') : hp('2.5%'),
   },
   
   optionCard: {
-    marginVertical: 0,
+    // Mantemos 2 colunas, mas o aumento do gap vai espaçá-las melhor
+    width: isTablet ? '48%' : '100%', 
+    // Aumento significativo na altura mínima para os cards ficarem bem maiores
+    minHeight: isTablet ? hp('38%') : undefined,
   },
   
   cardContent: {
+    flex: 1,
+    justifyContent: 'space-around', // 'space-around' para distribuir melhor o conteúdo interno
     alignItems: 'center',
-    gap: 12,
-  },
-  
-  iconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
+    // Mais padding interno para o conteúdo respirar
+    padding: isTablet ? wp('3%') : wp('4%'),
   },
   
   cardTitle: {
-    fontSize: 18,
+    fontSize: isTablet ? wp('3%') : wp('5%'), // Aumentado de 2.5% para 3%
     fontWeight: '600',
     color: colors.foreground,
     textAlign: 'center',
   },
   
   cardDescription: {
-    fontSize: 13,
+    fontSize: isTablet ? wp('2%') : wp('3.5%'), // Aumentado de 1.8% para 2%
     color: colors.mutedForeground,
     textAlign: 'center',
-    lineHeight: 18,
-    paddingHorizontal: 12,
+    lineHeight: isTablet ? hp('3.5%') : hp('2.5%'),
+    paddingHorizontal: wp('1%'),
   },
   
   actionButton: {
-    width: '80%',
-    marginTop: 4,
-  },
-  
-  iconPlaceholder: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 4,
-  },
-  
-  iconText: {
-    fontWeight: 'bold',
-    color: colors.primary,
+    // O botão vai parecer maior por causa do padding do seu componente
+    // e do aumento geral do card. Mantemos a largura relativa.
+    width: '85%',
+    // Podemos adicionar um padding vertical maior no próprio componente do botão se necessário
+    // Ex: paddingVertical: isTablet ? hp('2%') : hp('1.5%') (no estilo do componente Button)
+    marginTop: hp('1%'),
   },
 });

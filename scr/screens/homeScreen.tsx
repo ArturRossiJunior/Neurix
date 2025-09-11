@@ -1,10 +1,15 @@
 import React from 'react';
 import { Button } from '../components/Button';
 import { GameCard } from '../components/GameCard';
-import { styles } from '../components/styles/home.styles';
-import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
+//import { styles } from '../components/styles/home.styles';
+import { createStyles } from '../components/styles/home.styles';
+import { View, Text, ScrollView, Alert, useWindowDimensions } from 'react-native';
 
 const Home = () => {
+  const { width } = useWindowDimensions();
+  const isTablet = width >= 768;
+  const styles = createStyles(isTablet);
+
   const handleNavigation = (destination: string) => {
     Alert.alert(
       `Navegando para ${destination}`,
@@ -16,14 +21,12 @@ const Home = () => {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <View style={styles.content}>
-        
         <View style={styles.header}>
           <Text style={styles.welcomeText}>Bem-vindo</Text>
           <Text style={styles.subtitle}>
             Escolha uma das opções abaixo para começar
           </Text>
         </View>
-
         <View style={styles.optionsGrid}>
           
           <GameCard 
@@ -109,9 +112,7 @@ const Home = () => {
               </Button>
             </View>
           </GameCard>
-
         </View>
-
       </View>
     </ScrollView>
   );
