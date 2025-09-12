@@ -30,7 +30,7 @@ export const createStyles = (isTablet: boolean) => StyleSheet.create({
   
   // --- FONTES MAIORES ---
   welcomeText: {
-    fontSize: isTablet ? wp('5.5%') : wp('7%'), // Aumentado de 4% para 5.5%
+    fontSize: isTablet ? wp('8%') : wp('7%'), // Aumentado de 4% para 5.5%
     fontWeight: '700',
     color: colors.foreground,
     textAlign: 'center',
@@ -49,14 +49,14 @@ export const createStyles = (isTablet: boolean) => StyleSheet.create({
     flexWrap: isTablet ? 'wrap' : 'nowrap',
     justifyContent: 'center', // Centraliza os cards no container
     // Gap maior para dar mais espaço entre os cards grandes
-    gap: isTablet ? wp('4%') : hp('2.5%'),
+    gap: isTablet ? wp('3%') : hp('2.5%'),
   },
   
   optionCard: {
     // Mantemos 2 colunas, mas o aumento do gap vai espaçá-las melhor
     width: isTablet ? '48%' : '100%', 
     // Aumento significativo na altura mínima para os cards ficarem bem maiores
-    minHeight: isTablet ? hp('38%') : undefined,
+    minHeight: isTablet ? hp('30%') : undefined,
   },
   
   cardContent: {
@@ -68,17 +68,17 @@ export const createStyles = (isTablet: boolean) => StyleSheet.create({
   },
   
   cardTitle: {
-    fontSize: isTablet ? wp('3%') : wp('5%'), // Aumentado de 2.5% para 3%
+    fontSize: isTablet ? wp('4%') : wp('5%'), // Aumentado de 2.5% para 3%
     fontWeight: '600',
     color: colors.foreground,
     textAlign: 'center',
   },
   
   cardDescription: {
-    fontSize: isTablet ? wp('2%') : wp('3.5%'), // Aumentado de 1.8% para 2%
+    fontSize: isTablet ? wp('2.5%') : wp('3.5%'), // Aumentado de 1.8% para 2%
     color: colors.mutedForeground,
     textAlign: 'center',
-    lineHeight: isTablet ? hp('3.5%') : hp('2.5%'),
+    lineHeight: isTablet ? hp('2%') : hp('2.5%'),
     paddingHorizontal: wp('1%'),
   },
   
