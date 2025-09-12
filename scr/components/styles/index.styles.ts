@@ -1,36 +1,46 @@
 import { colors } from './colors';
 import { StyleSheet } from 'react-native';
 import { commonStyles } from './commonStyles';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
-export const styles = StyleSheet.create({
+export const createStyles = (isTablet: boolean) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
   },
   
   contentContainer: {
-    paddingVertical: 32,
+    paddingVertical: isTablet ? hp('6%') : hp('0%'),
+    flexGrow: 1,
+    justifyContent: 'center',
   },
   
   content: {
-    maxWidth: 400,
+    maxWidth: isTablet ? wp('100%') : wp('100%'),
     alignSelf: 'center',
     width: '100%',
-    paddingHorizontal: 16,
-    gap: 48,
+    paddingHorizontal: isTablet ? wp('5%') : wp('5%'),
+    gap: isTablet ? hp('8%') : hp('3%'),
   },
   
   navigationGrid: {
-    gap: 24,
+    flexDirection: isTablet ? 'row' : 'column',
+    gap: isTablet ? wp('4%') : hp('3%'),
+    justifyContent: 'center',
   },
   
   navCard: {
     marginVertical: 0,
+    width: isTablet ? wp('40%') : wp('90%'),
+    minHeight: isTablet ? hp('35%') : hp('0%'),
   },
   
   cardContent: {
     ...commonStyles.centerContent,
-    gap: 16,
+    flex: 1,
+    justifyContent: 'space-between',
+    gap: isTablet ? hp('0%') : hp('1%'),
+    paddingVertical: isTablet ? hp('5%') : hp('0%'),
   },
   
   iconContainer: {
@@ -40,89 +50,24 @@ export const styles = StyleSheet.create({
   
   textContainer: {
     ...commonStyles.centerContent,
-    gap: 8,
+    gap: isTablet ? hp('1%') : hp('2%'),
   },
   
   cardTitle: {
     ...commonStyles.cardTitle,
     color: colors.foreground,
+    fontSize: isTablet ? wp('5%') : wp('7%'),
   },
   
   cardDescription: {
     ...commonStyles.cardDescription,
-    paddingHorizontal: 16,
+    paddingHorizontal: isTablet ? wp('1%') : wp('1%'),
+    fontSize: isTablet ? wp('3%') : wp('4%'),
+    lineHeight: isTablet ? hp('3%') : hp('3.5%'),
   },
   
   actionButton: {
     width: '100%',
-    marginTop: 8,
-  },
-  
-  resourcesSection: {
-    gap: 24,
-  },
-  
-  sectionHeader: {
-    alignItems: 'center',
-    gap: 8,
-  },
-  
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: colors.foreground,
-    textAlign: 'center',
-  },
-  
-  sectionDescription: {
-    fontSize: 16,
-    color: colors.mutedForeground,
-    textAlign: 'center',
-  },
-  
-  resourcesGrid: {
-    gap: 16,
-  },
-  
-  resourceCard: {
-    marginVertical: 0,
-  },
-  
-  resourceContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  
-  smallIconContainer: {
-    ...commonStyles.iconContainer,
-    ...commonStyles.iconContainerSmall,
-  },
-  
-  resourceTextContainer: {
-    ...commonStyles.textContainer,
-  },
-  
-  resourceTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.foreground,
-  },
-  
-  resourceDescription: {
-    fontSize: 12,
-    color: colors.mutedForeground,
-    lineHeight: 16,
-  },
-  
-  iconPlaceholder: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 4,
-  },
-  
-  iconText: {
-    fontWeight: 'bold',
-    color: colors.primary,
+    marginTop: isTablet ? hp('1%') : hp('1%'),
   },
 });

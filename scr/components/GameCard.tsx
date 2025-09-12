@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
-import { styles } from './styles/gameCard.styles';
-import { View, TouchableOpacity, TouchableOpacityProps } from 'react-native';
+import { createStyles } from './styles/gameCard.styles';
+import { View, TouchableOpacity, TouchableOpacityProps, useWindowDimensions } from 'react-native';
 
 interface GameCardProps extends TouchableOpacityProps {
   children: ReactNode;
@@ -14,6 +14,10 @@ export const GameCard = ({
   style, 
   ...props 
 }: GameCardProps) => {
+  const { width } = useWindowDimensions();
+  const isTablet = width >= 768;
+  const styles = createStyles(isTablet);
+
   const cardStyle = [
     styles.baseContainer,
     variant === 'interactive' && styles.interactive,

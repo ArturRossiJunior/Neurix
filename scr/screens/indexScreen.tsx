@@ -3,10 +3,14 @@ import { Header } from '../components/Header';
 import { Button } from '../components/Button';
 import { GameCard } from '../components/GameCard';
 import { IndexScreenProps } from '../navigation/types';
-import { styles } from '../components/styles/index.styles';
-import { View, Text, ScrollView, Alert } from 'react-native';
+import { createStyles } from '../components/styles/index.styles';
+import { View, Text, ScrollView, Alert, useWindowDimensions } from 'react-native';
 
 const IndexScreen = ({ navigation }: IndexScreenProps) => {
+  const { width } = useWindowDimensions();
+  const isTablet = width >= 768;
+  const styles = createStyles(isTablet);
+
   const handleNavigation = (destination: string) => {
     Alert.alert(
       `Navegando para ${destination}`,

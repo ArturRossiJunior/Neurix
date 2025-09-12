@@ -3,7 +3,7 @@ import { shadows } from './shadows';
 import { StyleSheet } from 'react-native';
 import { commonStyles } from './commonStyles';
 
-export const styles = StyleSheet.create({
+export const createStyles = (isTablet: boolean) => StyleSheet.create({
   baseContainer: {
     ...commonStyles.cardContainer,
     ...shadows.shadowMedium,
@@ -69,5 +69,5 @@ export const styles = StyleSheet.create({
   centerContent: {
     ...commonStyles.centerContent,
     gap: 8,
-  },
+    },
 });

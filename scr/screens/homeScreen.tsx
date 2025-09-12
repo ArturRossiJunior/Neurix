@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button } from '../components/Button';
 import { GameCard } from '../components/GameCard';
-//import { styles } from '../components/styles/home.styles';
 import { createStyles } from '../components/styles/home.styles';
 import { View, Text, ScrollView, Alert, useWindowDimensions } from 'react-native';
 
