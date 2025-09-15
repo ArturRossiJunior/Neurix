@@ -1,7 +1,7 @@
 import React from 'react';
 import { Header } from '../components/Header';
 import { Button } from '../components/Button';
-import { GameCard } from '../components/GameCard';
+import { Card } from '../components/Card';
 import { IndexScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/index.styles';
 import { View, Text, ScrollView, Alert, useWindowDimensions } from 'react-native';
@@ -24,9 +24,10 @@ const IndexScreen = ({ navigation }: IndexScreenProps) => {
       <View style={styles.content}>
         <Header />
         <View style={styles.navigationGrid}>
-          <GameCard
-            variant="default"
-            style={styles.navCard}
+          <Card
+            variant="interactive"
+            style={styles.navigationCard}
+            onPress={() => navigation.navigate('Home')}
           >
             <View style={styles.cardContent}>
               <View style={styles.textContainer}>
@@ -37,18 +38,18 @@ const IndexScreen = ({ navigation }: IndexScreenProps) => {
               </View>
               <Button
                 variant="game"
-                size="lg"
+                size="default"
                 style={styles.actionButton}
                 onPress={() => navigation.navigate('Home')}
               >
-                🎮 Começar
+                Começar
               </Button>
             </View>
-          </GameCard>
-
-          <GameCard
-            variant="default"
-            style={styles.navCard}
+          </Card>
+          <Card
+            variant="interactive"
+            style={styles.navigationCard}
+            onPress={() => handleNavigation('Sobre o App')}
           >
             <View style={styles.cardContent}>
               <View style={styles.textContainer}>
@@ -59,14 +60,14 @@ const IndexScreen = ({ navigation }: IndexScreenProps) => {
               </View>
               <Button
                 variant="soft"
-                size="lg"
+                size="default"
                 style={styles.actionButton}
                 onPress={() => handleNavigation('Sobre o App')}
               >
-                📚 Saber Mais
+                Saber Mais
               </Button>
             </View>
-          </GameCard>
+          </Card>
         </View>
       </View>
     </ScrollView>

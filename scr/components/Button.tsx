@@ -1,15 +1,19 @@
 import React from 'react';
-import { styles } from './styles/button.styles';
+import { useIsTablet } from '../utils/useIsTablet';
 import { TouchableOpacity, TouchableOpacityProps, Text } from 'react-native';
+import { ButtonSize, ButtonVariant, createButtonStyles } from './styles/button.styles';
 
 export interface ButtonProps extends TouchableOpacityProps {
-  variant?: keyof typeof styles.variants;
-  size?: keyof typeof styles.sizes;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
   children: React.ReactNode;
 }
 
 const Button = React.forwardRef<React.ComponentRef<typeof TouchableOpacity>, ButtonProps>(
   ({ variant = 'default', size = 'default', children, style, ...props }, ref) => {
+    const isTablet = useIsTablet();
+    const styles = createButtonStyles(isTablet);
+    
     const containerStyle = [
       styles.baseContainer,
       styles.variants[variant].container,

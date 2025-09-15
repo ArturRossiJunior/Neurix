@@ -8,7 +8,7 @@ export const createStyles = (isTablet: boolean) => StyleSheet.create({
     alignItems: 'center',
     gap: isTablet ? hp('1%') : hp('3%'),
     paddingHorizontal: isTablet ? wp('0%') : wp('0%'),
-    paddingTop: isTablet ? hp('0%') : hp('0%'),
+    paddingTop: isTablet ? hp('0%') : hp('4%'),
   },
   
   imageContainer: {
