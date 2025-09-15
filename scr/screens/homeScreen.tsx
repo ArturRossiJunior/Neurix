@@ -3,18 +3,26 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { createStyles } from '../components/styles/home.styles';
 import { View, Text, ScrollView, Alert, useWindowDimensions } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/types';
 
-const Home = () => {
+type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
+
+const Home = ({ navigation }: HomeScreenProps) => {
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
   const styles = createStyles(isTablet);
 
   const handleNavigation = (destination: string) => {
-    Alert.alert(
-      `Navegando para ${destination}`,
-      'Esta funcionalidade será implementada em breve!',
-      [{ text: 'OK' }]
-    );
+    if (destination === 'Pacientes') {
+      navigation.navigate('Patients');
+    } else {
+      Alert.alert(
+        `Navegando para ${destination}`,
+        'Esta funcionalidade será implementada em breve!',
+        [{ text: 'OK' }]
+      );
+    }
   };
 
   return (
@@ -51,7 +59,7 @@ const Home = () => {
           <Card 
             variant="interactive" 
             style={styles.navigationCard}
-            onPress={() => handleNavigation('Pacientes')}
+            onPress={() => navigation.navigate('Patients')}
           >
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>Pacientes</Text>
@@ -62,7 +70,7 @@ const Home = () => {
                 variant="calm" 
                 size="default" 
                 style={styles.actionButton}
-                onPress={() => handleNavigation('Pacientes')}
+                onPress={() => navigation.navigate('Patients')}
               >
                 Acessar
               </Button>
