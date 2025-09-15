@@ -1,10 +1,14 @@
 import React from 'react';
 import { Button } from '../components/Button';
-import { GameCard } from '../components/GameCard';
-import { styles } from '../components/styles/home.styles';
-import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
+import { Card } from '../components/Card';
+import { createStyles } from '../components/styles/home.styles';
+import { View, Text, ScrollView, Alert, useWindowDimensions } from 'react-native';
 
 const Home = () => {
+  const { width } = useWindowDimensions();
+  const isTablet = width >= 768;
+  const styles = createStyles(isTablet);
+
   const handleNavigation = (destination: string) => {
     Alert.alert(
       `Navegando para ${destination}`,
@@ -16,19 +20,16 @@ const Home = () => {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <View style={styles.content}>
-        
         <View style={styles.header}>
           <Text style={styles.welcomeText}>Bem-vindo</Text>
           <Text style={styles.subtitle}>
             Escolha uma das opções abaixo para começar
           </Text>
         </View>
-
-        <View style={styles.optionsGrid}>
-          
-          <GameCard 
+        <View style={styles.navigationGrid}>
+          <Card 
             variant="interactive" 
-            style={styles.optionCard}
+            style={styles.navigationCard}
             onPress={() => handleNavigation('Novo Teste')}
           >
             <View style={styles.cardContent}>
@@ -45,11 +46,11 @@ const Home = () => {
                 Começar
               </Button>
             </View>
-          </GameCard>
+          </Card>
 
-          <GameCard 
+          <Card 
             variant="interactive" 
-            style={styles.optionCard}
+            style={styles.navigationCard}
             onPress={() => handleNavigation('Pacientes')}
           >
             <View style={styles.cardContent}>
@@ -66,11 +67,11 @@ const Home = () => {
                 Acessar
               </Button>
             </View>
-          </GameCard>
+          </Card>
 
-          <GameCard 
+          <Card 
             variant="interactive" 
-            style={styles.optionCard}
+            style={styles.navigationCard}
             onPress={() => handleNavigation('Dashboard')}
           >
             <View style={styles.cardContent}>
@@ -87,11 +88,11 @@ const Home = () => {
                 Ver Dados
               </Button>
             </View>
-          </GameCard>
+          </Card>
 
-          <GameCard 
+          <Card 
             variant="interactive" 
-            style={styles.optionCard}
+            style={styles.navigationCard}
             onPress={() => handleNavigation('Configurações')}
           >
             <View style={styles.cardContent}>
@@ -108,10 +109,8 @@ const Home = () => {
                 Ajustar
               </Button>
             </View>
-          </GameCard>
-
+          </Card>
         </View>
-
       </View>
     </ScrollView>
   );
