@@ -24,7 +24,6 @@ export const colors = {
   linkText: '#3B82F6',
   subtleBackground: '#F8FAFC',
   
-  active: '#34D399',
   deactivated : '#94A3B8',
 
   gradientColors: {

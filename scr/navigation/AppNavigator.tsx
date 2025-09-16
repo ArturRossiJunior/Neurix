@@ -2,12 +2,11 @@ import React from 'react';
 import { RootStackParamList } from './types';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
-import IndexScreen from '../screens/indexScreen';
 import HomeScreen from '../screens/homeScreen';
-import PatientsScreen from '../screens/PatientsScreen';
-import PatientDetailScreen from '../screens/PatientDetailScreen';
-import NewPatientScreen from '../screens/NewPatientScreen';
+import IndexScreen from '../screens/indexScreen';
+import PatientsScreen from '../screens/patientsListScreen';
+import NewPatientScreen from '../screens/patientCreationScreen';
+import PatientDetailScreen from '../screens/patientDetailScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 

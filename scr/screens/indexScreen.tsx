@@ -20,7 +20,7 @@ const IndexScreen = ({ navigation }: IndexScreenProps) => {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
       <View style={styles.content}>
         <Header />
         <View style={styles.navigationGrid}>

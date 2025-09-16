@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
+import { colors } from '../components/styles/colors';
 import { PatientsScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/patients.styles';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { colors } from '../components/styles/colors'
 
 // Mock data para demonstração
 const mockPatients = [
@@ -86,24 +86,22 @@ const PatientsScreen = ({ navigation }: PatientsScreenProps) => {
   };
 
   const getStatusColor = (status: string) => {
-    return status === 'Ativo' ? colors.active : colors.deactivated;
+    return status === 'Ativo' ? colors.softGreen : colors.deactivated;
   };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity 
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backButtonText}>←</Text>
+        <Text style={styles.backButtonText}>↩</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Pacientes</Text>
         <View style={styles.headerSpacer} />
       </View>
 
-      {/* Search and Filter Section */}
       <View style={styles.searchSection}>
         <View style={styles.searchContainer}>
           <TextInput
@@ -111,27 +109,17 @@ const PatientsScreen = ({ navigation }: PatientsScreenProps) => {
             placeholder="Buscar paciente..."
             value={searchText}
             onChangeText={handleSearch}
-            placeholderTextColor="#94A3B8"
+            placeholderTextColor={colors.deactivated}
           />
         </View>
+        <TouchableOpacity style={styles.filterButton} onPress={handleNewPatient}>
+          <Text style={styles.filterButtonText}>+</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.filterButton} onPress={handleFilter}>
           <Text style={styles.filterButtonText}>⚙</Text>
         </TouchableOpacity>
       </View>
 
-      {/* New Patient Button */}
-      <View style={styles.newPatientSection}>
-        <Button
-          variant="game"
-          size="default"
-          style={styles.newPatientButton}
-          onPress={handleNewPatient}
-        >
-          + Novo Paciente
-        </Button>
-      </View>
-
-      {/* Patients List */}
       <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.patientsList}>
           {filteredPatients.map((patient) => (
@@ -155,32 +143,23 @@ const PatientsScreen = ({ navigation }: PatientsScreenProps) => {
                     <Text style={styles.patientTestsCount}>Testes realizados: {patient.testsCount}</Text>
                   </View>
                 </View>
-                <View style={styles.patientActions}>
-                  <TouchableOpacity 
-                    style={styles.viewButton}
-                    onPress={() => handlePatientPress(patient.id)}
-                  >
-                    <Text style={styles.viewButtonText}>Ver</Text>
-                  </TouchableOpacity>
-                </View>
               </View>
             </Card>
           ))}
         </View>
       </ScrollView>
 
-      {/* Empty State */}
       {filteredPatients.length === 0 && (
         <View style={styles.emptyState}>
           <Text style={styles.emptyStateTitle}>Nenhum paciente encontrado</Text>
           <Text style={styles.emptyStateDescription}>
             {searchText.trim() !== '' 
-              ? 'Tente ajustar sua busca ou adicione um novo paciente.'
-              : 'Comece adicionando seu primeiro paciente.'
+              ? 'Tente ajustar sua busca ou adicione um novo paciente'
+              : 'Comece adicionando seu primeiro paciente'
             }
           </Text>
           <Button
-            variant="outline"
+            variant="secondary"
             size="default"
             style={styles.emptyStateButton}
             onPress={handleNewPatient}

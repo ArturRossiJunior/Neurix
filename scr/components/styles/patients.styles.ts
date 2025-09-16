@@ -12,13 +12,12 @@ export const createStyles = (isTablet: boolean) => {
       backgroundColor: colors.background,
     },
 
-    // Header Styles
     header: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
       paddingHorizontal: isTablet ? wp('4%') : wp('5%'),
-      paddingTop: isTablet ? hp('6%') : hp('7%'),
+      paddingTop: isTablet ? hp('4%') : hp('7%'),
       paddingBottom: isTablet ? hp('2%') : hp('3%'),
       backgroundColor: colors.background,
       borderBottomWidth: 1,
@@ -36,20 +35,21 @@ export const createStyles = (isTablet: boolean) => {
     },
 
     backButtonText: {
-      fontSize: isTablet ? wp('4%') : wp('5%'),
+      fontSize: isTablet ? wp('7%') : wp('5%'),
       fontWeight: '600',
       color: colors.foreground,
+      marginTop: isTablet ? wp('-1.5%') : wp('5%'),
     },
 
     headerTitle: {
-      fontSize: isTablet ? wp('5%') : wp('6%'),
+      fontSize: isTablet ? wp('8%') : wp('6%'),
       fontWeight: '700',
       color: colors.foreground,
       textAlign: 'center',
     },
 
     headerSpacer: {
-      width: isTablet ? hp('6%') : hp('5%'),
+      width: isTablet ? hp('3%') : hp('5%'),
     },
 
     // Search and Filter Section
@@ -92,18 +92,11 @@ export const createStyles = (isTablet: boolean) => {
       color: colors.primaryForeground,
     },
 
-    // New Patient Section
     newPatientSection: {
       paddingHorizontal: isTablet ? wp('4%') : wp('5%'),
       paddingBottom: isTablet ? hp('2%') : hp('2.5%'),
     },
 
-    newPatientButton: {
-      width: '100%',
-      paddingVertical: isTablet ? hp('2%') : hp('2.2%'),
-    },
-
-    // List Container
     listContainer: {
       flex: 1,
       paddingHorizontal: isTablet ? wp('4%') : wp('5%'),
@@ -179,25 +172,6 @@ export const createStyles = (isTablet: boolean) => {
       color: colors.mutedForeground,
     },
 
-    // Patient Actions
-    patientActions: {
-      marginLeft: isTablet ? wp('3%') : wp('3%'),
-    },
-
-    viewButton: {
-      backgroundColor: colors.primary,
-      paddingHorizontal: isTablet ? wp('4%') : wp('4%'),
-      paddingVertical: isTablet ? hp('1.2%') : hp('1.5%'),
-      borderRadius: isTablet ? 12 : 10,
-      ...shadows.shadowDefault,
-    },
-
-    viewButtonText: {
-      fontSize: isTablet ? wp('3%') : wp('3.5%'),
-      fontWeight: '600',
-      color: colors.primaryForeground,
-    },
-
     // Empty State
     emptyState: {
       flex: 1,
@@ -227,4 +201,3 @@ export const createStyles = (isTablet: boolean) => {
     },
   });
 };
-

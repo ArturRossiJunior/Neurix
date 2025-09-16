@@ -57,7 +57,7 @@ export const createStyles = (isTablet: boolean) => {
       //flex: isTablet ? 1 : undefined, 
       width: isTablet ? wp('43%') : '90%',
       minHeight: isTablet ? hp('30%') : hp('20%'),
-      marginBottom: isTablet ? wp('4%') : hp('1%'),
+      marginBottom: isTablet ? wp('-2%') : hp('1%'),
     },
     
     cardContent: {
