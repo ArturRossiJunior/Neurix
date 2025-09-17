@@ -97,6 +97,29 @@ export const createStyles = (isTablet: boolean) => {
       paddingBottom: isTablet ? hp('2%') : hp('2.5%'),
     },
 
+    patientActions: {
+      marginLeft: isTablet ? wp('3%') : wp('3%'),
+    },
+
+    viewButton: {
+      backgroundColor: colors.primary,
+      paddingHorizontal: isTablet ? wp('4%') : wp('4%'),
+      paddingVertical: isTablet ? hp('1.2%') : hp('1.5%'),
+      borderRadius: isTablet ? 12 : 10,
+      ...shadows.shadowDefault,
+    },
+
+    viewButtonText: {
+      fontSize: isTablet ? wp('3%') : wp('3.5%'),
+      fontWeight: '600',
+      color: colors.primaryForeground,
+    },
+
+    newPatientButton: {
+      width: '100%',
+      paddingVertical: isTablet ? hp('2%') : hp('2.2%'),
+    },
+
     listContainer: {
       flex: 1,
       paddingHorizontal: isTablet ? wp('4%') : wp('5%'),
