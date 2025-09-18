@@ -18,7 +18,7 @@ export const createStyles = (isTablet: boolean) => {
       justifyContent: 'space-between',
       paddingHorizontal: isTablet ? wp('4%') : wp('5%'),
       paddingTop: isTablet ? hp('4%') : hp('7%'),
-      paddingBottom: isTablet ? hp('2%') : hp('3%'),
+      paddingBottom: isTablet ? hp('0.5%') : hp('3%'),
       backgroundColor: colors.background,
       borderBottomWidth: 1,
       borderBottomColor: colors.outlineBorder,
@@ -92,7 +92,7 @@ export const createStyles = (isTablet: boolean) => {
       color: colors.primaryForeground,
     },
 
-    newPatientSection: {
+    patientCreationSection: {
       paddingHorizontal: isTablet ? wp('4%') : wp('5%'),
       paddingBottom: isTablet ? hp('2%') : hp('2.5%'),
     },
@@ -115,14 +115,21 @@ export const createStyles = (isTablet: boolean) => {
       color: colors.primaryForeground,
     },
 
-    newPatientButton: {
+    patientCreationButton: {
       width: '100%',
       paddingVertical: isTablet ? hp('2%') : hp('2.2%'),
+    },
+
+    editPatientButton: {
+      alignSelf: 'flex-start',
+      paddingVertical: isTablet ? hp('1.5%') : hp('2%'),
+      paddingHorizontal: isTablet ? wp('2.5%') : wp('4%'),
     },
 
     listContainer: {
       flex: 1,
       paddingHorizontal: isTablet ? wp('4%') : wp('5%'),
+      paddingTop: isTablet ? wp('3%') : wp('0%')
     },
 
     patientsList: {
@@ -161,6 +168,7 @@ export const createStyles = (isTablet: boolean) => {
       fontWeight: '600',
       color: colors.foreground,
       flex: 1,
+      paddingBottom: isTablet ? wp('2%') : wp('0%'),
     },
 
     statusBadge: {

@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import { Button } from '../components/Button';
 import { Card } from '../components/Card';
+import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
+import { colors } from '../components/styles/colors';
+import { MaskedTextInput } from 'react-native-mask-text';
+import { patientCreationScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/patients.styles';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/types';
 
-type NewPatientScreenProps = NativeStackScreenProps<RootStackParamList, 'NewPatient'>;
-
-const NewPatientScreen = ({ navigation }: NewPatientScreenProps) => {
+const PatientCreationScreen = ({ navigation }: patientCreationScreenProps) => {
   const isTablet = useIsTablet();
   const styles = createStyles(isTablet);
   
@@ -30,7 +29,6 @@ const NewPatientScreen = ({ navigation }: NewPatientScreenProps) => {
   };
 
   const handleSave = () => {
-    // Validação básica
     if (!formData.name.trim()) {
       Alert.alert('Erro', 'Nome do paciente é obrigatório');
       return;
@@ -41,7 +39,7 @@ const NewPatientScreen = ({ navigation }: NewPatientScreenProps) => {
       return;
     }
 
-    // Em um app real, você salvaria os dados aqui
+    // Aqui irá salvar os dados reais
     Alert.alert(
       'Sucesso',
       'Paciente cadastrado com sucesso!',
@@ -55,33 +53,36 @@ const NewPatientScreen = ({ navigation }: NewPatientScreenProps) => {
   };
 
   const handleCancel = () => {
+    const allEmpty = Object.values(formData).every(value => value.trim() === '');
+
+    if (allEmpty) {
+      navigation.goBack();
+      return;
+    }
+
     Alert.alert(
       'Cancelar',
       'Deseja cancelar o cadastro? Os dados não serão salvos.',
       [
-        { text: 'Continuar editando', style: 'cancel' },
-        { text: 'Cancelar', onPress: () => navigation.goBack() }
+        { text: 'Continuar', style: 'cancel' },
+        { text: 'Sair', onPress: () => navigation.goBack() }
       ]
     );
   };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity 
           style={styles.backButton}
           onPress={handleCancel}
         >
-          <Text style={styles.backButtonText}>←</Text>
+          <Text style={styles.backButtonText}>↩</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Novo Paciente</Text>
-        <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.patientsList}>
-          {/* Form Card */}
           <Card variant="default" style={styles.patientCard}>
             <View style={styles.patientInfo}>
               <Text style={styles.patientName}>Informações do Paciente</Text>
@@ -96,7 +97,7 @@ const NewPatientScreen = ({ navigation }: NewPatientScreenProps) => {
                     placeholder="Digite o nome completo"
                     value={formData.name}
                     onChangeText={(value) => handleInputChange('name', value)}
-                    placeholderTextColor="#94A3B8"
+                    placeholderTextColor={colors.secondaryMutedForeground}
                   />
                 </View>
 
@@ -104,12 +105,14 @@ const NewPatientScreen = ({ navigation }: NewPatientScreenProps) => {
                   Data de Nascimento
                 </Text>
                 <View style={styles.searchContainer}>
-                  <TextInput
+                  <MaskedTextInput
+                    mask="99/99/9999"
                     style={styles.searchInput}
                     placeholder="DD/MM/AAAA"
                     value={formData.birthDate}
-                    onChangeText={(value) => handleInputChange('birthDate', value)}
-                    placeholderTextColor="#94A3B8"
+                    onChangeText={(text, rawText) => handleInputChange('birthDate', text)}
+                    keyboardType="numeric"
+                    placeholderTextColor={colors.secondaryMutedForeground}
                   />
                 </View>
 
@@ -122,7 +125,7 @@ const NewPatientScreen = ({ navigation }: NewPatientScreenProps) => {
                     placeholder="Digite o nome do responsável"
                     value={formData.guardian}
                     onChangeText={(value) => handleInputChange('guardian', value)}
-                    placeholderTextColor="#94A3B8"
+                    placeholderTextColor={colors.secondaryMutedForeground}
                   />
                 </View>
 
@@ -130,13 +133,14 @@ const NewPatientScreen = ({ navigation }: NewPatientScreenProps) => {
                   Telefone
                 </Text>
                 <View style={styles.searchContainer}>
-                  <TextInput
+                  <MaskedTextInput
+                    mask="(99) 99999-9999"
                     style={styles.searchInput}
                     placeholder="(11) 99999-9999"
                     value={formData.phone}
-                    onChangeText={(value) => handleInputChange('phone', value)}
-                    placeholderTextColor="#94A3B8"
-                    keyboardType="phone-pad"
+                    onChangeText={(text, rawText) => handleInputChange('phone', text)}
+                    keyboardType="numeric"
+                    placeholderTextColor={colors.secondaryMutedForeground}
                   />
                 </View>
 
@@ -149,7 +153,7 @@ const NewPatientScreen = ({ navigation }: NewPatientScreenProps) => {
                     placeholder="email@exemplo.com"
                     value={formData.email}
                     onChangeText={(value) => handleInputChange('email', value)}
-                    placeholderTextColor="#94A3B8"
+                    placeholderTextColor={colors.secondaryMutedForeground}
                     keyboardType="email-address"
                     autoCapitalize="none"
                   />
@@ -164,7 +168,7 @@ const NewPatientScreen = ({ navigation }: NewPatientScreenProps) => {
                     placeholder="Observações sobre o paciente..."
                     value={formData.notes}
                     onChangeText={(value) => handleInputChange('notes', value)}
-                    placeholderTextColor="#94A3B8"
+                    placeholderTextColor={colors.secondaryMutedForeground}
                     multiline
                     numberOfLines={4}
                   />
@@ -177,24 +181,14 @@ const NewPatientScreen = ({ navigation }: NewPatientScreenProps) => {
             </View>
           </Card>
 
-          {/* Action Buttons */}
-          <View style={{ gap: 12 }}>
+          <View style={{ paddingBottom: 10 }}>
             <Button
               variant="game"
               size="default"
-              style={styles.newPatientButton}
+              style={styles.patientCreationButton}
               onPress={handleSave}
             >
               Salvar Paciente
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="default"
-              style={styles.newPatientButton}
-              onPress={handleCancel}
-            >
-              Cancelar
             </Button>
           </View>
         </View>
@@ -203,4 +197,4 @@ const NewPatientScreen = ({ navigation }: NewPatientScreenProps) => {
   );
 };
 
-export default NewPatientScreen;
+export default PatientCreationScreen;

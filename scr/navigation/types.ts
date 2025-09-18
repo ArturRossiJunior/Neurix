@@ -5,9 +5,11 @@ export type RootStackParamList = {
   Home: undefined;
   Patients: undefined;
   PatientDetail: { patientId: string };
-  NewPatient: undefined;
+  PatientCreation: undefined;
 };
 
 export type IndexScreenProps = NativeStackScreenProps<RootStackParamList, 'Index'>;
 export type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 export type PatientsScreenProps = NativeStackScreenProps<RootStackParamList, 'Patients'>;
+export type PatientDetailScreenProps = NativeStackScreenProps<RootStackParamList, 'PatientDetail'>;
+export type patientCreationScreenProps = NativeStackScreenProps<RootStackParamList, 'PatientCreation'>;

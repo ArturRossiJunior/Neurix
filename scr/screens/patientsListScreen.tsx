@@ -73,8 +73,8 @@ const PatientsScreen = ({ navigation }: PatientsScreenProps) => {
     navigation.navigate('PatientDetail', { patientId });
   };
 
-  const handleNewPatient = () => {
-    navigation.navigate('NewPatient');
+  const handlePatientCreation = () => {
+    navigation.navigate('PatientCreation');
   };
 
   const handleFilter = () => {
@@ -98,7 +98,6 @@ const PatientsScreen = ({ navigation }: PatientsScreenProps) => {
         >
         <Text style={styles.backButtonText}>↩</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Pacientes</Text>
         <View style={styles.headerSpacer} />
       </View>
 
@@ -112,7 +111,7 @@ const PatientsScreen = ({ navigation }: PatientsScreenProps) => {
             placeholderTextColor={colors.deactivated}
           />
         </View>
-        <TouchableOpacity style={styles.filterButton} onPress={handleNewPatient}>
+        <TouchableOpacity style={styles.filterButton} onPress={handlePatientCreation}>
           <Text style={styles.filterButtonText}>+</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.filterButton} onPress={handleFilter}>
@@ -162,7 +161,7 @@ const PatientsScreen = ({ navigation }: PatientsScreenProps) => {
             variant="secondary"
             size="default"
             style={styles.emptyStateButton}
-            onPress={handleNewPatient}
+            onPress={handlePatientCreation}
           >
             + Adicionar Paciente
           </Button>

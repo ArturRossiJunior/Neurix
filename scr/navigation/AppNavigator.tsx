@@ -5,8 +5,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/homeScreen';
 import IndexScreen from '../screens/indexScreen';
 import PatientsScreen from '../screens/patientsListScreen';
-import NewPatientScreen from '../screens/patientCreationScreen';
 import PatientDetailScreen from '../screens/patientDetailScreen';
+import PatientCreationScreen from '../screens/patientCreationScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -35,8 +35,8 @@ export default function AppNavigator() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="NewPatient"
-          component={NewPatientScreen}
+          name="PatientCreation"
+          component={PatientCreationScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

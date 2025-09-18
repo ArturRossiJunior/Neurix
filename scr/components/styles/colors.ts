@@ -19,6 +19,7 @@ export const colors = {
   cardForeground: '#1E293B',
   muted: '#F1F5F9',
   mutedForeground: '#64748B',
+  secondaryMutedForeground: '#94A3B8',
   
   outlineBorder: '#E2E8F0',
   linkText: '#3B82F6',

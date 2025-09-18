@@ -1,13 +1,11 @@
 import React from 'react';
-import { Button } from '../components/Button';
 import { Card } from '../components/Card';
+import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
+import { PatientDetailScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/patients.styles';
 import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/types';
-
-type PatientDetailScreenProps = NativeStackScreenProps<RootStackParamList, 'PatientDetail'>;
+import { colors } from '../components/styles/colors';
 
 // Mock data para demonstração
 const mockPatientDetail = {
@@ -53,7 +51,7 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
   const isTablet = useIsTablet();
   const styles = createStyles(isTablet);
   
-  // Em um app real, você buscaria os dados do paciente usando o patientId
+  // Buscar os dados do paciente usando o patientId
   const patient = mockPatientDetail;
 
   const handleEditPatient = () => {
@@ -81,37 +79,30 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
   };
 
   const getStatusColor = (status: string) => {
-    return status === 'Ativo' ? '#34D399' : '#94A3B8';
-  };
-
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return '#34D399';
-    if (score >= 60) return '#FDE047';
-    return '#EF4444';
+    return status === 'Ativo' ? colors.softGreen : colors.deactivated;
   };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity 
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backButtonText}>←</Text>
+          <Text style={styles.backButtonText}>↩</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Detalhes do Paciente</Text>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={handleEditPatient}
-        >
-          <Text style={styles.backButtonText}>✎</Text>
-        </TouchableOpacity>
+        <Button 
+          variant="soft"
+          size="sm"
+          style={styles.editPatientButton}
+          onPress={handleNewTest}
+        > 
+        Editar
+        </Button>
       </View>
 
       <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.patientsList}>
-          {/* Patient Info Card */}
           <Card variant="default" style={styles.patientCard}>
             <View style={styles.patientInfo}>
               <View style={styles.patientHeader}>
@@ -133,7 +124,6 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
             </View>
           </Card>
 
-          {/* Notes Card */}
           <Card variant="default" style={styles.patientCard}>
             <View style={styles.patientInfo}>
               <Text style={styles.patientName}>Observações</Text>
@@ -141,17 +131,15 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
             </View>
           </Card>
 
-          {/* New Test Button */}
           <Button
             variant="game"
             size="default"
-            style={styles.newPatientButton}
+            style={styles.patientCreationButton}
             onPress={handleNewTest}
           >
             + Novo Teste
           </Button>
 
-          {/* Tests History */}
           <Text style={[styles.patientName, { marginTop: 20, marginBottom: 10 }]}>
             Histórico de Testes
           </Text>
@@ -159,7 +147,7 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
           {patient.tests.map((test) => (
             <Card
               key={test.id}
-              variant="interactive"
+              variant="default"
               style={styles.patientCard}
               onPress={() => handleViewTest(test.id)}
             >
@@ -169,9 +157,6 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
                   <View style={styles.patientDetails}>
                     <Text style={styles.patientAge}>Data: {test.date}</Text>
                     <Text style={styles.patientAge}>Status: {test.status}</Text>
-                    <Text style={[styles.patientAge, { color: getScoreColor(test.score) }]}>
-                      Pontuação: {test.score}%
-                    </Text>
                   </View>
                 </View>
                 <View style={styles.patientActions}>

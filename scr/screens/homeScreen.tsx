@@ -36,7 +36,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
         </View>
         <View style={styles.navigationGrid}>
           <Card 
-            variant="interactive" 
+            variant="default" 
             style={styles.navigationCard}
             onPress={() => handleNavigation('Novo Teste')}
           >
@@ -57,7 +57,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
           </Card>
 
           <Card 
-            variant="interactive" 
+            variant="default" 
             style={styles.navigationCard}
             onPress={() => navigation.navigate('Patients')}
           >
@@ -78,7 +78,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
           </Card>
 
           <Card 
-            variant="interactive" 
+            variant="default" 
             style={styles.navigationCard}
             onPress={() => handleNavigation('Dashboard')}
           >
@@ -99,7 +99,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
           </Card>
 
           <Card 
-            variant="interactive" 
+            variant="default" 
             style={styles.navigationCard}
             onPress={() => handleNavigation('Configurações')}
           >
