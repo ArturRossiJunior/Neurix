@@ -1,11 +1,11 @@
-import React from 'react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
+import React, { useState, useMemo } from 'react';
 import { useIsTablet } from '../utils/useIsTablet';
+import { colors } from '../components/styles/colors';
 import { PatientDetailScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/patients.styles';
 import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import { colors } from '../components/styles/colors';
 
 // Mock data para demonstração
 const mockPatientDetail = {
@@ -49,7 +49,7 @@ const mockPatientDetail = {
 const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) => {
   const { patientId } = route.params;
   const isTablet = useIsTablet();
-  const styles = createStyles(isTablet);
+  const styles = useMemo(() => createStyles(isTablet), [isTablet]);
   
   // Buscar os dados do paciente usando o patientId
   const patient = mockPatientDetail;
@@ -95,7 +95,7 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
           variant="soft"
           size="sm"
           style={styles.editPatientButton}
-          onPress={handleNewTest}
+          onPress={handleEditPatient}
         > 
         Editar
         </Button>

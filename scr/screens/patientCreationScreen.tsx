@@ -33,13 +33,17 @@ const PatientCreationScreen = ({ navigation }: patientCreationScreenProps) => {
       Alert.alert('Erro', 'Nome do paciente é obrigatório');
       return;
     }
-    
+
+    if (!formData.name.trim().includes(' ')) {
+      Alert.alert('Erro', 'Digite o nome completo do paciente (nome e sobrenome)');
+      return;
+    }
+
     if (!formData.guardian.trim()) {
       Alert.alert('Erro', 'Nome do responsável é obrigatório');
       return;
     }
 
-    // Aqui irá salvar os dados reais
     Alert.alert(
       'Sucesso',
       'Paciente cadastrado com sucesso!',
