@@ -20,12 +20,12 @@ const IndexScreen = ({ navigation }: IndexScreenProps) => {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
       <View style={styles.content}>
         <Header />
         <View style={styles.navigationGrid}>
           <Card
-            variant="interactive"
+            variant="default"
             style={styles.navigationCard}
             onPress={() => navigation.navigate('Home')}
           >
@@ -47,7 +47,7 @@ const IndexScreen = ({ navigation }: IndexScreenProps) => {
             </View>
           </Card>
           <Card
-            variant="interactive"
+            variant="default"
             style={styles.navigationCard}
             onPress={() => handleNavigation('Sobre o App')}
           >
