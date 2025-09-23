@@ -16,6 +16,8 @@ const Home = ({ navigation }: HomeScreenProps) => {
   const handleNavigation = (destination: string) => {
     if (destination === 'Pacientes') {
       navigation.navigate('Patients');
+    } else if (destination === 'Dashboard') {
+      navigation.navigate('Dashboard');
     } else {
       Alert.alert(
         `Navegando para ${destination}`,

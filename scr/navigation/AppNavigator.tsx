@@ -7,6 +7,7 @@ import IndexScreen from '../screens/indexScreen';
 import PatientsScreen from '../screens/patientsListScreen';
 import PatientDetailScreen from '../screens/patientDetailScreen';
 import PatientCreationScreen from '../screens/patientCreationScreen';
+import { DashboardScreen } from '../screens/DashboardScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -37,6 +38,11 @@ export default function AppNavigator() {
         <Stack.Screen
           name="PatientCreation"
           component={PatientCreationScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Dashboard"
+          component={DashboardScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
