@@ -74,7 +74,8 @@ const PatientsScreen = ({ navigation }: PatientsScreenProps) => {
   };
 
   const handlePatientCreation = () => {
-    navigation.navigate('PatientCreation');
+    const nameToPreFill = searchText.trim();
+    navigation.navigate('PatientCreation', { prefillName: nameToPreFill });
   };
 
   const handleFilter = () => {

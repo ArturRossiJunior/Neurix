@@ -8,12 +8,14 @@ import { patientCreationScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/patients.styles';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
 
-const PatientCreationScreen = ({ navigation }: patientCreationScreenProps) => {
+const PatientCreationScreen = ({ navigation, route }: patientCreationScreenProps) => {
   const isTablet = useIsTablet();
   const styles = createStyles(isTablet);
+
+  const prefillName = route?.params?.prefillName || '';
   
   const [formData, setFormData] = useState({
-    name: '',
+    name: prefillName,
     birthDate: '',
     guardian: '',
     phone: '',
@@ -28,25 +30,72 @@ const PatientCreationScreen = ({ navigation }: patientCreationScreenProps) => {
     }));
   };
 
+  const capitalizeName = (name: string) => {
+    return name
+      .split(' ')
+      .filter(Boolean)
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  };
+
+  const isValidDate = (dateStr: string) => {
+    const regex = /^\d{2}\/\d{2}\/\d{4}$/;
+    if (!regex.test(dateStr)) return false;
+    const [day, month, year] = dateStr.split('/').map(Number);
+    const date = new Date(year, month - 1, day);
+    if (
+      date.getFullYear() !== year ||
+      date.getMonth() !== month - 1 ||
+      date.getDate() !== day
+    ) return false;
+    const today = new Date();
+    if (date > today) return false;
+    if (year < 1900) return false;
+    return true;
+  };
+
   const handleSave = () => {
     if (!formData.name.trim()) {
       Alert.alert('Erro', 'Nome do paciente é obrigatório');
       return;
     }
-
     if (!formData.name.trim().includes(' ')) {
       Alert.alert('Erro', 'Digite o nome completo do paciente (nome e sobrenome)');
       return;
     }
-
+    if (!formData.birthDate.trim() || !isValidDate(formData.birthDate.trim())) {
+      Alert.alert('Erro', 'Data de nascimento inválida');
+      return;
+    }
     if (!formData.guardian.trim()) {
       Alert.alert('Erro', 'Nome do responsável é obrigatório');
       return;
     }
+    if (!formData.guardian.trim().includes(' ')) {
+      Alert.alert('Erro', 'Digite o nome completo do responsável (nome e sobrenome)');
+      return;
+    }
+    if (!formData.phone.trim()) {
+      Alert.alert('Erro', 'Telefone é obrigatório');
+      return;
+    }
+    if (!formData.email.trim()) {
+      Alert.alert('Erro', 'Email é obrigatório');
+      return;
+    }
+    const emailRegex = /^[\w-.]+@[\w-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(formData.email.trim())) {
+      Alert.alert('Erro', 'Email inválido');
+      return;
+    }
+
+    // Exemplo: enviar para API ou atualizar estado
+    const capitalizedName = capitalizeName(formData.name.trim());
+    const capitalizedGuardian = capitalizeName(formData.guardian.trim());
 
     Alert.alert(
       'Sucesso',
-      'Paciente cadastrado com sucesso!',
+      `Paciente cadastrado com sucesso!\n\nNome: ${capitalizedName}\nResponsável: ${capitalizedGuardian}`,
       [
         {
           text: 'OK',
@@ -106,7 +155,7 @@ const PatientCreationScreen = ({ navigation }: patientCreationScreenProps) => {
                 </View>
 
                 <Text style={[styles.patientAge, { marginBottom: 8, marginTop: 16, fontWeight: '600' }]}>
-                  Data de Nascimento
+                  Data de Nascimento *
                 </Text>
                 <View style={styles.searchContainer}>
                   <MaskedTextInput
@@ -134,7 +183,7 @@ const PatientCreationScreen = ({ navigation }: patientCreationScreenProps) => {
                 </View>
 
                 <Text style={[styles.patientAge, { marginBottom: 8, marginTop: 16, fontWeight: '600' }]}>
-                  Telefone
+                  Telefone *
                 </Text>
                 <View style={styles.searchContainer}>
                   <MaskedTextInput
@@ -149,7 +198,7 @@ const PatientCreationScreen = ({ navigation }: patientCreationScreenProps) => {
                 </View>
 
                 <Text style={[styles.patientAge, { marginBottom: 8, marginTop: 16, fontWeight: '600' }]}>
-                  Email
+                  Email *
                 </Text>
                 <View style={styles.searchContainer}>
                   <TextInput

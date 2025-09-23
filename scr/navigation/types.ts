@@ -5,7 +5,7 @@ export type RootStackParamList = {
   Home: undefined;
   Patients: undefined;
   PatientDetail: { patientId: string };
-  PatientCreation: undefined;
+  PatientCreation: { prefillName?: string };
 };
 
 export type IndexScreenProps = NativeStackScreenProps<RootStackParamList, 'Index'>;
