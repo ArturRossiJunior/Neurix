@@ -1,11 +1,9 @@
 import { colors } from './colors';
 import { shadows } from './shadows';
 import { StyleSheet } from 'react-native';
-import { createCommonStyles } from './common.styles';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 export const createStyles = (isTablet: boolean) => {
-  const commonStyles = createCommonStyles(isTablet);
   return StyleSheet.create({
     container: {
       flex: 1,
@@ -52,7 +50,6 @@ export const createStyles = (isTablet: boolean) => {
       width: isTablet ? hp('3%') : hp('5%'),
     },
 
-    // Search and Filter Section
     searchSection: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -137,7 +134,6 @@ export const createStyles = (isTablet: boolean) => {
       paddingBottom: isTablet ? hp('3%') : hp('4%'),
     },
 
-    // Patient Card Styles
     patientCard: {
       marginVertical: 0,
       padding: isTablet ? wp('4%') : wp('4%'),
@@ -203,7 +199,6 @@ export const createStyles = (isTablet: boolean) => {
       color: colors.mutedForeground,
     },
 
-    // Empty State
     emptyState: {
       flex: 1,
       alignItems: 'center',

@@ -4,11 +4,11 @@ import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
 import { MaskedTextInput } from 'react-native-mask-text';
-import { patientCreationScreenProps } from '../navigation/types';
+import { PatientCreationScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/patients.styles';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
 
-const PatientCreationScreen = ({ navigation, route }: patientCreationScreenProps) => {
+const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps) => {
   const isTablet = useIsTablet();
   const styles = createStyles(isTablet);
 

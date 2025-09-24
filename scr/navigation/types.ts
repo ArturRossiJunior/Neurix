@@ -9,8 +9,9 @@ export type RootStackParamList = {
   Dashboard: undefined;
 };
 
-export type IndexScreenProps = NativeStackScreenProps<RootStackParamList, 'Index'>;
 export type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
+export type IndexScreenProps = NativeStackScreenProps<RootStackParamList, 'Index'>;
 export type PatientsScreenProps = NativeStackScreenProps<RootStackParamList, 'Patients'>;
+export type DashboardScreenProps = NativeStackScreenProps<RootStackParamList, 'Dashboard'>;
 export type PatientDetailScreenProps = NativeStackScreenProps<RootStackParamList, 'PatientDetail'>;
-export type patientCreationScreenProps = NativeStackScreenProps<RootStackParamList, 'PatientCreation'>;
+export type PatientCreationScreenProps = NativeStackScreenProps<RootStackParamList, 'PatientCreation'>;

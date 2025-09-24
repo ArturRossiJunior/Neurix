@@ -1,7 +1,7 @@
 import React from 'react';
+import { Card } from '../components/Card';
 import { Header } from '../components/Header';
 import { Button } from '../components/Button';
-import { Card } from '../components/Card';
 import { IndexScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/index.styles';
 import { View, Text, ScrollView, Alert, useWindowDimensions } from 'react-native';

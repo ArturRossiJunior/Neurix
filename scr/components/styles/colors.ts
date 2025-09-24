@@ -20,6 +20,8 @@ export const colors = {
   muted: '#F1F5F9',
   mutedForeground: '#64748B',
   secondaryMutedForeground: '#94A3B8',
+  text: '#1E293B',
+  shadow: 'rgba(0, 0, 0, 0.1)',
   
   outlineBorder: '#E2E8F0',
   linkText: '#3B82F6',

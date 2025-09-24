@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { useWindowDimensions } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
-import { dashboardStyles } from '../components/styles/dashboard.styles';
 import { colors } from '../components/styles/colors';
+import { DashboardScreenProps } from '../navigation/types';
+import { LineChart, PieChart } from 'react-native-chart-kit';
+import { createStyles } from '../components/styles/dashboard.styles';
+import { View, Text, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 
 // Mock data for demonstration
 const mockPatients = [
@@ -12,7 +14,12 @@ const mockPatients = [
   { id: '3', name: 'Paciente C' },
 ];
 
-const mockPatientData = {
+interface PatientData {
+  testResults: { month: string; score: number; }[];
+  symptomFrequency: { name: string; population: number; color: string; legendFontColor: string; legendFontSize: number; }[];
+}
+
+const mockPatientData: { [key: string]: PatientData } = {
   '1': {
     testResults: [
       { month: 'Jan', score: 60 },
@@ -59,9 +66,13 @@ const mockPatientData = {
 
 const screenWidth = Dimensions.get('window').width;
 
-export const DashboardScreen = () => {
-  const [selectedPatient, setSelectedPatient] = useState<string | null>(null);
+export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
+  const { width } = useWindowDimensions();
+  const isTablet = width >= 768;
+  const styles = createStyles(isTablet);
+
   const [patientData, setPatientData] = useState<any>(null);
+  const [selectedPatient, setSelectedPatient] = useState<string | null>(null);
 
   useEffect(() => {
     if (selectedPatient) {
@@ -72,10 +83,10 @@ export const DashboardScreen = () => {
   }, [selectedPatient]);
 
   const chartConfig = {
-    backgroundColor: colors.white,
-    backgroundGradientFrom: colors.white,
-    backgroundGradientTo: colors.white,
-    decimalPlaces: 0, // optional, defaults to 2dp
+    backgroundColor: colors.card,
+    backgroundGradientFrom: colors.card,
+    backgroundGradientTo: colors.card,
+    decimalPlaces: 0,
     color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
     labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
     style: {
@@ -89,16 +100,24 @@ export const DashboardScreen = () => {
   };
 
   return (
-    <View style={dashboardStyles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <Text style={dashboardStyles.header}>Análise de Pacientes</Text>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+        <Text style={styles.backButtonText}>↩</Text>
+        </TouchableOpacity>
+        <View style={styles.headerSpacer} />
+      </View>
 
-        <View style={dashboardStyles.patientSelectorContainer}>
-          <Text style={dashboardStyles.patientSelectorLabel}>Selecionar Paciente:</Text>
+      <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
+        <View style={styles.patientSelectorContainer}>
+          <Text style={styles.patientSelectorLabel}>Selecionar Paciente:</Text>
           <Picker
             selectedValue={selectedPatient}
             onValueChange={(itemValue) => setSelectedPatient(itemValue)}
-            style={dashboardStyles.picker}
+            style={styles.picker}
           >
             <Picker.Item label="Selecione um paciente" value={null} />
             {mockPatients.map((patient) => (
@@ -109,8 +128,8 @@ export const DashboardScreen = () => {
 
         {patientData ? (
           <>
-            <View style={dashboardStyles.chartContainer}>
-              <Text style={dashboardStyles.chartTitle}>Resultados dos Testes ao Longo do Tempo</Text>
+            <View style={styles.chartContainer}>
+              <Text style={styles.chartTitle}>Resultados dos Testes ao Longo do Tempo</Text>
               <LineChart
                 data={{
                   labels: patientData.testResults.map((data: any) => data.month),
@@ -120,7 +139,7 @@ export const DashboardScreen = () => {
                     },
                   ],
                 }}
-                width={screenWidth - 60} // from react-native
+                width={screenWidth - 60}
                 height={220}
                 yAxisLabel=""
                 yAxisSuffix="%"
@@ -133,8 +152,8 @@ export const DashboardScreen = () => {
               />
             </View>
 
-            <View style={dashboardStyles.chartContainer}>
-              <Text style={dashboardStyles.chartTitle}>Frequência de Sintomas</Text>
+            <View style={styles.chartContainer}>
+              <Text style={styles.chartTitle}>Frequência de Sintomas</Text>
               <PieChart
                 data={patientData.symptomFrequency}
                 width={screenWidth - 60}
@@ -152,10 +171,9 @@ export const DashboardScreen = () => {
             </View>
           </>
         ) : (
-          <Text style={dashboardStyles.noDataText}>Selecione um paciente para visualizar os dados.</Text>
+          <Text style={styles.noDataText}></Text>
         )}
       </ScrollView>
     </View>
   );
 };
-
