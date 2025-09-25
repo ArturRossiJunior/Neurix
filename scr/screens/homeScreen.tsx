@@ -1,12 +1,9 @@
 import React from 'react';
-import { Button } from '../components/Button';
 import { Card } from '../components/Card';
+import { Button } from '../components/Button';
+import { HomeScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/home.styles';
 import { View, Text, ScrollView, Alert, useWindowDimensions } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/types';
-
-type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 const Home = ({ navigation }: HomeScreenProps) => {
   const { width } = useWindowDimensions();
@@ -16,6 +13,8 @@ const Home = ({ navigation }: HomeScreenProps) => {
   const handleNavigation = (destination: string) => {
     if (destination === 'Pacientes') {
       navigation.navigate('Patients');
+    } else if (destination === 'Dashboard') {
+      navigation.navigate('Dashboard');
     } else {
       Alert.alert(
         `Navegando para ${destination}`,
