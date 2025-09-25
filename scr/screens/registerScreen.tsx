@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '../components/Button';
+import { colors } from '../components/styles/colors';
 import { RootStackParamList } from '../navigation/types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { createRegisterStyles } from '../components/styles/register.styles';
@@ -8,22 +9,22 @@ import { View, Text, TextInput, TouchableOpacity, Alert, useWindowDimensions } f
 type RegisterScreenProps = NativeStackScreenProps<RootStackParamList, 'Register'>;
 
 export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
   const styles = createRegisterStyles(isTablet);
 
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
   const handleRegister = () => {
     // Lógica de registro aqui
     if (password !== confirmPassword) {
-      Alert.alert('Erro', 'As senhas não coincidem.');
+      Alert.alert('Erro', 'As senhas não coincidem');
       return;
     }
-    // Simulação de registro bem-sucedido
-    Alert.alert('Sucesso', 'Registro realizado com sucesso! Faça login para continuar.');
+    Alert.alert('Sucesso', 'Registro realizado com sucesso! Faça login para continuar');
     navigation.navigate('Login');
   };
 
@@ -34,7 +35,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
         <TextInput
           style={styles.input}
           placeholder="Nome Completo"
-          placeholderTextColor="#64748B"
+          placeholderTextColor={colors.mutedForeground}
           autoCapitalize="words"
           value={name}
           onChangeText={setName}
@@ -42,7 +43,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
         <TextInput
           style={styles.input}
           placeholder="Email"
-          placeholderTextColor="#64748B"
+          placeholderTextColor={colors.mutedForeground}
           keyboardType="email-address"
           autoCapitalize="none"
           value={email}
@@ -51,7 +52,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
         <TextInput
           style={styles.input}
           placeholder="Senha"
-          placeholderTextColor="#64748B"
+          placeholderTextColor={colors.mutedForeground}
           secureTextEntry
           value={password}
           onChangeText={setPassword}
@@ -59,7 +60,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
         <TextInput
           style={styles.input}
           placeholder="Confirmar Senha"
-          placeholderTextColor="#64748B"
+          placeholderTextColor={colors.mutedForeground}
           secureTextEntry
           value={confirmPassword}
           onChangeText={setConfirmPassword}
@@ -67,12 +68,14 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
         <Button variant="default" size="default" onPress={handleRegister}>
           Registrar
         </Button>
-        <Text style={styles.loginText}>
-          Já tem uma conta?{' '}
+        <View style={styles.loginContainer}>
+          <Text style={styles.loginText}>
+            Já tem uma conta?
+          </Text>
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
             <Text style={styles.loginLink}>Faça Login</Text>
           </TouchableOpacity>
-        </Text>
+        </View>
       </View>
     </View>
   );

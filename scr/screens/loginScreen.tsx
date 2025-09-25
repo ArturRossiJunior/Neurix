@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '../components/Button';
+import { colors } from '../components/styles/colors';
 import { RootStackParamList } from '../navigation/types';
 import { createLoginStyles } from '../components/styles/login.styles';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -8,16 +9,17 @@ import { View, Text, TextInput, TouchableOpacity, Alert, useWindowDimensions } f
 type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 export const LoginScreen = ({ navigation }: LoginScreenProps) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
   const styles = createLoginStyles(isTablet);
+  
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleLogin = () => {
     // Lógica de autenticação aqui
-    if (email === 'test@test.com' && password === 'password') {
-      navigation.navigate('Home'); // Navegar para a tela inicial após o login
+    if (email === 'teste@teste.com' && password === 'teste') {
+      navigation.navigate('Home');
     } else {
       Alert.alert('Erro', 'Email ou senha inválidos.');
     }
@@ -30,7 +32,7 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
         <TextInput
           style={styles.input}
           placeholder="Email"
-          placeholderTextColor="#64748B"
+          placeholderTextColor={colors.mutedForeground}
           keyboardType="email-address"
           autoCapitalize="none"
           value={email}
@@ -39,7 +41,7 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
         <TextInput
           style={styles.input}
           placeholder="Senha"
-          placeholderTextColor="#64748B"
+          placeholderTextColor={colors.mutedForeground}
           secureTextEntry
           value={password}
           onChangeText={setPassword}
@@ -47,12 +49,14 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
         <Button variant="default" size="default" onPress={handleLogin}>
           Entrar
         </Button>
-        <Text style={styles.registerText}>
-          Não tem uma conta?{' '}
+        <View style={styles.registerContainer}>
+          <Text style={styles.registerText}>
+            Não tem uma conta?
+          </Text>
           <TouchableOpacity onPress={() => navigation.navigate('Register')}>
             <Text style={styles.registerLink}>Registre-se</Text>
           </TouchableOpacity>
-        </Text>
+        </View>
       </View>
     </View>
   );
