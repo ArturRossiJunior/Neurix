@@ -7,10 +7,12 @@ export type RootStackParamList = {
   PatientDetail: { patientId: string };
   PatientCreation: { prefillName?: string };
   Dashboard: undefined;
+  Login: undefined;
+  Register: undefined;
 };
 
-export type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 export type IndexScreenProps = NativeStackScreenProps<RootStackParamList, 'Index'>;
+export type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 export type PatientsScreenProps = NativeStackScreenProps<RootStackParamList, 'Patients'>;
 export type DashboardScreenProps = NativeStackScreenProps<RootStackParamList, 'Dashboard'>;
 export type PatientDetailScreenProps = NativeStackScreenProps<RootStackParamList, 'PatientDetail'>;
