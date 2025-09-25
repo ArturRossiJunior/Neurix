@@ -7,6 +7,11 @@ export const colors = {
   softGreen: '#34D399',
   gentlePurple: '#A78BFA',
   warmYellow: '#FDE047',
+
+  graph1: '#FF6384',
+  graph2: '#36A2EB',
+  graph3: '#FFCE56',
+  legend: '#7F7F7F',
   
   destructive: '#EF4444',
   destructiveForeground: '#FFFFFF',

@@ -62,7 +62,7 @@ export const createStyles = (isTablet: boolean) => StyleSheet.create({
   },
 
   chartTitle: {
-    fontSize: isTablet ? wp('4.5%') : wp('5%'),
+    fontSize: isTablet ? wp('4%') : wp('4.5%'),
     fontWeight: 'bold',
     color: colors.primary,
     marginBottom: isTablet ? hp('2%') : hp('1.5%'),

@@ -9,9 +9,9 @@ import { View, Text, ScrollView, Dimensions, TouchableOpacity } from 'react-nati
 
 // Mock data for demonstration
 const mockPatients = [
-  { id: '1', name: 'Paciente A' },
-  { id: '2', name: 'Paciente B' },
-  { id: '3', name: 'Paciente C' },
+  { id: '1', name: 'Ana Silva' },
+  { id: '2', name: 'João Santos' },
+  { id: '3', name: 'Maria Oliveira' },
 ];
 
 interface PatientData {
@@ -29,9 +29,9 @@ const mockPatientData: { [key: string]: PatientData } = {
       { month: 'Mai', score: 80 },
     ],
     symptomFrequency: [
-      { name: 'Desatenção', population: 40, color: '#FF6384', legendFontColor: '#7F7F7F', legendFontSize: 15 },
-      { name: 'Hiperatividade', population: 30, color: '#36A2EB', legendFontColor: '#7F7F7F', legendFontSize: 15 },
-      { name: 'Impulsividade', population: 20, color: '#FFCE56', legendFontColor: '#7F7F7F', legendFontSize: 15 },
+      { name: 'Desatenção', population: 50, color: colors.graph1, legendFontColor: colors.legend, legendFontSize: 15 },
+      { name: 'Hiperatividade', population: 30, color: colors.graph2, legendFontColor: colors.legend, legendFontSize: 15 },
+      { name: 'Impulsividade', population: 20, color: colors.graph3, legendFontColor: colors.legend, legendFontSize: 15 },
     ],
   },
   '2': {
@@ -43,9 +43,9 @@ const mockPatientData: { [key: string]: PatientData } = {
       { month: 'Mai', score: 60 },
     ],
     symptomFrequency: [
-      { name: 'Desatenção', population: 50, color: '#FF6384', legendFontColor: '#7F7F7F', legendFontSize: 15 },
-      { name: 'Hiperatividade', population: 20, color: '#36A2EB', legendFontColor: '#7F7F7F', legendFontSize: 15 },
-      { name: 'Impulsividade', population: 10, color: '#FFCE56', legendFontColor: '#7F7F7F', legendFontSize: 15 },
+      { name: 'Desatenção', population: 50, color: colors.graph1, legendFontColor: colors.legend, legendFontSize: 15 },
+      { name: 'Hiperatividade', population: 40, color: colors.graph2, legendFontColor: colors.legend, legendFontSize: 15 },
+      { name: 'Impulsividade', population: 10, color: colors.graph3, legendFontColor: colors.legend, legendFontSize: 15 },
     ],
   },
   '3': {
@@ -57,9 +57,9 @@ const mockPatientData: { [key: string]: PatientData } = {
       { month: 'Mai', score: 82 },
     ],
     symptomFrequency: [
-      { name: 'Desatenção', population: 30, color: '#FF6384', legendFontColor: '#7F7F7F', legendFontSize: 15 },
-      { name: 'Hiperatividade', population: 40, color: '#36A2EB', legendFontColor: '#7F7F7F', legendFontSize: 15 },
-      { name: 'Impulsividade', population: 30, color: '#FFCE56', legendFontColor: '#7F7F7F', legendFontSize: 15 },
+      { name: 'Desatenção', population: 30, color: colors.graph1, legendFontColor: colors.legend, legendFontSize: 15 },
+      { name: 'Hiperatividade', population: 40, color: colors.graph2, legendFontColor: colors.legend, legendFontSize: 15 },
+      { name: 'Impulsividade', population: 30, color: colors.graph3, legendFontColor: colors.legend, legendFontSize: 15 },
     ],
   },
 };
@@ -148,6 +148,7 @@ export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
                 style={{
                   marginVertical: 8,
                   borderRadius: 16,
+                  overflow: 'hidden',
                 }}
               />
             </View>

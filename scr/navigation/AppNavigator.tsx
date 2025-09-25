@@ -7,7 +7,7 @@ import IndexScreen from '../screens/indexScreen';
 import PatientsScreen from '../screens/patientsListScreen';
 import PatientDetailScreen from '../screens/patientDetailScreen';
 import PatientCreationScreen from '../screens/patientCreationScreen';
-import { DashboardScreen } from '../screens/DashboardScreen';
+import { DashboardScreen } from '../screens/dashboardScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
