@@ -18,12 +18,27 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  const validateEmail = (email: string) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
   const handleRegister = () => {
-    // Lógica de registro aqui
+    if (!name.trim().includes(' ')) {
+      Alert.alert('Erro', 'Informe seu nome completo (nome e sobrenome)');
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      Alert.alert('Erro', 'Informe um email válido');
+      return;
+    }
+
     if (password !== confirmPassword) {
       Alert.alert('Erro', 'As senhas não coincidem');
       return;
     }
+
     Alert.alert('Sucesso', 'Registro realizado com sucesso! Faça login para continuar');
     navigation.navigate('Login');
   };
