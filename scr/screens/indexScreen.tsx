@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card } from '../components/Card';
 import { Header } from '../components/Header';
 import { Button } from '../components/Button';
+import { Card } from '../components/Card';
 import { IndexScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/index.styles';
 import { View, Text, ScrollView, Alert, useWindowDimensions } from 'react-native';
@@ -11,14 +11,6 @@ const IndexScreen = ({ navigation }: IndexScreenProps) => {
   const isTablet = width >= 768;
   const styles = createStyles(isTablet);
 
-  const handleNavigation = (destination: string) => {
-    Alert.alert(
-      `Navegando para ${destination}`,
-      'Esta funcionalidade será implementada em breve!',
-      [{ text: 'OK' }]
-    );
-  };
-
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
       <View style={styles.content}>
@@ -27,7 +19,7 @@ const IndexScreen = ({ navigation }: IndexScreenProps) => {
           <Card
             variant="default"
             style={styles.navigationCard}
-            onPress={() => navigation.navigate('Home')}
+            onPress={() => navigation.navigate('Login')}
           >
             <View style={styles.cardContent}>
               <View style={styles.textContainer}>
@@ -40,7 +32,7 @@ const IndexScreen = ({ navigation }: IndexScreenProps) => {
                 variant="game"
                 size="default"
                 style={styles.actionButton}
-                onPress={() => navigation.navigate('Home')}
+                onPress={() => navigation.navigate('Login')}
               >
                 Começar
               </Button>
@@ -49,7 +41,11 @@ const IndexScreen = ({ navigation }: IndexScreenProps) => {
           <Card
             variant="default"
             style={styles.navigationCard}
-            onPress={() => handleNavigation('Sobre o App')}
+            onPress={() => Alert.alert(
+              `Navegando para Sobre o App`,
+              'Esta funcionalidade será implementada em breve!',
+              [{ text: 'OK' }]
+            )}
           >
             <View style={styles.cardContent}>
               <View style={styles.textContainer}>
@@ -62,7 +58,11 @@ const IndexScreen = ({ navigation }: IndexScreenProps) => {
                 variant="soft"
                 size="default"
                 style={styles.actionButton}
-                onPress={() => handleNavigation('Sobre o App')}
+                onPress={() => Alert.alert(
+                  `Navegando para Sobre o App`,
+                  'Esta funcionalidade será implementada em breve!',
+                  [{ text: 'OK' }]
+                )}
               >
                 Saber Mais
               </Button>

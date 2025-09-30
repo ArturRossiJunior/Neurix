@@ -149,6 +149,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
                     style={styles.searchInput}
                     placeholder="Digite o nome completo"
                     value={formData.name}
+                    autoCapitalize="words"
                     onChangeText={(value) => handleInputChange('name', value)}
                     placeholderTextColor={colors.secondaryMutedForeground}
                   />
@@ -177,6 +178,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
                     style={styles.searchInput}
                     placeholder="Digite o nome do responsável"
                     value={formData.guardian}
+                    autoCapitalize="words"
                     onChangeText={(value) => handleInputChange('guardian', value)}
                     placeholderTextColor={colors.secondaryMutedForeground}
                   />
