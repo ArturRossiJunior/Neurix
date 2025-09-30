@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import { Button } from '../components/Button';
 import { colors } from '../components/styles/colors';
-import { RootStackParamList } from '../navigation/types';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RegisterScreenProps } from '../navigation/types';
 import { createRegisterStyles } from '../components/styles/register.styles';
 import { View, Text, TextInput, TouchableOpacity, Alert, useWindowDimensions } from 'react-native';
-
-type RegisterScreenProps = NativeStackScreenProps<RootStackParamList, 'Register'>;
 
 export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
   const { width } = useWindowDimensions();

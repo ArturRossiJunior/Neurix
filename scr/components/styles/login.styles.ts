@@ -62,5 +62,16 @@ export const createLoginStyles = (isTablet: boolean) => {
       alignItems: 'baseline',
       marginTop: isTablet ? hp('2%') : hp('2%'),
     },
+    checkboxContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: isTablet ? hp('2.5%') : hp('3%'),
+      alignSelf: 'flex-start',
+    },
+    checkboxLabel: {
+      marginLeft: 8,
+      color: colors.foreground,
+      fontSize: isTablet ? wp('2%') : wp('4%'),
+    },
   });
 };
