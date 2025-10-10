@@ -3,10 +3,12 @@ import { RootStackParamList } from './types';
 import HomeScreen from '../screens/homeScreen';
 import IndexScreen from '../screens/indexScreen';
 import { LoginScreen } from '../screens/loginScreen';
+import { TestsListScreen } from '../screens/testsListScreen';
 import PatientsScreen from '../screens/patientsListScreen';
 import { RegisterScreen } from '../screens/registerScreen';
 import { DashboardScreen } from '../screens/dashboardScreen';
 import { NavigationContainer } from '@react-navigation/native';
+import { TestDetailScreen } from '../screens/testDetailScreen';
 import PatientDetailScreen from '../screens/patientDetailScreen';
 import PatientCreationScreen from '../screens/patientCreationScreen';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -55,6 +57,16 @@ export default function AppNavigator() {
         <Stack.Screen
           name="Dashboard"
           component={DashboardScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Tests"
+          component={TestsListScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="TestDetail"
+          component={TestDetailScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

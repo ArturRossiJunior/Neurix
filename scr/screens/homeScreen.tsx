@@ -11,7 +11,9 @@ const Home = ({ navigation }: HomeScreenProps) => {
   const styles = createStyles(isTablet);
 
   const handleNavigation = (destination: string) => {
-    if (destination === 'Pacientes') {
+    if (destination === 'Novo Teste') {
+      navigation.navigate('Tests');
+    } else if (destination === 'Pacientes') {
       navigation.navigate('Patients');
     } else if (destination === 'Dashboard') {
       navigation.navigate('Dashboard');
