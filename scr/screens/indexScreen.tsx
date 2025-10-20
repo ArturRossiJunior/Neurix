@@ -1,7 +1,7 @@
 import React from 'react';
+import { Card } from '../components/Card';
 import { Header } from '../components/Header';
 import { Button } from '../components/Button';
-import { Card } from '../components/Card';
 import { IndexScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/index.styles';
 import { View, Text, ScrollView, Alert, useWindowDimensions } from 'react-native';
@@ -19,7 +19,6 @@ const IndexScreen = ({ navigation }: IndexScreenProps) => {
           <Card
             variant="default"
             style={styles.navigationCard}
-            onPress={() => navigation.navigate('Login')}
           >
             <View style={styles.cardContent}>
               <View style={styles.textContainer}>
@@ -32,7 +31,7 @@ const IndexScreen = ({ navigation }: IndexScreenProps) => {
                 variant="game"
                 size="default"
                 style={styles.actionButton}
-                onPress={() => navigation.navigate('Login')}
+                onPress={() => navigation.navigate('Home')}
               >
                 Começar
               </Button>
@@ -41,15 +40,10 @@ const IndexScreen = ({ navigation }: IndexScreenProps) => {
           <Card
             variant="default"
             style={styles.navigationCard}
-            onPress={() => Alert.alert(
-              `Navegando para Sobre o App`,
-              'Esta funcionalidade será implementada em breve!',
-              [{ text: 'OK' }]
-            )}
           >
             <View style={styles.cardContent}>
               <View style={styles.textContainer}>
-                <Text style={styles.cardTitle}>Sobre o App</Text>
+                <Text style={styles.cardTitle}>Sobre</Text>
                 <Text style={styles.cardDescription}>
                   Conheça mais sobre nossa ferramenta e metodologia
                 </Text>
@@ -58,11 +52,7 @@ const IndexScreen = ({ navigation }: IndexScreenProps) => {
                 variant="soft"
                 size="default"
                 style={styles.actionButton}
-                onPress={() => Alert.alert(
-                  `Navegando para Sobre o App`,
-                  'Esta funcionalidade será implementada em breve!',
-                  [{ text: 'OK' }]
-                )}
+                onPress={() => navigation.navigate('About')}
               >
                 Saber Mais
               </Button>
