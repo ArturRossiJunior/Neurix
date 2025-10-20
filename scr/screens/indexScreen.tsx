@@ -31,7 +31,7 @@ const IndexScreen = ({ navigation }: IndexScreenProps) => {
                 variant="game"
                 size="default"
                 style={styles.actionButton}
-                onPress={() => navigation.navigate('Home')}
+                onPress={() => navigation.navigate('Login')}
               >
                 Começar
               </Button>
