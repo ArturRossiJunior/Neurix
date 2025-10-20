@@ -2,10 +2,11 @@ import React from 'react';
 import { RootStackParamList } from './types';
 import HomeScreen from '../screens/homeScreen';
 import IndexScreen from '../screens/indexScreen';
+import AboutScreen from '../screens/aboutScreen';
 import { LoginScreen } from '../screens/loginScreen';
-import { TestsListScreen } from '../screens/testsListScreen';
 import PatientsScreen from '../screens/patientsListScreen';
 import { RegisterScreen } from '../screens/registerScreen';
+import { TestsListScreen } from '../screens/testsListScreen';
 import { DashboardScreen } from '../screens/dashboardScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { TestDetailScreen } from '../screens/testDetailScreen';
@@ -67,6 +68,11 @@ export default function AppNavigator() {
         <Stack.Screen
           name="TestDetail"
           component={TestDetailScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="About"
+          component={AboutScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

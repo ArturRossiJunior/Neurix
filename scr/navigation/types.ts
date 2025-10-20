@@ -11,12 +11,14 @@ export type RootStackParamList = {
   Register: undefined;
   Tests: undefined;
   TestDetail: { testId: string; testName: string; };
+  About: undefined;
 };
 
 export type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 export type IndexScreenProps = NativeStackScreenProps<RootStackParamList, 'Index'>;
 export type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 export type TestsScreenProps = NativeStackScreenProps<RootStackParamList, 'Tests'>;
+export type AboutScreenProps = NativeStackScreenProps<RootStackParamList, 'About'>;
 export type PatientsScreenProps = NativeStackScreenProps<RootStackParamList, 'Patients'>;
 export type RegisterScreenProps = NativeStackScreenProps<RootStackParamList, 'Register'>;
 export type DashboardScreenProps = NativeStackScreenProps<RootStackParamList, 'Dashboard'>;
