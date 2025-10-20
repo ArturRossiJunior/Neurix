@@ -96,7 +96,7 @@ export const TestsListScreen = ({ navigation }: TestsScreenProps) => {
         <View style={styles.emptyState}>
           <Text style={styles.emptyStateTitle}>Nenhum teste encontrado</Text>
           <Text style={styles.emptyStateDescription}>
-            Tente ajustar sua busca para encontrar o teste que procura.
+            Tente ajustar sua busca para encontrar o teste que procura
           </Text>
         </View>
       )}

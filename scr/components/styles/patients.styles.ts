@@ -10,6 +10,11 @@ export const createStyles = (isTablet: boolean) => {
       backgroundColor: colors.background,
     },
 
+    centralizer: {
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+
     header: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -68,7 +73,7 @@ export const createStyles = (isTablet: boolean) => {
     },
 
     searchInput: {
-      paddingHorizontal: isTablet ? wp('4%') : wp('4%'),
+      paddingHorizontal: isTablet ? wp('3%') : wp('3%'),
       paddingVertical: isTablet ? hp('1.8%') : hp('2%'),
       fontSize: isTablet ? wp('3.5%') : wp('4%'),
       color: colors.foreground,
@@ -184,9 +189,15 @@ export const createStyles = (isTablet: boolean) => {
       gap: isTablet ? hp('0.3%') : hp('0.5%'),
     },
 
-    patientAge: {
+    patientInput: {
       fontSize: isTablet ? wp('3%') : wp('3.5%'),
       color: colors.mutedForeground,
+    },
+
+    patientCreationMargin: {
+      marginBottom: isTablet ? wp('2%') : wp('3%'), 
+      marginTop: isTablet ? wp('2%') : wp('3%'),
+      fontWeight: '600'
     },
 
     patientLastTest: {

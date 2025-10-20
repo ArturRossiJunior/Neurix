@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
 import { Card } from '../components/Card';
+import { useAuth } from '../../AuthContext';
+import { supabase } from '../utils/supabase';
 import { Button } from '../components/Button';
+import React, { useState, useEffect } from 'react';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
+import { Picker } from '@react-native-picker/picker';
 import { MaskedTextInput } from 'react-native-mask-text';
 import { PatientCreationScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/patients.styles';
+import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
 
 const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps) => {
@@ -17,11 +21,21 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
   const [formData, setFormData] = useState({
     name: prefillName,
     birthDate: '',
+    gender: 'prefiro_nao_informar',
     guardian: '',
     phone: '',
     email: '',
     notes: '',
   });
+
+  const { professionalId } = useAuth();
+
+  useEffect(() => {
+    if (!professionalId) {
+      Alert.alert('Erro', 'ID do profissional não encontrado. Faça login novamente');
+      navigation.goBack();
+    }
+  }, [professionalId]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -54,7 +68,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
     return true;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.name.trim()) {
       Alert.alert('Erro', 'Nome do paciente é obrigatório');
       return;
@@ -88,21 +102,45 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
       Alert.alert('Erro', 'Email inválido');
       return;
     }
+    if (!professionalId) {
+      Alert.alert('Erro', 'ID do profissional não encontrado. Faça login novamente.');
+      return;
+    }
 
-    // Exemplo: enviar para API ou atualizar estado
     const capitalizedName = capitalizeName(formData.name.trim());
     const capitalizedGuardian = capitalizeName(formData.guardian.trim());
 
-    Alert.alert(
-      'Sucesso',
-      `Paciente cadastrado com sucesso!\n\nNome: ${capitalizedName}\nResponsável: ${capitalizedGuardian}`,
-      [
+    try {
+      const { error } = await supabase.from('pacientes').insert([
         {
-          text: 'OK',
-          onPress: () => navigation.goBack()
-        }
-      ]
-    );
+          id_profissional: professionalId,
+          nome_completo: capitalizedName,
+          data_nascimento: new Date(formData.birthDate.split('/').reverse().join('-')).toISOString(),
+          genero: formData.gender,
+          nome_responsavel: capitalizedGuardian,
+          telefone_responsavel: formData.phone.trim(),
+          email_responsavel: formData.email.trim(),
+          observacoes: formData.notes.trim(),
+        },
+      ]).select();
+
+      if (error) {
+        throw error;
+      }
+
+      Alert.alert(
+        'Sucesso',
+        `Paciente cadastrado com sucesso!\n\nNome: ${capitalizedName}\nResponsável: ${capitalizedGuardian}`,
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.goBack()
+          }
+        ]
+      );
+    } catch (error: any) {
+      Alert.alert('Erro ao cadastrar paciente', error.message);
+    }
   };
 
   const handleCancel = () => {
@@ -141,7 +179,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
               <Text style={styles.patientName}>Informações do Paciente</Text>
               
               <View style={styles.patientDetails}>
-                <Text style={[styles.patientAge, { marginBottom: 8, fontWeight: '600' }]}>
+                <Text style={[styles.patientInput, { marginBottom: isTablet ? wp('2%') : wp('3%'), fontWeight: '600' }]}>
                   Nome do Paciente *
                 </Text>
                 <View style={styles.searchContainer}>
@@ -155,7 +193,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
                   />
                 </View>
 
-                <Text style={[styles.patientAge, { marginBottom: 8, marginTop: 16, fontWeight: '600' }]}>
+                <Text style={[styles.patientInput, styles.patientCreationMargin]}>
                   Data de Nascimento *
                 </Text>
                 <View style={styles.searchContainer}>
@@ -164,13 +202,13 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
                     style={styles.searchInput}
                     placeholder="DD/MM/AAAA"
                     value={formData.birthDate}
-                    onChangeText={(text, rawText) => handleInputChange('birthDate', text)}
+                    onChangeText={(text) => handleInputChange('birthDate', text)}
                     keyboardType="numeric"
                     placeholderTextColor={colors.secondaryMutedForeground}
                   />
                 </View>
 
-                <Text style={[styles.patientAge, { marginBottom: 8, marginTop: 16, fontWeight: '600' }]}>
+                <Text style={[styles.patientInput, styles.patientCreationMargin]}>
                   Nome do Responsável *
                 </Text>
                 <View style={styles.searchContainer}>
@@ -184,7 +222,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
                   />
                 </View>
 
-                <Text style={[styles.patientAge, { marginBottom: 8, marginTop: 16, fontWeight: '600' }]}>
+                <Text style={[styles.patientInput, styles.patientCreationMargin]}>
                   Telefone *
                 </Text>
                 <View style={styles.searchContainer}>
@@ -193,13 +231,30 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
                     style={styles.searchInput}
                     placeholder="(11) 99999-9999"
                     value={formData.phone}
-                    onChangeText={(text, rawText) => handleInputChange('phone', text)}
+                    onChangeText={(text) => handleInputChange('phone', text)}
                     keyboardType="numeric"
                     placeholderTextColor={colors.secondaryMutedForeground}
                   />
                 </View>
 
-                <Text style={[styles.patientAge, { marginBottom: 8, marginTop: 16, fontWeight: '600' }]}>
+                <Text style={[styles.patientInput, styles.patientCreationMargin]}>
+                  Gênero
+                </Text>
+                <View style={styles.searchContainer}>
+                  <Picker
+                    selectedValue={formData.gender}
+                    onValueChange={(itemValue) => handleInputChange('gender', itemValue)}
+                    style={[styles.searchInput, { marginLeft: isTablet ? wp('3%') : wp('3%') }]}
+                    itemStyle={{ color: colors.text }}
+                  >
+                    <Picker.Item label="Prefiro não informar" value="prefiro_nao_informar" />
+                    <Picker.Item label="Masculino" value="masculino" />
+                    <Picker.Item label="Feminino" value="feminino" />
+                    <Picker.Item label="Outro" value="outro" />
+                  </Picker>
+                </View>
+
+                <Text style={[styles.patientInput, styles.patientCreationMargin]}>
                   Email *
                 </Text>
                 <View style={styles.searchContainer}>
@@ -214,7 +269,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
                   />
                 </View>
 
-                <Text style={[styles.patientAge, { marginBottom: 8, marginTop: 16, fontWeight: '600' }]}>
+                <Text style={[styles.patientInput, styles.patientCreationMargin]}>
                   Observações
                 </Text>
                 <View style={[styles.searchContainer, { height: 100 }]}>
@@ -229,7 +284,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
                   />
                 </View>
 
-                <Text style={[styles.patientAge, { marginTop: 16, fontStyle: 'italic' }]}>
+                <Text style={[styles.patientInput, { marginTop: isTablet ? wp('2%') : wp('3%'), fontStyle: 'italic' }]}>
                   * Campos obrigatórios
                 </Text>
               </View>
