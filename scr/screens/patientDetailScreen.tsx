@@ -1,9 +1,9 @@
 import { Card } from '../components/Card';
 import { supabase } from '../utils/supabase';
-import { calculateAge } from '../utils/utils';
 import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
+import { calculateDetailedAge } from '../utils/utils';
 import { PatientDetailScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/patients.styles';
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
@@ -169,7 +169,7 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
                 </View>
               </View>
               <View style={styles.patientDetails}>
-                <Text style={styles.patientInput}>Idade: {calculateAge(patient.data_nascimento)} anos</Text>
+                <Text style={styles.patientInput}>Idade: {calculateDetailedAge(patient.data_nascimento)}</Text>
                 <Text style={styles.patientInput}>Data de nascimento: {new Date(patient.data_nascimento).toLocaleDateString('pt-BR')}</Text>
                 <Text style={styles.patientInput}>Gênero: {patient.genero}</Text>
                 <Text style={styles.patientInput}>Responsável: {patient.nome_responsavel}</Text>

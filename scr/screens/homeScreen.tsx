@@ -39,7 +39,6 @@ const Home = ({ navigation }: HomeScreenProps) => {
           <Card 
             variant="default" 
             style={styles.navigationCard}
-            onPress={() => handleNavigation('Novo Teste')}
           >
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>Novo Teste</Text>
@@ -60,7 +59,6 @@ const Home = ({ navigation }: HomeScreenProps) => {
           <Card 
             variant="default" 
             style={styles.navigationCard}
-            onPress={() => navigation.navigate('Patients')}
           >
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>Pacientes</Text>
@@ -81,7 +79,26 @@ const Home = ({ navigation }: HomeScreenProps) => {
           <Card 
             variant="default" 
             style={styles.navigationCard}
-            onPress={() => handleNavigation('Dashboard')}
+          >
+            <View style={styles.cardContent}>
+              <Text style={styles.cardTitle}>Responsáveis</Text>
+              <Text style={styles.cardDescription}>
+                Gerenciar e visualizar informações dos responsáveis
+              </Text>
+              <Button 
+                variant="calm" 
+                size="default" 
+                style={styles.actionButton}
+                onPress={() => navigation.navigate('Guardians')}
+              >
+                Acessar
+              </Button>
+            </View>
+          </Card>
+
+          <Card 
+            variant="default" 
+            style={styles.navigationCard}
           >
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>Dashboard</Text>
@@ -102,7 +119,6 @@ const Home = ({ navigation }: HomeScreenProps) => {
           <Card 
             variant="default" 
             style={styles.navigationCard}
-            onPress={() => handleNavigation('Configurações')}
           >
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>Configurações</Text>
