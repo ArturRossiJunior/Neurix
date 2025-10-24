@@ -4,6 +4,7 @@ import { Button } from '../components/Button';
 import { colors } from '../components/styles/colors';
 import { RegisterScreenProps } from '../navigation/types';
 import { createRegisterStyles } from '../components/styles/register.styles';
+import { formatCRPForDB, validateCRP, validateEmail } from '../utils/utils';
 import { View, Text, TextInput, TouchableOpacity, Alert, useWindowDimensions } from 'react-native';
 
 export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
@@ -18,32 +19,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
   const [registroProfissional, setRegistroProfissional] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const validateEmail = (email: string) => /^[^@]+@[^@]+\.[^@]+$/.test(email);
-
-  const validateCRP = (crp: string) => {
-    const normalized = crp.toUpperCase().replace('CRP', '').trim();
-    const crpRegex = /^(?:\d{1,2}[\/\-\s]\d{4,}|\d{4,}[\/\-\s]\d{1,2})$/;
-    return crpRegex.test(normalized);
-  };
-
-  const formatCRPForDB = (crp: string): string => {
-    const normalized = crp
-      .toUpperCase()
-      .replace('CRP', '')
-      .replace(/[\s\-\/]/, '/') 
-      .replace(/[^0-9\/]/g, '');
-
-    let match = normalized.match(/^(\d{4,})\/(\d{1,2})$/);
-    if (match) {
-      return `${match[2]}/${match[1]}`;
-    }
-
-    match = normalized.match(/^(\d{1,2})\/(\d{4,})$/);
-    if (match) {
-      return normalized;
-    }
-    return crp.toUpperCase(); 
-  };
+  
 
   const handleRegister = async () => {
     setLoading(true);
@@ -54,7 +30,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
       return;
     }
 
-    if (!validateEmail(email)) {
+    if (!validateEmail(email.trim())) {
       Alert.alert('Atenção', 'Informe um email válido');
       setLoading(false);
       return;

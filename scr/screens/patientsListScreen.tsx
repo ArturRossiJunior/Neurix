@@ -6,7 +6,7 @@ import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
 import { PatientsScreenProps } from '../navigation/types';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { createStyles } from '../components/styles/patients.styles';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 
@@ -90,8 +90,11 @@ const PatientsScreen = ({ navigation }: PatientsScreenProps) => {
   }, [professionalId]);
 
   useEffect(() => {
-    fetchPatients();
-  }, [fetchPatients]);
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchPatients();
+    });
+    return unsubscribe;
+  }, [navigation, fetchPatients]);
 
   const handleSearch = (text: string) => {
     setSearchText(text);

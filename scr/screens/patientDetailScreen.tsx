@@ -3,23 +3,31 @@ import { supabase } from '../utils/supabase';
 import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
-import { calculateDetailedAge } from '../utils/utils';
 import { PatientDetailScreenProps } from '../navigation/types';
+import { calculateDetailedAge, formatPhone } from '../utils/utils';
 import { createStyles } from '../components/styles/patients.styles';
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { ESCOLARIDADE_OPTIONS, LATERALIDADE_OPTIONS, GENERO_OPTIONS } from '../utils/constants';
 import { View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+
+interface Responsible {
+  nome_completo: string;
+  telefone: string;
+  email: string;
+}
 
 interface PatientDetail {
   id: string;
   nome_completo: string;
   data_nascimento: string;
   genero: string;
-  nome_responsavel: string;
-  telefone_responsavel: string;
-  email_responsavel: string;
   status: 'ativo' | 'inativo';
   criado_em: string;
   observacoes: string;
+  cpf: string | null;
+  escolaridade: string;
+  lateralidade: string;
+  responsavel: Responsible | null;
 }
 
 interface TestDetail {
@@ -27,7 +35,6 @@ interface TestDetail {
   nome_teste: string;
   data_aplicacao: string;
   resultado_pontuacao: number;
-  // status: string; // No seu schema, o status do teste não está explícito, usando 'Concluído' como padrão
 }
 
 const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) => {
@@ -46,7 +53,14 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
     try {
       const { data: patientData, error: patientError } = await supabase
         .from('pacientes')
-        .select('*')
+        .select(`
+          *,
+          responsavel (
+            nome_completo,
+            telefone,
+            email
+          )
+        `)
         .eq('id', patientId)
         .single();
 
@@ -54,7 +68,7 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
         throw patientError;
       }
 
-      setPatient(patientData);
+      setPatient(patientData as PatientDetail);
 
       const { data: testsData, error: testsError } = await supabase
         .from('avaliacoes')
@@ -92,6 +106,20 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
     fetchPatientDetails();
   }, [fetchPatientDetails]);
 
+  const formatLabel = (
+    options: { label: string; value: string }[],
+    value: string
+  ) => {
+    return options.find(o => o.value === value)?.label || value;
+  };
+
+  const formatCPF = (cpf: string | null) => {
+    if (!cpf) return 'N/A';
+    const onlyDigits = cpf.replace(/\D/g, '');
+    if (onlyDigits.length !== 11) return cpf;
+    return onlyDigits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  };
+
   const handleEditPatient = () => {
     Alert.alert(
       'Editar Paciente',
@@ -101,8 +129,6 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
   };
 
   const handleNewTest = () => {
-    // Integrar passando o paciente como parametro para tela de testes
-    // navigation.navigate('Tests', { patientId: patient?.id });
     navigation.navigate('Tests');
   };
 
@@ -171,13 +197,20 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
               <View style={styles.patientDetails}>
                 <Text style={styles.patientInput}>Idade: {calculateDetailedAge(patient.data_nascimento)}</Text>
                 <Text style={styles.patientInput}>Data de nascimento: {new Date(patient.data_nascimento).toLocaleDateString('pt-BR')}</Text>
-                <Text style={styles.patientInput}>Gênero: {patient.genero}</Text>
-                <Text style={styles.patientInput}>Responsável: {patient.nome_responsavel}</Text>
-                <Text style={styles.patientInput}>Telefone: {patient.telefone_responsavel}</Text>
-                <Text style={styles.patientInput}>Email: {patient.email_responsavel}</Text>
-                <Text style={styles.patientInput}>Data de cadastro: {registrationDate}</Text>
-                <Text style={styles.patientInput}>Último teste: {lastTestDate}</Text>
-                <Text style={styles.patientInput}>Total de testes: {tests.length}</Text>
+                <Text style={styles.patientInput}>Gênero: {formatLabel(GENERO_OPTIONS, patient.genero)}</Text>
+                <Text style={styles.patientInput}>CPF: {formatCPF(patient.cpf)}</Text>
+                <Text style={styles.patientInput}>Escolaridade: {formatLabel(ESCOLARIDADE_OPTIONS, patient.escolaridade)}</Text>
+                <Text style={styles.patientInput}>Lateralidade: {formatLabel(LATERALIDADE_OPTIONS, patient.lateralidade)}</Text>
+                
+                <Text style={[styles.patientInput, { marginTop: 10, fontWeight: 'bold' }]}>Informações do responsável:</Text>
+                <Text style={styles.patientInput}>   Responsável: {patient.responsavel?.nome_completo || 'N/A'}</Text>
+                <Text style={styles.patientInput}>   Telefone: {formatPhone(patient.responsavel?.telefone) || 'N/A'}</Text>
+                <Text style={styles.patientInput}>   Email: {patient.responsavel?.email || 'N/A'}</Text>
+                
+                <Text style={[styles.patientInput, { marginTop: 10, fontWeight: 'bold' }]}>Informações de cadastro:</Text>
+                <Text style={styles.patientInput}>   Data de cadastro: {registrationDate}</Text>
+                <Text style={styles.patientInput}>   Último teste: {lastTestDate}</Text>
+                <Text style={styles.patientInput}>   Total de testes: {tests.length}</Text>
               </View>
             </View>
           </Card>

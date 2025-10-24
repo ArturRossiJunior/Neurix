@@ -81,3 +81,55 @@ export const formatCPF = (cpf: string | null | undefined): string => {
   if (cleaned.length !== 11) return cpf;
   return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
 };
+
+export const capitalizeName = (name: string) => {
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
+export const isValidDate = (dateStr: string) => {
+  const regex = /^\d{2}\/\d{2}\/\d{4}$/;
+  if (!regex.test(dateStr)) return false;
+  const [day, month, year] = dateStr.split('/').map(Number);
+  const date = new Date(year, month - 1, day);
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  )
+    return false;
+  const today = new Date();
+  if (date > today) return false;
+  if (year < 1900) return false;
+  return true;
+};
+
+export const validateEmail = (email: string) => /^[^@]+@[^@]+\.[^@]+$/.test(email);
+
+export const validateCRP = (crp: string) => {
+  const normalized = crp.toUpperCase().replace('CRP', '').trim();
+  const crpRegex = /^(?:\d{1,2}[\/\-\s]\d{4,}|\d{4,}[\/\-\s]\d{1,2})$/;
+  return crpRegex.test(normalized);
+};
+
+export const formatCRPForDB = (crp: string): string => {
+  const normalized = crp
+    .toUpperCase()
+    .replace('CRP', '')
+    .replace(/[\s\-\/]/, '/') 
+    .replace(/[^0-9\/]/g, '');
+
+  let match = normalized.match(/^(\d{4,})\/(\d{1,2})$/);
+  if (match) {
+    return `${match[2]}/${match[1]}`;
+  }
+
+  match = normalized.match(/^(\d{1,2})\/(\d{4,})$/);
+  if (match) {
+    return normalized;
+  }
+  return crp.toUpperCase(); 
+};

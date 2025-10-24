@@ -5,6 +5,7 @@ import { formatPhone } from '../utils/utils';
 import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
+import { useFocusEffect } from '@react-navigation/native';
 import { GuardiansScreenProps } from '../navigation/types'; 
 import React, { useState, useEffect, useCallback } from 'react';
 import { createStyles } from '../components/styles/guardians.styles'; 
@@ -36,32 +37,19 @@ const GuardiansScreen = ({ navigation }: GuardiansScreenProps) => {
 
     setLoading(true);
     try {
-      const { data: patientsData, error: patientsError } = await supabase
-        .from('pacientes')
-        .select('id_responsavel')
-        .eq('id_profissional', professionalId)
-        .not('id_responsavel', 'is', null);
+      const { data: guardiansData, error: guardiansError } = await supabase
+        .from('responsavel')
+        .select('id, nome_completo, telefone, email');
 
-      if (patientsError) {
-        throw patientsError;
+      if (guardiansError) {
+        throw guardiansError;
       }
 
-      const guardianIds = [...new Set(patientsData.map(p => p.id_responsavel))];
-
-      if (guardianIds.length === 0) {
+      if (!guardiansData || guardiansData.length === 0) {
         setGuardians([]);
         setFilteredGuardians([]);
         setLoading(false);
         return;
-      }
-
-      const { data: guardiansData, error: guardiansError } = await supabase
-        .from('responsavel') 
-        .select('id, nome_completo, telefone, email') 
-        .in('id', guardianIds);
-
-      if (guardiansError) {
-        throw guardiansError;
       }
 
       const guardiansWithDetails: Guardian[] = await Promise.all(
@@ -71,10 +59,10 @@ const GuardiansScreen = ({ navigation }: GuardiansScreenProps) => {
             .from('pacientes')
             .select('nome_completo')
             .eq('id_responsavel', guardian.id)
-            .eq('id_profissional', professionalId); 
+            .eq('id_profissional', professionalId);
 
           if (countError) {
-            console.error('Erro ao contar pacientes associados:', countError);
+            console.error('Erro ao buscar pacientes associados:', countError);
           }
 
           const patientsCount = associatedPatients?.length || 0;
@@ -109,9 +97,11 @@ const GuardiansScreen = ({ navigation }: GuardiansScreenProps) => {
     }
   }, [professionalId]);
 
-  useEffect(() => {
-    fetchGuardians();
-  }, [fetchGuardians]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchGuardians();
+    }, [fetchGuardians])
+  );
 
   const handleSearch = (text: string) => {
     setSearchText(text);

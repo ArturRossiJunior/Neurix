@@ -5,6 +5,7 @@ import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
 import { MaskedTextInput } from 'react-native-mask-text';
+import { capitalizeName, validateEmail } from '../utils/utils';
 import { GuardianCreationScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/guardians.styles';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
@@ -24,19 +25,11 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
   });
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  const capitalizeName = (name: string) => {
-    return name
-      .split(' ')
-      .filter(Boolean)
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ');
-  };
+      setFormData(prev => ({
+        ...prev,
+        [field]: value,
+      }));
+    };
 
   const handleSave = async () => {
     const unmaskedPhone = formData.phone.replace(/\D/g, '');
@@ -51,11 +44,11 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
       return;
     }
     if (!unmaskedCPF || unmaskedCPF.length !== 11) {
-      Alert.alert('Erro', 'CPF inválido. Deve conter 11 dígitos.');
+      Alert.alert('Erro', 'CPF inválido. Deve conter 11 dígitos');
       return;
     }
     if (/^(\d)\1+$/.test(unmaskedCPF)) {
-      Alert.alert('Erro', 'CPF inválido (dígitos repetidos).');
+      Alert.alert('Erro', 'CPF inválido (dígitos repetidos)');
       return;
     }
     if (!unmaskedPhone || (unmaskedPhone.length !== 10 && unmaskedPhone.length !== 11)) {
@@ -66,8 +59,7 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
       Alert.alert('Erro', 'Email é obrigatório');
       return;
     }
-    const emailRegex = /^[\w-.]+@[\w-]+\.[a-zA-Z]{2,}$/;
-    if (!emailRegex.test(formData.email.trim())) {
+    if (!validateEmail(formData.email.trim())) {
       Alert.alert('Erro', 'Email inválido');
       return;
     }
@@ -75,6 +67,40 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
     const capitalizedName = capitalizeName(formData.name.trim());
 
     try {
+      const { data: existingPaciente, error: fetchPacienteError } = await supabase
+        .from('pacientes')
+        .select('id')
+        .eq('cpf', unmaskedCPF);
+
+      if (fetchPacienteError) throw fetchPacienteError;
+
+      if (existingPaciente && existingPaciente.length > 0) {
+        Alert.alert('Erro', 'Este CPF já está cadastrado como um paciente. Um responsável não pode ter o mesmo CPF de um paciente');
+        return;
+      }
+
+      const { data: existing, error: fetchError } = await supabase
+        .from('responsavel')
+        .select('cpf, telefone, email')
+        .or(`cpf.eq.${unmaskedCPF},telefone.eq.${unmaskedPhone},email.eq.${formData.email.trim()}`);
+
+      if (fetchError) throw fetchError;
+
+      if (existing && existing.length > 0) {
+        const duplicateMessages: string[] = [];
+
+        const hasCPF = existing.some(item => item.cpf === unmaskedCPF);
+        const hasPhone = existing.some(item => item.telefone === unmaskedPhone);
+        const hasEmail = existing.some(item => item.email === formData.email.trim());
+
+        if (hasCPF) duplicateMessages.push('CPF já cadastrado');
+        if (hasPhone) duplicateMessages.push('Telefone já cadastrado');
+        if (hasEmail) duplicateMessages.push('Email já cadastrado');
+
+        Alert.alert('Duplicação detectada', duplicateMessages.join('\n'));
+        return;
+      }
+
       const { error } = await supabase
         .from('responsavel')
         .insert([
@@ -84,21 +110,13 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
             telefone: unmaskedPhone,
             email: formData.email.trim(),
           },
-        ])
-        .select();
+        ]);
 
       if (error) throw error;
 
-      Alert.alert(
-        'Sucesso',
-        `Responsável cadastrado com sucesso!\n\nNome: ${capitalizedName}`,
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.goBack(),
-          },
-        ],
-      );
+      Alert.alert('Sucesso', 'Responsável cadastrado com sucesso!');
+      navigation.goBack();
+
     } catch (error: any) {
       Alert.alert('Erro ao cadastrar responsável', error.message);
     }
@@ -106,20 +124,24 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
 
   const handleCancel = () => {
     const isDirty =
+      formData.name.trim() !== '' ||
       formData.cpf.trim() !== '' ||
       formData.phone.trim() !== '' ||
-      formData.email.trim() !== '' ||
-      (formData.name.trim() !== '' && formData.name.trim() !== prefillName);
+      formData.email.trim() !== '';
 
     if (!isDirty) {
       navigation.goBack();
       return;
     }
 
-    Alert.alert('Cancelar', 'Deseja cancelar o cadastro? Os dados não serão salvos.', [
-      { text: 'Continuar', style: 'cancel' },
-      { text: 'Sair', onPress: () => navigation.goBack() },
-    ]);
+    Alert.alert(
+      'Cancelar',
+      'Tem certeza que deseja sair? Os dados não serão salvos',
+      [
+        { text: 'Continuar', style: 'cancel' },
+        { text: 'Sair', style: 'destructive', onPress: () => navigation.goBack() },
+      ]
+    );
   };
 
   return (
@@ -187,7 +209,7 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
                 </View>
 
                 <Text style={[styles.guardianInput, styles.guardianCreationMargin]}>
-                  Email *
+                  E-mail *
                 </Text>
                 <View style={styles.searchContainer}>
                   <TextInput
