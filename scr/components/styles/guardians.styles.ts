@@ -94,12 +94,12 @@ export const createStyles = (isTablet: boolean) => {
       color: colors.primaryForeground,
     },
 
-    patientCreationSection: {
+    guardianCreationSection: {
       paddingHorizontal: isTablet ? wp('4%') : wp('5%'),
       paddingBottom: isTablet ? hp('2%') : hp('2.5%'),
     },
 
-    patientActions: {
+    guardianActions: {
       marginLeft: isTablet ? wp('3%') : wp('3%'),
     },
 
@@ -117,12 +117,12 @@ export const createStyles = (isTablet: boolean) => {
       color: colors.primaryForeground,
     },
 
-    patientCreationButton: {
+    guardianCreationButton: {
       width: '100%',
       paddingVertical: isTablet ? hp('2%') : hp('2.2%'),
     },
 
-    editPatientButton: {
+    editGuardianButton: {
       alignSelf: 'flex-start',
       paddingVertical: isTablet ? hp('1.5%') : hp('2%'),
       paddingHorizontal: isTablet ? wp('2.5%') : wp('4%'),
@@ -134,37 +134,37 @@ export const createStyles = (isTablet: boolean) => {
       paddingTop: isTablet ? wp('3%') : wp('0%')
     },
 
-    patientsList: {
+    guardiansList: {
       gap: isTablet ? hp('1.5%') : hp('2%'),
       paddingBottom: isTablet ? hp('3%') : hp('4%'),
     },
 
-    patientCard: {
+    guardianCard: {
       marginVertical: 0,
       padding: isTablet ? wp('4%') : wp('4%'),
       borderRadius: isTablet ? 20 : 16,
       ...shadows.shadowMedium,
     },
 
-    patientCardContent: {
+    guardianCardContent: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
     },
 
-    patientInfo: {
+    guardianInfo: {
       flex: 1,
       gap: isTablet ? hp('1%') : hp('1.2%'),
     },
 
-    patientHeader: {
+    guardianHeader: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
       marginBottom: isTablet ? hp('0.5%') : hp('0.8%'),
     },
 
-    patientName: {
+    guardianName: {
       fontSize: isTablet ? wp('4%') : wp('4.5%'),
       fontWeight: '600',
       color: colors.foreground,
@@ -185,27 +185,27 @@ export const createStyles = (isTablet: boolean) => {
       color: colors.primaryForeground,
     },
 
-    patientDetails: {
+    guardianDetails: {
       gap: isTablet ? hp('0.3%') : hp('0.5%'),
     },
 
-    patientInput: {
+    guardianInput: {
       fontSize: isTablet ? wp('3%') : wp('3.5%'),
       color: colors.mutedForeground,
     },
 
-    patientCreationMargin: {
+    guardianCreationMargin: {
       marginBottom: isTablet ? wp('2%') : wp('3%'), 
       marginTop: isTablet ? wp('2%') : wp('3%'),
       fontWeight: '600'
     },
 
-    patientLastTest: {
+    guardianLastTest: {
       fontSize: isTablet ? wp('3%') : wp('3.5%'),
       color: colors.mutedForeground,
     },
 
-    patientTestsCount: {
+    guardianTestsCount: {
       fontSize: isTablet ? wp('3%') : wp('3.5%'),
       color: colors.mutedForeground,
     },

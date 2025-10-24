@@ -1,4 +1,6 @@
 import CheckBox from 'expo-checkbox';
+import { useAuth } from '../../AuthContext';
+import { supabase } from '../utils/supabase';
 import { Button } from '../components/Button';
 import React, { useState, useEffect } from 'react';
 import { colors } from '../components/styles/colors';
@@ -11,6 +13,7 @@ import { View, Text, TextInput, TouchableOpacity, Alert, useWindowDimensions } f
 const STORAGE_KEY = '@remember_me';
 
 export const LoginScreen = ({ navigation }: LoginScreenProps) => {
+  const { setSession, setUser, setProfessionalId } = useAuth();
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
   const styles = createLoginStyles(isTablet);
@@ -18,6 +21,7 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const loadRememberedUser = async () => {
@@ -37,12 +41,18 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
   }, []);
 
   const handleLogin = async () => {
+    if (!email.trim() || !password) {
+      Alert.alert('Erro', 'Por favor, preencha o email e a senha.');
+      return;
+    }
+
+    setLoading(true);
     if (rememberMe) {
       try {
         const jsonValue = JSON.stringify({ rememberedEmail: email });
         await AsyncStorage.setItem(STORAGE_KEY, jsonValue);
       } catch (e) {
-        console.error('Failed to save user to storage.', e);
+        console.error('Failed to save user to storage', e);
       }
     } else {
       try {
@@ -52,15 +62,35 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
       }
     }
 
-    if (email === 'teste@teste.com' && password === 'teste') {
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{ name: 'Home' }],
-        })
-      );
-    } else {
-      Alert.alert('Erro', 'Email ou senha inválidos.');
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      if (error) {
+        if (error.message === 'Invalid login credentials') {
+          Alert.alert('Erro no Login', 'Email ou senha inválidos.');
+        } else {
+          Alert.alert('Erro no Login', error.message);
+        }
+      } else {
+        const { data: { session } } = await supabase.auth.getSession();
+        const user = session?.user || null;
+        setSession(session);
+        setUser(user);
+        setProfessionalId(user?.id || null);
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: 'Home' }],
+          })
+        );
+      }
+    } catch (error: any) {
+      Alert.alert('Erro Inesperado', error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -95,8 +125,8 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
           <Text style={styles.checkboxLabel}>Lembrar de mim</Text>
         </View>
 
-        <Button variant="default" size="default" onPress={handleLogin}>
-          Entrar
+        <Button variant="default" size="default" onPress={handleLogin} disabled={loading}>
+          {loading ? 'Entrando...' : 'Entrar'}
         </Button>
         <View style={styles.registerContainer}>
           <Text style={styles.registerText}>

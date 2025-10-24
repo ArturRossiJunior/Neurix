@@ -1,69 +1,108 @@
-import React, { useState } from 'react';
 import { Card } from '../components/Card';
+import { useAuth } from '../../AuthContext';
+import { supabase } from '../utils/supabase';
+import { calculateAge } from '../utils/utils';
 import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
 import { PatientsScreenProps } from '../navigation/types';
+import React, { useState, useCallback, useEffect } from 'react';
 import { createStyles } from '../components/styles/patients.styles';
-import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 
-// Mock data para demonstração
-const mockPatients = [
-  {
-    id: '1',
-    name: 'Ana Silva',
-    age: 8,
-    lastTest: '15/03/2024',
-    status: 'Ativo',
-    testsCount: 3,
-  },
-  {
-    id: '2',
-    name: 'João Santos',
-    age: 7,
-    lastTest: '12/03/2024',
-    status: 'Ativo',
-    testsCount: 2,
-  },
-  {
-    id: '3',
-    name: 'Maria Oliveira',
-    age: 9,
-    lastTest: '10/03/2024',
-    status: 'Inativo',
-    testsCount: 5,
-  },
-  {
-    id: '4',
-    name: 'Pedro Costa',
-    age: 6,
-    lastTest: '08/03/2024',
-    status: 'Ativo',
-    testsCount: 1,
-  },
-  {
-    id: '5',
-    name: 'Sofia Ferreira',
-    age: 8,
-    lastTest: '05/03/2024',
-    status: 'Ativo',
-    testsCount: 4,
-  },
-];
+interface Patient {
+  id: string;
+  nome_completo: string;
+  data_nascimento: string;
+  status: 'ativo' | 'inativo';
+  lastTest?: string;
+  testsCount?: number;
+}
 
 const PatientsScreen = ({ navigation }: PatientsScreenProps) => {
   const isTablet = useIsTablet();
   const styles = createStyles(isTablet);
   const [searchText, setSearchText] = useState('');
-  const [filteredPatients, setFilteredPatients] = useState(mockPatients);
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { professionalId } = useAuth();
+
+  const fetchPatients = useCallback(async () => {
+    if (!professionalId) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data: patientsData, error: patientsError } = await supabase
+        .from('pacientes')
+        .select('id, nome_completo, data_nascimento, status')
+        .eq('id_profissional', professionalId);
+
+      if (patientsError) {
+        throw patientsError;
+      }
+
+      const patientsWithDetails: Patient[] = await Promise.all(
+        patientsData.map(async (patient) => {
+          const { data: lastTestData, error: lastTestError } = await supabase
+            .from('avaliacoes')
+            .select('data_aplicacao')
+            .eq('id_paciente', patient.id)
+            .order('data_aplicacao', { ascending: false })
+            .limit(1);
+
+          if (lastTestError) {
+            console.error('Erro ao buscar último teste:', lastTestError);
+          }
+
+          const lastTest = lastTestData && lastTestData.length > 0
+            ? new Date(lastTestData[0].data_aplicacao).toLocaleDateString('pt-BR')
+            : undefined;
+
+          const { count: testsCount, error: countError } = await supabase
+            .from('avaliacoes')
+            .select('*', { count: 'exact' })
+            .eq('id_paciente', patient.id);
+
+          if (countError) {
+            console.error('Erro ao contar testes:', countError);
+          }
+
+          return {
+            ...patient,
+            lastTest,
+            testsCount: testsCount || 0,
+          };
+        })
+      );
+
+      setPatients(patientsWithDetails);
+      setFilteredPatients(patientsWithDetails);
+    } catch (error: any) {
+      Alert.alert('Erro', 'Erro ao carregar pacientes: ' + error.message);
+      console.error('Erro ao carregar pacientes:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [professionalId]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchPatients();
+    });
+    return unsubscribe;
+  }, [navigation, fetchPatients]);
 
   const handleSearch = (text: string) => {
     setSearchText(text);
     if (text.trim() === '') {
-      setFilteredPatients(mockPatients);
+      setFilteredPatients(patients);
     } else {
-      const filtered = mockPatients.filter(patient =>
-        patient.name.toLowerCase().includes(text.toLowerCase())
+      const filtered = patients.filter(patient =>
+        patient.nome_completo.toLowerCase().includes(text.toLowerCase())
       );
       setFilteredPatients(filtered);
     }
@@ -86,9 +125,18 @@ const PatientsScreen = ({ navigation }: PatientsScreenProps) => {
     );
   };
 
-  const getStatusColor = (status: string) => {
-    return status === 'Ativo' ? colors.softGreen : colors.deactivated;
+  const getStatusColor = (status: 'ativo' | 'inativo') => {
+    return status === 'ativo' ? colors.softGreen : colors.deactivated;
   };
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={{ marginTop: 10, color: colors.text }}>Carregando pacientes...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -132,14 +180,14 @@ const PatientsScreen = ({ navigation }: PatientsScreenProps) => {
               <View style={styles.patientCardContent}>
                 <View style={styles.patientInfo}>
                   <View style={styles.patientHeader}>
-                    <Text style={styles.patientName}>{patient.name}</Text>
+                    <Text style={styles.patientName}>{patient.nome_completo}</Text>
                     <View style={[styles.statusBadge, { backgroundColor: getStatusColor(patient.status) }]}>
-                      <Text style={styles.statusText}>{patient.status}</Text>
+                      <Text style={styles.statusText}>{patient.status === 'ativo' ? 'Ativo' : 'Inativo'}</Text>
                     </View>
                   </View>
                   <View style={styles.patientDetails}>
-                    <Text style={styles.patientAge}>Idade: {patient.age} anos</Text>
-                    <Text style={styles.patientLastTest}>Último teste: {patient.lastTest}</Text>
+                    <Text style={styles.patientInput}>Idade: {patient.data_nascimento ? `${calculateAge(patient.data_nascimento)} anos` : 'N/A'}</Text>
+                    <Text style={styles.patientLastTest}>Último teste: {patient.lastTest || 'Nenhum'}</Text>
                     <Text style={styles.patientTestsCount}>Testes realizados: {patient.testsCount}</Text>
                   </View>
                 </View>
@@ -149,7 +197,7 @@ const PatientsScreen = ({ navigation }: PatientsScreenProps) => {
         </View>
       </ScrollView>
 
-      {filteredPatients.length === 0 && (
+      {filteredPatients.length === 0 && !loading && (
         <View style={styles.emptyState}>
           <Text style={styles.emptyStateTitle}>Nenhum paciente encontrado</Text>
           <Text style={styles.emptyStateDescription}>

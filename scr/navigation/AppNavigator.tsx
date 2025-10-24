@@ -6,12 +6,15 @@ import AboutScreen from '../screens/aboutScreen';
 import { LoginScreen } from '../screens/loginScreen';
 import PatientsScreen from '../screens/patientsListScreen';
 import { RegisterScreen } from '../screens/registerScreen';
-import { TestsListScreen } from '../screens/testsListScreen';
 import { DashboardScreen } from '../screens/dashboardScreen';
+import { TestsListScreen } from '../screens/testsListScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { TestDetailScreen } from '../screens/testDetailScreen';
 import PatientDetailScreen from '../screens/patientDetailScreen';
+import GuardiansListScreen from '../screens/guardiansListScreen';
+import GuardianDetailScreen from '../screens/guardianDetailScreen';
 import PatientCreationScreen from '../screens/patientCreationScreen';
+import GuardianCreationScreen from '../screens/guardianCreationScreen';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -68,6 +71,21 @@ export default function AppNavigator() {
         <Stack.Screen
           name="TestDetail"
           component={TestDetailScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Guardians"
+          component={GuardiansListScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="GuardianDetail"
+          component={GuardianDetailScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="GuardianCreation"
+          component={GuardianCreationScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen
