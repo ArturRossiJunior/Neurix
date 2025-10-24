@@ -2,6 +2,7 @@ import React from 'react';
 import { RootStackParamList } from './types';
 import HomeScreen from '../screens/homeScreen';
 import IndexScreen from '../screens/indexScreen';
+import AboutScreen from '../screens/aboutScreen';
 import { LoginScreen } from '../screens/loginScreen';
 import PatientsScreen from '../screens/patientsListScreen';
 import { RegisterScreen } from '../screens/registerScreen';
@@ -85,6 +86,11 @@ export default function AppNavigator() {
         <Stack.Screen
           name="GuardianCreation"
           component={GuardianCreationScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="About"
+          component={AboutScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
