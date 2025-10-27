@@ -5,68 +5,89 @@ import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
 import { MaskedTextInput } from 'react-native-mask-text';
-import { capitalizeName, validateEmail } from '../utils/utils';
 import { GuardianCreationScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/guardians.styles';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
+import { capitalizeName, validateEmail, isValidCPF } from '../utils/utils';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
 
 const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenProps) => {
+  const isEditing = route.params?.guardianId !== undefined;
+  const guardianId = route.params?.guardianId;
   const isTablet = useIsTablet();
   const styles = createStyles(isTablet);
-
-  const prefillName = route?.params?.prefillName || '';
+  const prefillName = route.params?.prefillName || '';
+  const prefillCPF = route.params?.prefillCPF || '';
+  const prefillPhone = route.params?.prefillPhone || '';
+  const prefillEmail = route.params?.prefillEmail || '';
 
   const [formData, setFormData] = useState({
     name: prefillName,
+    cpf: prefillCPF,
+    phone: prefillPhone,
+    email: prefillEmail,
+  });
+
+  const [errors, setErrors] = useState({
+    name: '',
     cpf: '',
     phone: '',
     email: '',
   });
 
+  const [isSaving, setIsSaving] = useState(false);
+
   const handleInputChange = (field: string, value: string) => {
-      setFormData(prev => ({
-        ...prev,
-        [field]: value,
-      }));
-    };
+    setFormData(prev => ({ ...prev, [field]: value }));
+    setErrors(prev => ({ ...prev, [field]: '' }));
+  };
 
   const handleSave = async () => {
+    if (isSaving) return;
+
     const unmaskedPhone = formData.phone.replace(/\D/g, '');
     const unmaskedCPF = formData.cpf.replace(/\D/g, '');
+    const newErrors = { name: '', cpf: '', phone: '', email: '' };
+    let hasError = false;
 
     if (!formData.name.trim()) {
-      Alert.alert('Erro', 'Nome do responsável é obrigatório');
-      return;
+      newErrors.name = 'Nome do responsável é obrigatório';
+      hasError = true;
+    } else {
+      const nameParts = formData.name.trim().split(/\s+/);
+      if (nameParts.length < 2 || nameParts.some(part => part.length < 2)) {
+        newErrors.name = 'Digite o nome completo (nome e sobrenome)';
+        hasError = true;
+      }
     }
-    if (!formData.name.trim().includes(' ')) {
-      Alert.alert('Erro', 'Digite o nome completo do responsável (nome e sobrenome)');
-      return;
+
+    if (!isValidCPF(unmaskedCPF)) {
+      newErrors.cpf = 'CPF inválido';
+      hasError = true;
     }
-    if (!unmaskedCPF || unmaskedCPF.length !== 11) {
-      Alert.alert('Erro', 'CPF inválido. Deve conter 11 dígitos');
-      return;
-    }
-    if (/^(\d)\1+$/.test(unmaskedCPF)) {
-      Alert.alert('Erro', 'CPF inválido (dígitos repetidos)');
-      return;
-    }
+
     if (!unmaskedPhone || (unmaskedPhone.length !== 10 && unmaskedPhone.length !== 11)) {
-      Alert.alert('Erro', 'Telefone inválido. Deve conter 10 ou 11 dígitos.');
-      return;
+      newErrors.phone = 'Telefone inválido';
+      hasError = true;
     }
+
     if (!formData.email.trim()) {
-      Alert.alert('Erro', 'Email é obrigatório');
-      return;
+      newErrors.email = 'Email é obrigatório';
+      hasError = true;
+    } else if (!validateEmail(formData.email.trim())) {
+      newErrors.email = 'Email inválido';
+      hasError = true;
     }
-    if (!validateEmail(formData.email.trim())) {
-      Alert.alert('Erro', 'Email inválido');
+
+    if (hasError) {
+      setErrors(newErrors);
       return;
     }
 
     const capitalizedName = capitalizeName(formData.name.trim());
+    setIsSaving(true);
 
-    try {
+    try {      
       const { data: existingPaciente, error: fetchPacienteError } = await supabase
         .from('pacientes')
         .select('id')
@@ -75,35 +96,60 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
       if (fetchPacienteError) throw fetchPacienteError;
 
       if (existingPaciente && existingPaciente.length > 0) {
-        Alert.alert('Erro', 'Este CPF já está cadastrado como um paciente. Um responsável não pode ter o mesmo CPF de um paciente');
+        Alert.alert(
+          'Atenção',
+          'Este CPF já está cadastrado como um paciente'
+        );
+        setIsSaving(false);
         return;
       }
 
       const { data: existing, error: fetchError } = await supabase
         .from('responsavel')
-        .select('cpf, telefone, email')
+        .select('id, cpf, telefone, email')
         .or(`cpf.eq.${unmaskedCPF},telefone.eq.${unmaskedPhone},email.eq.${formData.email.trim()}`);
 
       if (fetchError) throw fetchError;
 
       if (existing && existing.length > 0) {
         const duplicateMessages: string[] = [];
+        let isDuplicate = false;
 
-        const hasCPF = existing.some(item => item.cpf === unmaskedCPF);
-        const hasPhone = existing.some(item => item.telefone === unmaskedPhone);
-        const hasEmail = existing.some(item => item.email === formData.email.trim());
+        const hasCPF = existing.some(item => item.cpf === unmaskedCPF && (!isEditing || item.id != guardianId));
+        const hasPhone = existing.some(item => item.telefone === unmaskedPhone && (!isEditing || item.id != guardianId));
+        const hasEmail = existing.some(item => item.email === formData.email.trim() && (!isEditing || item.id != guardianId));
 
-        if (hasCPF) duplicateMessages.push('CPF já cadastrado');
-        if (hasPhone) duplicateMessages.push('Telefone já cadastrado');
-        if (hasEmail) duplicateMessages.push('Email já cadastrado');
+        if (hasCPF) {
+          duplicateMessages.push('CPF já cadastrado');
+          isDuplicate = true;
+        }
+        if (hasPhone) {
+          duplicateMessages.push('Telefone já cadastrado');
+          isDuplicate = true;
+        }
+        if (hasEmail) {
+          duplicateMessages.push('Email já cadastrado');
+          isDuplicate = true;
+        }
 
-        Alert.alert('Duplicação detectada', duplicateMessages.join('\n'));
-        return;
+        if (isDuplicate) {
+          Alert.alert('Atenção', duplicateMessages.join('\n'));
+          setIsSaving(false);
+          return;
+        }
       }
 
-      const { error } = await supabase
-        .from('responsavel')
-        .insert([
+      let error;
+      if (isEditing) {
+        const { error: updateError } = await supabase.from('responsavel').update({
+          nome_completo: capitalizedName,
+          cpf: unmaskedCPF,
+          telefone: unmaskedPhone,
+          email: formData.email.trim(),
+        }).eq('id', guardianId);
+        error = updateError;
+      } else {
+        const { error: insertError } = await supabase.from('responsavel').insert([
           {
             nome_completo: capitalizedName,
             cpf: unmaskedCPF,
@@ -111,23 +157,27 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
             email: formData.email.trim(),
           },
         ]);
+        error = insertError;
+      }
 
       if (error) throw error;
 
-      Alert.alert('Sucesso', 'Responsável cadastrado com sucesso!');
       navigation.goBack();
-
     } catch (error: any) {
-      Alert.alert('Erro ao cadastrar responsável', error.message);
+      Alert.alert(`Erro ao ${isEditing ? 'atualizar' : 'cadastrar'} responsável`, error.message);
+      setIsSaving(false);
     }
   };
 
   const handleCancel = () => {
+    const unmaskedCPF = formData.cpf.replace(/\D/g, '');
+    const unmaskedPhone = formData.phone.replace(/\D/g, '');
+
     const isDirty =
-      formData.name.trim() !== '' ||
-      formData.cpf.trim() !== '' ||
-      formData.phone.trim() !== '' ||
-      formData.email.trim() !== '';
+      formData.name.trim() !== prefillName.trim() ||
+      unmaskedCPF !== prefillCPF.replace(/\D/g, '') ||
+      unmaskedPhone !== prefillPhone.replace(/\D/g, '') ||
+      formData.email.trim() !== prefillEmail.trim();
 
     if (!isDirty) {
       navigation.goBack();
@@ -136,13 +186,18 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
 
     Alert.alert(
       'Cancelar',
-      'Tem certeza que deseja sair? Os dados não serão salvos',
+      `Deseja cancelar a ${isEditing ? 'edição' : 'criação'}? Os dados não serão salvos`,
       [
         { text: 'Continuar', style: 'cancel' },
-        { text: 'Sair', style: 'destructive', onPress: () => navigation.goBack() },
+        { text: 'Sair', onPress: () => navigation.goBack() },
       ]
     );
   };
+
+  const getInputStyle = (field: keyof typeof errors) => [
+    styles.searchInput,
+    errors[field] ? styles.errorBorder : {},
+  ];
 
   return (
     <View style={styles.container}>
@@ -156,20 +211,17 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
         <View style={styles.guardiansList}>
           <Card variant="default" style={styles.guardianCard}>
             <View style={styles.guardianInfo}>
-              <Text style={styles.guardianName}>Informações do Responsável</Text>
+              <Text style={styles.guardianName}>
+                {isEditing ? 'Editar Responsável' : 'Informações do Responsável'}
+              </Text>
 
               <View style={styles.guardianDetails}>
-                <Text
-                  style={[
-                    styles.guardianInput,
-                    { marginBottom: isTablet ? wp('2%') : wp('3%'), fontWeight: '600' },
-                  ]}
-                >
+                <Text style={[styles.guardianInput, { marginBottom: isTablet ? wp('2%') : wp('3%') }]}>
                   Nome do Responsável *
                 </Text>
                 <View style={styles.searchContainer}>
                   <TextInput
-                    style={styles.searchInput}
+                    style={getInputStyle('name')}
                     placeholder="Digite o nome completo"
                     value={formData.name}
                     autoCapitalize="words"
@@ -177,14 +229,13 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
                     placeholderTextColor={colors.secondaryMutedForeground}
                   />
                 </View>
+                {errors.name ? <Text style={{ color: 'red', fontSize: 12 }}>{errors.name}</Text> : null}
 
-                <Text style={[styles.guardianInput, styles.guardianCreationMargin]}>
-                  CPF *
-                </Text>
+                <Text style={[styles.guardianInput, styles.guardianCreationMargin]}>CPF *</Text>
                 <View style={styles.searchContainer}>
                   <MaskedTextInput
                     mask="999.999.999-99"
-                    style={styles.searchInput}
+                    style={getInputStyle('cpf')}
                     placeholder="000.000.000-00"
                     value={formData.cpf}
                     onChangeText={text => handleInputChange('cpf', text)}
@@ -192,28 +243,30 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
                     placeholderTextColor={colors.secondaryMutedForeground}
                   />
                 </View>
+                {errors.cpf ? <Text style={{ color: 'red', fontSize: 12 }}>{errors.cpf}</Text> : null}
 
-                <Text style={[styles.guardianInput, styles.guardianCreationMargin]}>
-                  Telefone *
-                </Text>
+                <Text style={[styles.guardianInput, styles.guardianCreationMargin]}>Telefone *</Text>
                 <View style={styles.searchContainer}>
                   <MaskedTextInput
-                    mask="(99) 99999-9999"
-                    style={styles.searchInput}
-                    placeholder="(11) 99999-9999"
+                    mask={
+                      formData.phone.replace(/\D/g, '').length === 11
+                        ? '(99) 99999-9999'
+                        : '(99) 9999-9999'
+                    }
+                    style={getInputStyle('phone')}
+                    placeholder="(00) 00000-0000"
                     value={formData.phone}
                     onChangeText={text => handleInputChange('phone', text)}
                     keyboardType="numeric"
                     placeholderTextColor={colors.secondaryMutedForeground}
                   />
                 </View>
+                {errors.phone ? <Text style={{ color: 'red', fontSize: 12 }}>{errors.phone}</Text> : null}
 
-                <Text style={[styles.guardianInput, styles.guardianCreationMargin]}>
-                  E-mail *
-                </Text>
+                <Text style={[styles.guardianInput, styles.guardianCreationMargin]}>E-mail *</Text>
                 <View style={styles.searchContainer}>
                   <TextInput
-                    style={styles.searchInput}
+                    style={getInputStyle('email')}
                     placeholder="email@exemplo.com"
                     value={formData.email}
                     onChangeText={value => handleInputChange('email', value)}
@@ -222,6 +275,7 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
                     autoCapitalize="none"
                   />
                 </View>
+                {errors.email ? <Text style={{ color: 'red', fontSize: 12 }}>{errors.email}</Text> : null}
 
                 <Text
                   style={[
@@ -241,8 +295,9 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
               size="default"
               style={styles.guardianCreationButton}
               onPress={handleSave}
+              disabled={isSaving}
             >
-              Salvar Responsável
+              {isSaving ? 'Salvando...' : isEditing ? 'Salvar' : 'Criar'}
             </Button>
           </View>
         </View>

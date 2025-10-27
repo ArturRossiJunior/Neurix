@@ -5,7 +5,17 @@ export type RootStackParamList = {
   Home: undefined;
   Patients: undefined;
   PatientDetail: { patientId: string };
-  PatientCreation: { prefillName?: string };
+  PatientCreation: { 
+    patientId?: string;
+    prefillName?: string; 
+    prefillBirthDate?: string;
+    prefillCPF?: string;
+    prefillGender?: string;
+    prefillEscolaridade?: string;
+    prefillIdResponsavel?: number;
+    prefillLateralidade?: string;
+    prefillNotes?: string;
+  } | undefined;
   Dashboard: undefined;
   Login: undefined;
   Register: undefined;
@@ -13,7 +23,13 @@ export type RootStackParamList = {
   TestDetail: { testId: string; testName: string; };
   Guardians: undefined;
   GuardianDetail: { guardianId: string };
-  GuardianCreation: { prefillName: string };
+  GuardianCreation: { 
+    guardianId?: string; 
+    prefillName?: string; 
+    prefillCPF?: string; 
+    prefillPhone?: string; 
+    prefillEmail?: string; 
+  } | undefined;
   About: undefined;
 };
 

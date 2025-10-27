@@ -3,10 +3,11 @@ import { supabase } from '../utils/supabase';
 import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useState, useMemo, useCallback } from 'react';
 import { PatientDetailScreenProps } from '../navigation/types';
-import { calculateDetailedAge, formatPhone } from '../utils/utils';
 import { createStyles } from '../components/styles/patients.styles';
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { calculateDetailedAge, formatCPF, formatPhone } from '../utils/utils';
 import { ESCOLARIDADE_OPTIONS, LATERALIDADE_OPTIONS, GENERO_OPTIONS } from '../utils/constants';
 import { View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 
@@ -27,6 +28,7 @@ interface PatientDetail {
   cpf: string | null;
   escolaridade: string;
   lateralidade: string;
+  id_responsavel: string;
   responsavel: Responsible | null;
 }
 
@@ -37,6 +39,7 @@ interface TestDetail {
   resultado_pontuacao: number;
 }
 
+
 const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) => {
   const { patientId } = route.params;
   const isTablet = useIsTablet();
@@ -46,6 +49,7 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
   const [tests, setTests] = useState<TestDetail[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
   const fetchPatientDetails = useCallback(async () => {
     setLoading(true);
@@ -102,9 +106,11 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
     }
   }, [patientId]);
 
-  useEffect(() => {
-    fetchPatientDetails();
-  }, [fetchPatientDetails]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchPatientDetails();
+    }, [fetchPatientDetails])
+  );
 
   const formatLabel = (
     options: { label: string; value: string }[],
@@ -113,21 +119,75 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
     return options.find(o => o.value === value)?.label || value;
   };
 
-  const formatCPF = (cpf: string | null) => {
-    if (!cpf) return 'N/A';
-    const onlyDigits = cpf.replace(/\D/g, '');
-    if (onlyDigits.length !== 11) return cpf;
-    return onlyDigits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  const handleEditPatient = () => {
+    if (!patient) return;
+
+    const formattedDate = new Date(patient.data_nascimento).toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+
+    navigation.navigate('PatientCreation', {
+      patientId: patient.id.toString(),
+      prefillName: patient.nome_completo,
+      prefillBirthDate: formattedDate,
+      prefillCPF: patient.cpf ?? undefined,
+      prefillGender: patient.genero,
+      prefillEscolaridade: patient.escolaridade,
+      prefillIdResponsavel: Number(patient.id_responsavel),
+      prefillLateralidade: patient.lateralidade,
+      prefillNotes: patient.observacoes,
+    });
   };
 
-  const handleEditPatient = () => {
+  const handleTogglePatientStatus = async () => {
+    if (!patient || isUpdatingStatus) return;
+
+    const isActivating = patient.status === 'inativo';
+    const newStatus = isActivating ? 'ativo' : 'inativo';
+    const actionText = isActivating ? 'ativar' : 'inativar';
+    const actionTextCapitalized = isActivating ? 'Ativar' : 'Inativar';
+    const successText = isActivating ? 'ativado' : 'inativado';
+    
+    const alertMessage = isActivating
+      ? `Tem certeza que deseja ativar "${patient.nome_completo}"? O paciente voltará a aparecer nas listas ativas.`
+      : `Tem certeza que deseja inativar "${patient.nome_completo}"? O paciente não aparecerá mais nas listas ativas, mas todos os seus dados e testes serão mantidos.`;
+
     Alert.alert(
-      'Editar Paciente',
-      'Funcionalidade de edição será implementada em breve!',
-      [{ text: 'OK' }]
+      `Confirmar ${actionTextCapitalized}`,
+      alertMessage,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: actionTextCapitalized,
+          style: 'destructive',
+          onPress: async () => {
+            setIsUpdatingStatus(true);
+            try {
+              const { error: updateError } = await supabase
+                .from('pacientes')
+                .update({ status: newStatus })
+                .eq('id', patientId);
+
+              if (updateError) {
+                throw new Error(`Erro ao ${actionText} paciente: ${updateError.message}`);
+              }
+
+              navigation.goBack();
+
+            } catch (err: any) {
+              console.error(`Erro ao ${actionText} paciente:`, err);
+              Alert.alert('Erro', `Não foi possível ${actionText} o paciente: ${err.message}`);
+            } finally {
+              setIsUpdatingStatus(false);
+            }
+          },
+        },
+      ]
     );
   };
-
+  
   const handleNewTest = () => {
     navigation.navigate('Tests');
   };
@@ -174,18 +234,21 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
         >
           <Text style={styles.backButtonText}>↩</Text>
         </TouchableOpacity>
+        
         <Button 
           variant="soft"
           size="sm"
-          style={styles.editPatientButton}
+          style={styles.editPatientButton} 
           onPress={handleEditPatient}
+          disabled={isUpdatingStatus}
         > 
-        Editar
+          Editar
         </Button>
       </View>
-
+      
       <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.patientsList}>
+          
           <Card variant="default" style={styles.patientCard}>
             <View style={styles.patientInfo}>
               <View style={styles.patientHeader}>
@@ -218,7 +281,7 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
           <Card variant="default" style={styles.patientCard}>
             <View style={styles.patientInfo}>
               <Text style={styles.patientName}>Observações</Text>
-              <Text style={styles.patientInput}>{patient.observacoes || 'Nenhuma observação.'}</Text>
+              <Text style={styles.patientInput}>{patient.observacoes || 'Nenhuma observação'}</Text>
             </View>
           </Card>
 
@@ -263,8 +326,23 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
               </Card>
             ))
           ) : (
-            <Text style={{ color: colors.text, textAlign: 'center', marginTop: 10, fontSize: 24 }}>Nenhum teste registrado para este paciente</Text>
+            <Text style={styles.textTestNull}>Nenhum teste registrado para este paciente</Text>
           )}
+
+          <Button
+            variant="default"
+            size="default"
+            style={[
+              styles.buttonDeactivate,
+              patient.status === 'inativo' && { backgroundColor: colors.softGreen }
+            ]}
+            onPress={handleTogglePatientStatus}
+            disabled={isUpdatingStatus || loading}
+          >
+            {isUpdatingStatus 
+              ? 'Atualizando...' 
+              : (patient.status === 'ativo' ? 'Inativar' : 'Ativar')}
+          </Button>
         </View>
       </ScrollView>
     </View>

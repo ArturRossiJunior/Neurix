@@ -37,6 +37,12 @@ export const createStyles = (isTablet: boolean) => {
       ...shadows.shadowDefault,
     },
 
+    errorBorder: {
+      borderColor: 'red',
+      borderWidth: 1.5,
+      borderRadius: isTablet ? 16 : 12,
+    },
+
     backButtonText: {
       fontSize: isTablet ? wp('7%') : wp('5%'),
       fontWeight: '600',
@@ -79,19 +85,23 @@ export const createStyles = (isTablet: boolean) => {
       color: colors.foreground,
     },
 
+    // --- Estilo do Botão de Filtro Atualizado ---
     filterButton: {
       width: isTablet ? hp('6%') : hp('5.5%'),
       height: isTablet ? hp('6%') : hp('5.5%'),
       borderRadius: isTablet ? 16 : 12,
-      backgroundColor: colors.primary,
+      backgroundColor: colors.card, // Alterado de colors.primary
+      borderWidth: 1, // Adicionado
+      borderColor: colors.outlineBorder, // Adicionado
       alignItems: 'center',
       justifyContent: 'center',
       ...shadows.shadowDefault,
     },
 
+    // --- Estilo do Texto do Botão de Filtro Atualizado ---
     filterButtonText: {
       fontSize: isTablet ? wp('4%') : wp('4.5%'),
-      color: colors.primaryForeground,
+      color: colors.foreground, // Alterado de colors.primaryForeground
     },
 
     guardianCreationSection: {
@@ -131,7 +141,7 @@ export const createStyles = (isTablet: boolean) => {
     listContainer: {
       flex: 1,
       paddingHorizontal: isTablet ? wp('4%') : wp('5%'),
-      paddingTop: isTablet ? wp('3%') : wp('0%')
+      paddingTop: isTablet ? wp('3%') : wp('0%'),
     },
 
     guardiansList: {
@@ -195,9 +205,9 @@ export const createStyles = (isTablet: boolean) => {
     },
 
     guardianCreationMargin: {
-      marginBottom: isTablet ? wp('2%') : wp('3%'), 
+      marginBottom: isTablet ? wp('2%') : wp('3%'),
       marginTop: isTablet ? wp('2%') : wp('3%'),
-      fontWeight: '600'
+      fontWeight: '600',
     },
 
     guardianLastTest: {
@@ -236,5 +246,104 @@ export const createStyles = (isTablet: boolean) => {
       marginTop: isTablet ? hp('1%') : hp('1.5%'),
       paddingHorizontal: isTablet ? wp('8%') : wp('10%'),
     },
+
+    // --- Novos Estilos do Modal (Copiados de patients.styles.ts) ---
+    modalOverlay: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+
+    modalContent: {
+      width: isTablet ? wp('75%') : wp('90%'),
+      maxWidth: isTablet ? 700 : 400,
+      backgroundColor: colors.card,
+      borderRadius: isTablet ? 20 : 16,
+      padding: isTablet ? wp('3%') : wp('5%'),
+      ...shadows.shadowMedium,
+    },
+
+    modalTitle: {
+      fontSize: isTablet ? wp('3%') : wp('5.5%'),
+      fontWeight: 'bold',
+      marginBottom: isTablet ? hp('2%') : hp('2.5%'),
+      color: colors.foreground,
+      textAlign: 'center',
+    },
+
+    filterOption: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: isTablet ? hp('1%') : hp('1.5%'),
+    },
+
+    filterLabel: {
+      fontSize: isTablet ? wp('2.2%') : wp('4%'),
+      color: colors.foreground,
+    },
+
+    filterSectionTitle: {
+      fontSize: isTablet ? wp('2.5%') : wp('4%'),
+      fontWeight: '600',
+      color: colors.mutedForeground,
+      marginTop: isTablet ? hp('2%') : hp('2.5%'),
+      marginBottom: isTablet ? hp('1%') : hp('1.5%'),
+      borderBottomWidth: 1,
+      borderBottomColor: colors.outlineBorder,
+      paddingBottom: isTablet ? hp('0.5%') : hp('0.8%'),
+    },
+
+    filterInputContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      gap: isTablet ? wp('2%') : wp('3%'),
+    },
+
+    filterInput: {
+      flex: 1,
+      backgroundColor: colors.background,
+      borderColor: colors.outlineBorder,
+      borderWidth: 1,
+      borderRadius: isTablet ? 12 : 10,
+      paddingVertical: isTablet ? hp('1.2%') : hp('1.5%'),
+      paddingHorizontal: isTablet ? wp('3%') : wp('4%'),
+      fontSize: isTablet ? wp('2.2%') : wp('3.5%'),
+      color: colors.foreground,
+    },
+
+    sortContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: isTablet ? wp('1.5%') : wp('2%'),
+    },
+
+    sortButton: {
+      backgroundColor: colors.card,
+      borderColor: colors.primary,
+      borderWidth: 1,
+      borderRadius: isTablet ? 12 : 20,
+      paddingVertical: isTablet ? hp('0.8%') : hp('1%'),
+      paddingHorizontal: isTablet ? wp('2.5%') : wp('3%'),
+    },
+
+    sortButtonSelected: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
+
+    sortButtonText: {
+      fontSize: isTablet ? wp('2%') : wp('3%'),
+      color: colors.primary,
+      fontWeight: '500',
+    },
+
+    sortButtonTextSelected: {
+      color: colors.primaryForeground,
+      fontWeight: '600',
+    },
+    // --- Fim dos Novos Estilos do Modal ---
   });
 };

@@ -9,6 +9,7 @@ import { GuardianDetailScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/guardians.styles';
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface GuardianDetail {
   id: number;
@@ -113,16 +114,21 @@ const GuardianDetailScreen = ({ navigation, route }: GuardianDetailScreenProps) 
     }
   }, [guardianId]);
 
-  useEffect(() => {
-    fetchGuardianDetails();
-  }, [fetchGuardianDetails]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchGuardianDetails();
+    }, [fetchGuardianDetails])
+  );
 
   const handleEditGuardian = () => {
-    Alert.alert(
-      'Editar Responsável',
-      'Funcionalidade de edição será implementada em breve!',
-      [{ text: 'OK' }]
-    );
+    if (!guardian) return;
+    navigation.navigate('GuardianCreation', { 
+      guardianId: guardian.id.toString(),
+      prefillName: guardian.nome_completo,
+      prefillCPF: guardian.cpf ?? undefined,
+      prefillPhone: guardian.telefone ?? undefined,
+      prefillEmail: guardian.email ?? undefined,
+    });
   };
 
   const handleViewPatient = (patientId: string) => {
