@@ -1,6 +1,6 @@
 import { shadows } from './shadows';
 import { StyleSheet } from 'react-native';
-import { colors } from '../styles/colors';
+import { colors } from './colors';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 export const createStyles = (isTablet: boolean) => StyleSheet.create({

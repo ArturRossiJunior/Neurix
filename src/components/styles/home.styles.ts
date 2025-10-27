@@ -1,6 +1,6 @@
 import { colors } from './colors';
 import { StyleSheet } from 'react-native';
-import { createCommonStyles } from '../styles/common.styles';
+import { createCommonStyles } from './common.styles';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 export const createStyles = (isTablet: boolean) => {
