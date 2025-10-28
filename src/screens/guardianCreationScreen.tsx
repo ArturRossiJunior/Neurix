@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
 import { Card } from '../components/Card';
 import { supabase } from '../utils/supabase';
 import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
 import { MaskedTextInput } from 'react-native-mask-text';
+import React, { useEffect, useRef, useState } from 'react';
 import { GuardianCreationScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/guardians.styles';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
@@ -23,8 +23,8 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
 
   const [formData, setFormData] = useState({
     name: prefillName,
-    cpf: prefillCPF,
-    phone: prefillPhone,
+    cpf: prefillCPF.replace(/\D/g, ''),
+    phone: prefillPhone.replace(/\D/g, ''),
     email: prefillEmail,
   });
 
@@ -37,16 +37,29 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
 
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleInputChange = (field: string, value: string) => {
+  const isMounted = useRef(true);
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
+  const handleInputChange = (field: 'name' | 'email', value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    setErrors(prev => ({ ...prev, [field]: '' }));
+  };
+
+  const handleMaskedInputChange = (field: 'cpf' | 'phone', rawText: string) => {
+    setFormData(prev => ({ ...prev, [field]: rawText }));
     setErrors(prev => ({ ...prev, [field]: '' }));
   };
 
   const handleSave = async () => {
     if (isSaving) return;
 
-    const unmaskedPhone = formData.phone.replace(/\D/g, '');
-    const unmaskedCPF = formData.cpf.replace(/\D/g, '');
+    const unmaskedPhone = formData.phone;
+    const unmaskedCPF = formData.cpf;
     const newErrors = { name: '', cpf: '', phone: '', email: '' };
     let hasError = false;
 
@@ -134,7 +147,9 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
 
         if (isDuplicate) {
           Alert.alert('Atenção', duplicateMessages.join('\n'));
-          setIsSaving(false);
+          if (isMounted.current) {
+            setIsSaving(false);
+          }
           return;
         }
       }
@@ -165,18 +180,17 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
       navigation.goBack();
     } catch (error: any) {
       Alert.alert(`Erro ao ${isEditing ? 'atualizar' : 'cadastrar'} responsável`, error.message);
-      setIsSaving(false);
+      if (isMounted.current) {
+        setIsSaving(false);
+      }
     }
   };
 
   const handleCancel = () => {
-    const unmaskedCPF = formData.cpf.replace(/\D/g, '');
-    const unmaskedPhone = formData.phone.replace(/\D/g, '');
-
     const isDirty =
       formData.name.trim() !== prefillName.trim() ||
-      unmaskedCPF !== prefillCPF.replace(/\D/g, '') ||
-      unmaskedPhone !== prefillPhone.replace(/\D/g, '') ||
+      formData.cpf !== prefillCPF.replace(/\D/g, '') ||
+      formData.phone !== prefillPhone.replace(/\D/g, '') ||
       formData.email.trim() !== prefillEmail.trim();
 
     if (!isDirty) {
@@ -216,7 +230,7 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
               </Text>
 
               <View style={styles.guardianDetails}>
-                <Text style={[styles.guardianInput, { marginBottom: isTablet ? wp('2%') : wp('3%') }]}>
+                <Text style={[styles.guardianInput, styles.guardianCreationMargin]}>
                   Nome do Responsável *
                 </Text>
                 <View style={styles.searchContainer}>
@@ -237,8 +251,8 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
                     mask="999.999.999-99"
                     style={getInputStyle('cpf')}
                     placeholder="000.000.000-00"
-                    value={formData.cpf}
-                    onChangeText={text => handleInputChange('cpf', text)}
+                    value={formData.cpf} 
+                    onChangeText={(text, rawText) => handleMaskedInputChange('cpf', rawText)}
                     keyboardType="numeric"
                     placeholderTextColor={colors.secondaryMutedForeground}
                   />
@@ -249,14 +263,14 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
                 <View style={styles.searchContainer}>
                   <MaskedTextInput
                     mask={
-                      formData.phone.replace(/\D/g, '').length === 11
+                      formData.phone.length === 11
                         ? '(99) 99999-9999'
                         : '(99) 9999-9999'
                     }
                     style={getInputStyle('phone')}
                     placeholder="(00) 00000-0000"
                     value={formData.phone}
-                    onChangeText={text => handleInputChange('phone', text)}
+                    onChangeText={(text, rawText) => handleMaskedInputChange('phone', rawText)}
                     keyboardType="numeric"
                     placeholderTextColor={colors.secondaryMutedForeground}
                   />

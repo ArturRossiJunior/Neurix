@@ -36,7 +36,9 @@ interface TestDetail {
   id: string;
   nome_teste: string;
   data_aplicacao: string;
-  resultado_pontuacao: number;
+  resultado_correto: number;
+  resultado_incorreto: number;
+  resultado_omisso: number;
 }
 
 
@@ -79,7 +81,9 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
         .select(`
           id,
           data_aplicacao,
-          resultado_pontuacao,
+          resultado_correto,
+          resultado_incorreto,
+          resultado_omisso,
           tipos_de_teste(nome_teste)
         `)
         .eq('id_paciente', patientId)
@@ -93,7 +97,9 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
         id: test.id,
         nome_teste: test.tipos_de_teste.nome_teste,
         data_aplicacao: new Date(test.data_aplicacao).toLocaleDateString('pt-BR'),
-        resultado_pontuacao: test.resultado_pontuacao,
+        resultado_correto: test.resultado_correto,
+        resultado_incorreto: test.resultado_incorreto,
+        resultado_omisso: test.resultado_omisso,
       }));
       setTests(formattedTests);
 
@@ -192,6 +198,14 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
     navigation.navigate('Tests');
   };
 
+  const handleViewGuardian = () => {
+    if (!patient?.id_responsavel) {
+      Alert.alert("Erro", "Este paciente não tem um responsável associado");
+      return;
+    }
+    navigation.replace('GuardianDetail', { guardianId: patient.id_responsavel });
+  };
+
   const handleViewTest = (testId: string) => {
     Alert.alert(
       'Ver Teste',
@@ -265,15 +279,25 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
                 <Text style={styles.patientInput}>Escolaridade: {formatLabel(ESCOLARIDADE_OPTIONS, patient.escolaridade)}</Text>
                 <Text style={styles.patientInput}>Lateralidade: {formatLabel(LATERALIDADE_OPTIONS, patient.lateralidade)}</Text>
                 
-                <Text style={[styles.patientInput, { marginTop: 10, fontWeight: 'bold' }]}>Informações do responsável:</Text>
-                <Text style={styles.patientInput}>   Responsável: {patient.responsavel?.nome_completo || 'N/A'}</Text>
-                <Text style={styles.patientInput}>   Telefone: {formatPhone(patient.responsavel?.telefone) || 'N/A'}</Text>
-                <Text style={styles.patientInput}>   Email: {patient.responsavel?.email || 'N/A'}</Text>
-                
                 <Text style={[styles.patientInput, { marginTop: 10, fontWeight: 'bold' }]}>Informações de cadastro:</Text>
                 <Text style={styles.patientInput}>   Data de cadastro: {registrationDate}</Text>
                 <Text style={styles.patientInput}>   Último teste: {lastTestDate}</Text>
                 <Text style={styles.patientInput}>   Total de testes: {tests.length}</Text>
+              </View>
+            </View>
+          </Card>
+
+          <Card
+            variant="interactive"
+            style={styles.patientCard}
+            onPress={handleViewGuardian}
+          >
+            <View style={styles.patientInfo}>
+              <Text style={styles.patientName}>Informações do Responsável</Text>
+              <View style={styles.patientDetails}>
+                <Text style={styles.patientInput}>Responsável: {patient.responsavel?.nome_completo || 'N/A'}</Text>
+                <Text style={styles.patientInput}>Telefone: {formatPhone(patient.responsavel?.telefone) || 'N/A'}</Text>
+                <Text style={styles.patientInput}>Email: {patient.responsavel?.email || 'N/A'}</Text>
               </View>
             </View>
           </Card>
@@ -311,7 +335,9 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
                     <Text style={styles.patientName}>{test.nome_teste}</Text>
                     <View style={styles.patientDetails}>
                       <Text style={styles.patientInput}>Data: {test.data_aplicacao}</Text>
-                      <Text style={styles.patientInput}>Pontuação: {test.resultado_pontuacao}</Text>
+                      <Text style={styles.patientInput}>Corretos: {test.resultado_correto}</Text>
+                      <Text style={styles.patientInput}>Incorretos: {test.resultado_incorreto}</Text>
+                      <Text style={styles.patientInput}>Omitidos: {test.resultado_omisso}</Text>
                     </View>
                   </View>
                   <View style={styles.patientActions}>

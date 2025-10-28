@@ -2,14 +2,15 @@ import { Card } from '../components/Card';
 import { useAuth } from '../../AuthContext';
 import { supabase } from '../utils/supabase';
 import { Button } from '../components/Button';
-import React, { useState, useEffect } from 'react';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
 import { Picker } from '@react-native-picker/picker';
 import { MaskedTextInput } from 'react-native-mask-text';
-import { capitalizeName, isValidCPF, isValidDate } from '../utils/utils';
+import { useFocusEffect } from '@react-navigation/native';
 import { PatientCreationScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/patients.styles';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { capitalizeName, isValidCPF, isValidDate } from '../utils/utils';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { ESCOLARIDADE_OPTIONS, LATERALIDADE_OPTIONS } from '../utils/constants';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
@@ -25,7 +26,6 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
 
   const isEditing = route.params?.patientId !== undefined;
   const patientId = route.params?.patientId;
-
   const prefillName = route?.params?.prefillName || '';
   const prefillBirthDate = route.params?.prefillBirthDate || '';
   const prefillCPF = route.params?.prefillCPF || '';
@@ -34,10 +34,17 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
   const prefillIdResponsavel = route.params?.prefillIdResponsavel || -1;
   const prefillLateralidade = route.params?.prefillLateralidade || '';
   const prefillNotes = route.params?.prefillNotes || '';
-
   const [responsibles, setResponsibles] = useState<Responsible[]>([]);
   const [loadingResponsibles, setLoadingResponsibles] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+
+  const isMounted = useRef(true);
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   const [formData, setFormData] = useState({
     name: prefillName,
@@ -65,13 +72,19 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
   useEffect(() => {
     if (!professionalId && !isEditing) {
       Alert.alert('Erro', 'ID do profissional não encontrado. Faça login novamente');
-      navigation.goBack();
+      if (isMounted.current) {
+        navigation.goBack();
+      }
     }
-    fetchResponsibles();
   }, [professionalId, isEditing, navigation]);
 
   const fetchResponsibles = async () => {
-    setLoadingResponsibles(true);
+    if (isMounted.current) {
+      setLoadingResponsibles(true);
+    } else {
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('responsavel')
@@ -79,12 +92,65 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
         .order('nome_completo', { ascending: true });
 
       if (error) throw error;
-      if (data) setResponsibles(data as Responsible[]);
+      if (isMounted.current) {
+        setResponsibles(data as Responsible[]);
+      }
     } catch (error: any) {
-      Alert.alert('Erro ao carregar responsáveis', error.message);
+      console.error('Erro ao carregar responsáveis', error.message);
     } finally {
-      setLoadingResponsibles(false);
+      if (isMounted.current) {
+        setLoadingResponsibles(false);
+      }
     }
+  };
+  
+  useFocusEffect(
+    useCallback(() => {
+      if (professionalId || isEditing) {
+        fetchResponsibles();
+      }
+    }, [professionalId, isEditing])
+  );
+
+  const cleanupOrphanedResponsibles = async () => {
+    try {
+      const { data: patientData, error: patientError } = await supabase
+        .from('pacientes')
+        .select('id_responsavel')
+        .not('id_responsavel', 'is', null);
+
+      if (patientError) {
+        console.error('Erro ao buscar responsáveis vinculados:', patientError.message);
+        return;
+      }
+      
+      const usedResponsibleIds = [...new Set(patientData.map(p => p.id_responsavel))];
+      let deleteQuery = supabase.from('responsavel').delete();
+
+      if (usedResponsibleIds.length > 0) {
+        deleteQuery = deleteQuery.not('id', 'in', `(${usedResponsibleIds.join(',')})`);
+      } else {
+        deleteQuery = deleteQuery.not('id', 'is', null);
+      }
+
+      const { error: deleteError } = await deleteQuery;
+
+      if (deleteError) {
+        console.error('Erro ao deletar responsáveis órfãos:', deleteError.message);
+      }
+      
+    } catch (error: any) {
+      console.error('Erro na limpeza de responsáveis:', error.message);
+    }
+  };
+  
+  const navigateBackAndCleanup = async () => {
+    await cleanupOrphanedResponsibles();
+    navigation.goBack();
+  };
+
+  const handleNewGuardian = () => {
+    navigation.navigate('GuardianCreation');
   };
 
   const handleInputChange = (field: string, value: any) => {
@@ -206,11 +272,14 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
       }
 
       if (error) throw error;
+      
+      await navigateBackAndCleanup();
 
-      navigation.goBack();
     } catch (error: any) {
       Alert.alert(`Erro ao ${isEditing ? 'atualizar' : 'cadastrar'} paciente`, error.message);
-      setIsSaving(false);
+      if (isMounted.current) {
+        setIsSaving(false);
+      }
     }
   };
 
@@ -229,7 +298,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
       formData.notes.trim() !== prefillNotes.trim();
 
     if (!isDirty) {
-      navigation.goBack();
+      navigateBackAndCleanup();
       return;
     }
 
@@ -238,7 +307,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
       `Deseja cancelar a ${isEditing ? 'edição' : 'criação'}? Os dados não serão salvos`, 
       [
         { text: 'Continuar', style: 'cancel' },
-        { text: 'Sair', onPress: () => navigation.goBack() },
+        { text: 'Sair', onPress: () => navigateBackAndCleanup() },
       ]
     );
   };
@@ -270,7 +339,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
               </Text>
 
               <View style={styles.patientDetails}>
-                <Text style={[styles.patientInput, { marginBottom: isTablet ? wp('2%') : wp('3%'), fontWeight: '600' }]}>
+                <Text style={[styles.patientInput, styles.patientCreationMargin]}>
                   Nome do Paciente *
                 </Text>
                 <View style={getPickerContainerStyle('name')}>
@@ -357,7 +426,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
                   >
                     {formData.id_responsavel === -1 && (
                       <Picker.Item
-                        label={responsibles.length === 0 ? 'Nenhum responsável encontrado' : 'Selecione o responsável'}
+                        label={loadingResponsibles ? 'Carregando...' : (responsibles.length === 0 ? 'Nenhum responsável encontrado' : 'Selecione o responsável')}
                         value={-1}
                         enabled={false}
                       />
@@ -367,6 +436,16 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
                     ))}
                   </Picker>
                 </View>
+
+                <Button
+                  variant="link"
+                  size="sm"
+                  style={styles.patientCreationButton}
+                  onPress={handleNewGuardian}
+                  >
+                  Novo Responsável
+                </Button>
+
                 {errors.id_responsavel ? <Text style={{ color: 'red', fontSize: 12 }}>{errors.id_responsavel}</Text> : null}
 
                 <Text style={[styles.patientInput, styles.patientCreationMargin]}>Lateralidade *</Text>

@@ -162,11 +162,6 @@ const GuardiansScreen = ({ navigation }: GuardiansScreenProps) => {
     navigation.navigate('GuardianDetail', { guardianId });
   };
 
-  const handleGuardianCreation = () => {
-    const nameToPreFill = searchText.trim();
-    navigation.navigate('GuardianCreation', { prefillName: nameToPreFill });
-  };
-
   const handleFilter = () => {
     setIsFilterModalVisible(true);
   };
@@ -278,12 +273,6 @@ const GuardiansScreen = ({ navigation }: GuardiansScreenProps) => {
             placeholderTextColor={colors.deactivated}
           />
         </View>
-        <TouchableOpacity
-          style={styles.filterButton}
-          onPress={handleGuardianCreation}
-        >
-          <Text style={styles.filterButtonText}>+</Text>
-        </TouchableOpacity>
         
         <TouchableOpacity
           style={[
@@ -349,14 +338,6 @@ const GuardiansScreen = ({ navigation }: GuardiansScreenProps) => {
               ? 'Tente ajustar seus filtros ou adicione um novo responsável'
               : 'Comece adicionando seu primeiro responsável'}
           </Text>
-          <Button
-            variant="secondary"
-            size="default"
-            style={styles.emptyStateButton}
-            onPress={handleGuardianCreation}
-          >
-            + Adicionar Responsável
-          </Button>
         </View>
       )}
     </View>

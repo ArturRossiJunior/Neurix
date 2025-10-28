@@ -132,7 +132,7 @@ const GuardianDetailScreen = ({ navigation, route }: GuardianDetailScreenProps) 
   };
 
   const handleViewPatient = (patientId: string) => {
-    navigation.navigate('PatientDetail', { patientId });
+    navigation.replace('PatientDetail', { patientId });
   };
 
   const getStatusColor = (status: 'ativo' | 'inativo') => {
