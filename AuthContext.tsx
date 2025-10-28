@@ -1,4 +1,4 @@
-import { supabase } from '../Neurix//scr/utils/supabase';
+import { supabase } from './src/utils/supabase';
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 
 interface AuthContextType {

@@ -17,12 +17,18 @@
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.arturrossijunior.Neurix"
     },
-    "web": {
-    },
+    "web": {},
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "77d38650-841e-40fd-a9e2-c156e041e657"
+      }
+    }
   }
 }
