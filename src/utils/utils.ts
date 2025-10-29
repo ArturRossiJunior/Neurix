@@ -1,8 +1,8 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 export function calculateAge(birthDate: string) {
@@ -14,20 +14,37 @@ export function calculateAge(birthDate: string) {
     age--;
   }
   return age;
-};
+}
 
 export const formatPhone = (phone: string | null | undefined): string => {
   if (!phone) return 'N/A';
   const cleaned = phone.replace(/\D/g, '');
-  
+
   if (cleaned.length === 11) {
     return cleaned.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
   }
   if (cleaned.length === 10) {
     return cleaned.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
   }
-  
+
   return phone;
+};
+
+export const maskPhone = (value: string): string => {
+  let v = value.replace(/\D/g, '');
+  v = v.substring(0, 11);
+  const length = v.length;
+
+  if (length <= 2) {
+    return `(${v}`;
+  }
+  if (length <= 6) {
+    return `(${v.substring(0, 2)}) ${v.substring(2)}`;
+  }
+  if (length <= 10) {
+    return `(${v.substring(0, 2)}) ${v.substring(2, 6)}-${v.substring(6)}`;
+  }
+  return `(${v.substring(0, 2)}) ${v.substring(2, 7)}-${v.substring(7)}`;
 };
 
 export const calculateDetailedAge = (dateString: string): string => {
@@ -48,7 +65,11 @@ export const calculateDetailedAge = (dateString: string): string => {
 
   if (days < 0) {
     months--;
-    const lastMonthDays = new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+    const lastMonthDays = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      0,
+    ).getDate();
     days += lastMonthDays;
   }
 
@@ -86,7 +107,7 @@ export const capitalizeName = (name: string) => {
   return name
     .split(' ')
     .filter(Boolean)
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
 };
 
@@ -107,31 +128,53 @@ export const isValidDate = (dateStr: string) => {
   return true;
 };
 
-export const validateEmail = (email: string) => /^[^@]+@[^@]+\.[^@]+$/.test(email);
+export const validateEmail = (email: string) =>
+  /^[^@]+@[^@]+\.[^@]+$/.test(email);
 
-export const validateCRP = (crp: string) => {
-  const normalized = crp.toUpperCase().replace('CRP', '').trim();
-  const crpRegex = /^(?:\d{1,2}[\/\-\s]\d{4,}|\d{4,}[\/\-\s]\d{1,2})$/;
-  return crpRegex.test(normalized);
+export const validatePassword = (password: string): string | null => {
+  if (password.length < 8) {
+    return 'A senha deve ter pelo menos 8 caracteres';
+  }
+  if (!/[a-z]/.test(password)) {
+    return 'A senha deve conter pelo menos uma letra minúscula';
+  }
+  if (!/[A-Z]/.test(password)) {
+    return 'A senha deve conter pelo menos uma letra maiúscula';
+  }
+  if (!/\d/.test(password)) {
+    return 'A senha deve conter pelo menos um número';
+  }
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    return 'A senha deve conter pelo menos um caractere especial';
+  }
+  return null;
 };
 
-export const formatCRPForDB = (crp: string): string => {
-  const normalized = crp
-    .toUpperCase()
-    .replace('CRP', '')
-    .replace(/[\s\-\/]/, '/') 
-    .replace(/[^0-9\/]/g, '');
+export const isValidPhone = (phone: string): boolean => {
+  if (typeof phone !== 'string') return false;
+  const cleaned = phone.replace(/\D/g, '');
+  return cleaned.length === 10 || cleaned.length === 11;
+};
 
-  let match = normalized.match(/^(\d{4,})\/(\d{1,2})$/);
-  if (match) {
-    return `${match[2]}/${match[1]}`;
-  }
+export const validateCRM = (crm: string) => {
+  const crmRegex = /^\d{4,8}\/[A-Z]{2}$/i;
+  return crmRegex.test(crm.trim());
+};
 
-  match = normalized.match(/^(\d{1,2})\/(\d{4,})$/);
-  if (match) {
-    return normalized;
+export const formatCRMForDB = (crm: string): string => {
+  return crm.trim().toUpperCase();
+};
+
+export const maskCRM = (value: string): string => {
+  let v = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+  const digits = (v.match(/\d+/) || [''])[0].substring(0, 8);
+  const letters = (v.match(/[A-Z]+/) || [''])[0].substring(0, 2);
+
+  if (letters) {
+    return `${digits}/${letters}`;
   }
-  return crp.toUpperCase(); 
+  return digits;
 };
 
 export const isValidCPF = (cpf: string): boolean => {
@@ -162,4 +205,15 @@ export const isValidCPF = (cpf: string): boolean => {
   if (rest !== parseInt(cpf.substring(10, 11))) return false;
 
   return true;
+};
+
+export const validateFullName = (name: string): string | null => {
+  if (!name.trim()) {
+    return 'Nome é obrigatório';
+  }
+  const nameParts = name.trim().split(/\s+/);
+  if (nameParts.length < 2 || nameParts.some(part => part.length < 2)) {
+    return 'Digite o nome completo (nome e sobrenome)';
+  }
+  return null;
 };

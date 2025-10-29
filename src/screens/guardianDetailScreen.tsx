@@ -1,15 +1,15 @@
 import { Card } from '../components/Card';
 import { supabase } from '../utils/supabase';
 import { formatPhone } from '../utils/utils';
-import { calculateAge, formatCPF } from '../utils/utils'; 
 import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
+import { calculateAge, formatCPF } from '../utils/utils';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useState, useMemo, useCallback } from 'react';
 import { GuardianDetailScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/guardians.styles';
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
 
 interface GuardianDetail {
   id: number;

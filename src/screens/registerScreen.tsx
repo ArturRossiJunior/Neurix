@@ -4,8 +4,23 @@ import { Button } from '../components/Button';
 import { colors } from '../components/styles/colors';
 import { RegisterScreenProps } from '../navigation/types';
 import { createRegisterStyles } from '../components/styles/register.styles';
-import { formatCRPForDB, validateCRP, validateEmail } from '../utils/utils';
-import { View, Text, TextInput, TouchableOpacity, Alert, useWindowDimensions } from 'react-native';
+import {
+  validateEmail,
+  validatePassword,
+  validateCRM,
+  formatCRMForDB,
+  maskCRM,
+  maskPhone,
+  capitalizeName,
+} from '../utils/utils';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  useWindowDimensions,
+} from 'react-native';
 
 export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
   const { width } = useWindowDimensions();
@@ -14,12 +29,11 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [crm, setCRM] = useState('');
+  const [telefone, setTelefone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [registroProfissional, setRegistroProfissional] = useState('');
   const [loading, setLoading] = useState(false);
-
-  
 
   const handleRegister = async () => {
     setLoading(true);
@@ -36,22 +50,37 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
       return;
     }
 
+    if (!validateCRM(crm)) {
+      Alert.alert('CRM Inválido', 'Informe um CRM válido (ex: 123456/SP)');
+      setLoading(false);
+      return;
+    }
+
+    const telefoneLimpo = telefone.replace(/\D/g, '');
+    if (telefoneLimpo.length < 10 || telefoneLimpo.length > 11) {
+      Alert.alert(
+        'Telefone Inválido',
+        'Informe um telefone válido com DDD (10 ou 11 dígitos)',
+      );
+      setLoading(false);
+      return;
+    }
+
     if (password !== confirmPassword) {
       Alert.alert('Atenção', 'As senhas não coincidem');
       setLoading(false);
       return;
     }
 
-    if (!validateCRP(registroProfissional)) {
-      Alert.alert(
-        'CRP Inválido',
-        'Informe um CRP válido (ex: 06/123456)',
-      );
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      Alert.alert('Senha Inválida', passwordError);
       setLoading(false);
       return;
     }
 
-    const crpFormatado = formatCRPForDB(registroProfissional);
+    const crmFormatado = formatCRMForDB(crm);
+    const nomeCapitalizado = capitalizeName(name);
 
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -59,8 +88,9 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
         password: password,
         options: {
           data: {
-            nome_completo: name,
-            registro_profissional: crpFormatado, 
+            nome_completo: nomeCapitalizado,
+            registro_profissional: crmFormatado,
+            telefone: telefoneLimpo,
           },
         },
       });
@@ -108,11 +138,21 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
         />
         <TextInput
           style={styles.input}
-          placeholder="CRP (ex: 06/123456)" 
+          placeholder="CRM (ex: 123456/SP)"
           placeholderTextColor={colors.mutedForeground}
+          autoCapitalize="characters"
+          value={crm}
+          onChangeText={(text) => setCRM(maskCRM(text))}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Telefone (ex: (11) 98765-4321)"
+          placeholderTextColor={colors.mutedForeground}
+          keyboardType="phone-pad"
           autoCapitalize="none"
-          value={registroProfissional}
-          onChangeText={setRegistroProfissional}
+          value={telefone}
+          onChangeText={(text) => setTelefone(maskPhone(text))}
+          maxLength={15}
         />
         <TextInput
           style={styles.input}
@@ -130,7 +170,12 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
           value={confirmPassword}
           onChangeText={setConfirmPassword}
         />
-        <Button variant="default" size="default" onPress={handleRegister} disabled={loading}>
+        <Button
+          variant="default"
+          size="default"
+          onPress={handleRegister}
+          disabled={loading}
+        >
           {loading ? 'Registrando...' : 'Registrar'}
         </Button>
         <View style={styles.loginContainer}>
