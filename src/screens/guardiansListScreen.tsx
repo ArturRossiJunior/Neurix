@@ -336,7 +336,7 @@ const GuardiansScreen = ({ navigation }: GuardiansScreenProps) => {
           <Text style={styles.emptyStateDescription}>
             {searchText.trim() !== '' || areFiltersActive()
               ? 'Tente ajustar seus filtros ou adicione um novo responsável'
-              : 'Comece adicionando seu primeiro responsável'}
+              : 'Adicione responsáveis para gerenciar os pacientes associados'}
           </Text>
         </View>
       )}

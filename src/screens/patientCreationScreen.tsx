@@ -10,7 +10,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { PatientCreationScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/patients.styles';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { capitalizeName, isValidCPF, isValidDate } from '../utils/utils';
+import { capitalizeName, isValidDate, isValidCPF, validateFullName } from '../utils/utils';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { ESCOLARIDADE_OPTIONS, LATERALIDADE_OPTIONS } from '../utils/constants';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
@@ -155,26 +155,30 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    setErrors(prev => ({ ...prev, [field]: '' }));
+
+    if (field in errors && errors[field as keyof typeof errors]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
   };
 
   const validateFields = () => {
     const newErrors: typeof errors = { name: '', birthDate: '', cpf: '', gender: '', escolaridade: '', id_responsavel: '', lateralidade: '' };
     let hasError = false;
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Nome do paciente é obrigatório';
+    const nameError = validateFullName(formData.name);
+    if (nameError) {
+      newErrors.name = nameError.replace('Nome', 'Nome do paciente');
       hasError = true;
-    } else {
-      const nameParts = formData.name.trim().split(/\s+/);
-      if (nameParts.length < 2 || nameParts.some(part => part.length < 2)) {
-        newErrors.name = 'Digite o nome completo (nome e sobrenome)';
-        hasError = true;
-      }
     }
 
     if (!formData.birthDate.trim() || !isValidDate(formData.birthDate)) {
       newErrors.birthDate = 'Data inválida';
+      hasError = true;
+    }
+
+    const cpf = formData.cpf.replace(/\D/g, '');
+    if (cpf.length > 0 && !isValidCPF(cpf)) {
+      newErrors.cpf = 'CPF inválido';
       hasError = true;
     }
 
@@ -206,19 +210,12 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
     if (isSaving) return;
 
     if (!validateFields()) {
-      Alert.alert('Atenção', 'Preencha todos os campos obrigatórios corretamente');
       return;
     }
 
     setIsSaving(true);
     const capitalizedName = capitalizeName(formData.name.trim());
     const cpf = formData.cpf.replace(/\D/g, '');
-
-    if (cpf.length > 0 && !isValidCPF(cpf)) {
-      Alert.alert('Atenção', 'CPF inválido');
-      setIsSaving(false);
-      return;
-    }
 
     try {
       if (cpf.length === 11) {
@@ -373,7 +370,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
                   <MaskedTextInput
                     mask="999.999.999-99"
                     style={getInputStyle('cpf')}
-                    placeholder="000.000.000-00"
+                    placeholder="999.999.999-99"
                     value={formData.cpf}
                     onChangeText={text => handleInputChange('cpf', text)}
                     keyboardType="numeric"

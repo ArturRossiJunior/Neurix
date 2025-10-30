@@ -1,4 +1,5 @@
 import { Card } from '../components/Card';
+import { useAuth } from '../../AuthContext';
 import { supabase } from '../utils/supabase';
 import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
@@ -8,8 +9,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { GuardianCreationScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/guardians.styles';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
-import { capitalizeName, validateEmail, isValidCPF } from '../utils/utils';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { capitalizeName, validateEmail, isValidCPF, isValidPhone, validateFullName} from '../utils/utils';
 
 const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenProps) => {
   const isEditing = route.params?.guardianId !== undefined;
@@ -20,6 +21,7 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
   const prefillCPF = route.params?.prefillCPF || '';
   const prefillPhone = route.params?.prefillPhone || '';
   const prefillEmail = route.params?.prefillEmail || '';
+  const { professionalId } = useAuth();
 
   const [formData, setFormData] = useState({
     name: prefillName,
@@ -52,7 +54,10 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
 
   const handleMaskedInputChange = (field: 'cpf' | 'phone', rawText: string) => {
     setFormData(prev => ({ ...prev, [field]: rawText }));
-    setErrors(prev => ({ ...prev, [field]: '' }));
+    
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
   };
 
   const handleSave = async () => {
@@ -63,15 +68,10 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
     const newErrors = { name: '', cpf: '', phone: '', email: '' };
     let hasError = false;
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Nome do responsável é obrigatório';
+    const nameError = validateFullName(formData.name);
+    if (nameError) {
+      newErrors.name = nameError.replace('Nome', 'Nome do responsável');
       hasError = true;
-    } else {
-      const nameParts = formData.name.trim().split(/\s+/);
-      if (nameParts.length < 2 || nameParts.some(part => part.length < 2)) {
-        newErrors.name = 'Digite o nome completo (nome e sobrenome)';
-        hasError = true;
-      }
     }
 
     if (!isValidCPF(unmaskedCPF)) {
@@ -79,8 +79,8 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
       hasError = true;
     }
 
-    if (!unmaskedPhone || (unmaskedPhone.length !== 10 && unmaskedPhone.length !== 11)) {
-      newErrors.phone = 'Telefone inválido';
+    if (!isValidPhone(unmaskedPhone)) {
+      newErrors.phone = 'Telefone inválido (deve ter 10 ou 11 dígitos)';
       hasError = true;
     }
 
@@ -170,6 +170,7 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
             cpf: unmaskedCPF,
             telefone: unmaskedPhone,
             email: formData.email.trim(),
+            id_profissional: professionalId,
           },
         ]);
         error = insertError;
@@ -250,7 +251,7 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
                   <MaskedTextInput
                     mask="999.999.999-99"
                     style={getInputStyle('cpf')}
-                    placeholder="000.000.000-00"
+                    placeholder="999.999.999-99"
                     value={formData.cpf} 
                     onChangeText={(text, rawText) => handleMaskedInputChange('cpf', rawText)}
                     keyboardType="numeric"
@@ -262,13 +263,9 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
                 <Text style={[styles.guardianInput, styles.guardianCreationMargin]}>Telefone *</Text>
                 <View style={styles.searchContainer}>
                   <MaskedTextInput
-                    mask={
-                      formData.phone.length === 11
-                        ? '(99) 99999-9999'
-                        : '(99) 9999-9999'
-                    }
+                    mask="(99) 99999-9999"
                     style={getInputStyle('phone')}
-                    placeholder="(00) 00000-0000"
+                    placeholder="(99) 99999-9999"
                     value={formData.phone}
                     onChangeText={(text, rawText) => handleMaskedInputChange('phone', rawText)}
                     keyboardType="numeric"
