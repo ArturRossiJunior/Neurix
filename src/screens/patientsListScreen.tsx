@@ -5,6 +5,7 @@ import { calculateAge } from '../utils/utils';
 import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
+import ScreenHeader from '../components/ScreenHeader';
 import { PatientsScreenProps } from '../navigation/types';
 import React, { useState, useCallback, useEffect } from 'react';
 import { createStyles } from '../components/styles/patients.styles';
@@ -324,15 +325,10 @@ const PatientsScreen = ({ navigation }: PatientsScreenProps) => {
         </Pressable>
       </Modal>
 
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.backButtonText}>↩</Text>
-        </TouchableOpacity>
-        <View style={styles.headerSpacer} />
-      </View>
+      <ScreenHeader
+        onBackPress={() => navigation.goBack()}
+        isTablet={isTablet}
+      />
 
       <View style={styles.searchSection}>
         <View style={styles.searchContainer}>

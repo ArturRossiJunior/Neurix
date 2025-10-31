@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { colors } from '../components/styles/colors';
+import ScreenHeader from '../components/ScreenHeader';
 import { DashboardScreenProps } from '../navigation/types';
 import { LineChart, PieChart } from 'react-native-chart-kit';
+import { View, Text, ScrollView, Dimensions } from 'react-native';
 import { createStyles } from '../components/styles/dashboard.styles';
-import { View, Text, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 
 // Mock data for demonstration
 const mockPatients = [
@@ -101,15 +102,10 @@ export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-        <Text style={styles.backButtonText}>↩</Text>
-        </TouchableOpacity>
-        <View style={styles.headerSpacer} />
-      </View>
+      <ScreenHeader
+        onBackPress={() => navigation.goBack()}
+        isTablet={isTablet}
+      />
 
       <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.patientSelectorContainer}>

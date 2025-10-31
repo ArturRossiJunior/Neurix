@@ -15,28 +15,6 @@ export const createStyles = (isTablet: boolean) => {
       alignItems: 'center',
     },
 
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: isTablet ? wp('4%') : wp('5%'),
-      paddingTop: isTablet ? hp('4%') : hp('7%'),
-      paddingBottom: isTablet ? hp('0.5%') : hp('3%'),
-      backgroundColor: colors.background,
-      borderBottomWidth: 1,
-      borderBottomColor: colors.outlineBorder,
-    },
-
-    backButton: {
-      width: isTablet ? hp('6%') : hp('5%'),
-      height: isTablet ? hp('6%') : hp('5%'),
-      borderRadius: isTablet ? hp('3%') : hp('2.5%'),
-      backgroundColor: colors.secondary,
-      alignItems: 'center',
-      justifyContent: 'center',
-      ...shadows.shadowDefault,
-    },
-
     errorBorder: {
       borderColor: 'red',
       borderWidth: 1.5,
@@ -85,23 +63,21 @@ export const createStyles = (isTablet: boolean) => {
       color: colors.foreground,
     },
 
-    // --- Estilo do Botão de Filtro Atualizado ---
     filterButton: {
       width: isTablet ? hp('6%') : hp('5.5%'),
       height: isTablet ? hp('6%') : hp('5.5%'),
       borderRadius: isTablet ? 16 : 12,
-      backgroundColor: colors.card, // Alterado de colors.primary
-      borderWidth: 1, // Adicionado
-      borderColor: colors.outlineBorder, // Adicionado
+      backgroundColor: colors.card, 
+      borderWidth: 1,
+      borderColor: colors.outlineBorder,
       alignItems: 'center',
       justifyContent: 'center',
       ...shadows.shadowDefault,
     },
 
-    // --- Estilo do Texto do Botão de Filtro Atualizado ---
     filterButtonText: {
       fontSize: isTablet ? wp('4%') : wp('4.5%'),
-      color: colors.foreground, // Alterado de colors.primaryForeground
+      color: colors.foreground, 
     },
 
     guardianCreationSection: {
@@ -129,24 +105,17 @@ export const createStyles = (isTablet: boolean) => {
 
     guardianCreationButton: {
       width: '100%',
-      paddingVertical: isTablet ? hp('2%') : hp('2.2%'),
-    },
-
-    editGuardianButton: {
-      alignSelf: 'flex-start',
-      paddingVertical: isTablet ? hp('1.5%') : hp('2%'),
-      paddingHorizontal: isTablet ? wp('2.5%') : wp('4%'),
+      paddingVertical: isTablet ? hp('2%') : hp('2%'),
     },
 
     listContainer: {
       flex: 1,
       paddingHorizontal: isTablet ? wp('4%') : wp('5%'),
-      paddingTop: isTablet ? wp('3%') : wp('0%'),
+      paddingTop: isTablet ? wp('3%') : wp('3%'),
     },
 
     guardiansList: {
-      gap: isTablet ? hp('1.5%') : hp('2%'),
-      paddingBottom: isTablet ? hp('3%') : hp('4%'),
+      gap: isTablet ? hp('1.5%') : hp('0%'),
     },
 
     guardianCard: {
@@ -247,7 +216,6 @@ export const createStyles = (isTablet: boolean) => {
       paddingHorizontal: isTablet ? wp('8%') : wp('10%'),
     },
 
-    // --- Novos Estilos do Modal (Copiados de patients.styles.ts) ---
     modalOverlay: {
       flex: 1,
       justifyContent: 'center',
@@ -344,6 +312,5 @@ export const createStyles = (isTablet: boolean) => {
       color: colors.primaryForeground,
       fontWeight: '600',
     },
-    // --- Fim dos Novos Estilos do Modal ---
   });
 };

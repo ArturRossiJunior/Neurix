@@ -153,7 +153,7 @@ export const validatePassword = (password: string): string | null => {
 export const isValidPhone = (phone: string): boolean => {
   if (typeof phone !== 'string') return false;
   const cleaned = phone.replace(/\D/g, '');
-  return cleaned.length === 10 || cleaned.length === 11;
+  return cleaned.length === 11;
 };
 
 export const validateCRM = (crm: string) => {
@@ -207,13 +207,13 @@ export const isValidCPF = (cpf: string): boolean => {
   return true;
 };
 
-export const validateFullName = (name: string): string | null => {
-  if (!name.trim()) {
-    return 'Nome é obrigatório';
+export const isValidFullName = (name: string): boolean => {
+  if (typeof name !== 'string' || !name.trim()) {
+    return false;
   }
   const nameParts = name.trim().split(/\s+/);
   if (nameParts.length < 2 || nameParts.some(part => part.length < 2)) {
-    return 'Digite o nome completo (nome e sobrenome)';
+    return false;
   }
-  return null;
+  return true;
 };

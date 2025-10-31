@@ -33,7 +33,7 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
           setRememberMe(true);
         }
       } catch (e) {
-        console.error('Failed to load user from storage', e);
+        console.error('Falha ao carregar usuário do armazenamento', e);
       }
     };
 
@@ -42,7 +42,7 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
 
   const handleLogin = async () => {
     if (!email.trim() || !password) {
-      Alert.alert('Erro', 'Por favor, preencha o email e a senha.');
+      Alert.alert('Erro', 'Por favor, preencha o email e a senha');
       return;
     }
 
@@ -52,13 +52,13 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
         const jsonValue = JSON.stringify({ rememberedEmail: email });
         await AsyncStorage.setItem(STORAGE_KEY, jsonValue);
       } catch (e) {
-        console.error('Failed to save user to storage', e);
+        console.error('Falha ao carregar usuário do armazenamento', e);
       }
     } else {
       try {
         await AsyncStorage.removeItem(STORAGE_KEY);
       } catch (e) {
-        console.error('Failed to remove user from storage', e);
+        console.error('Falha ao remover usuário do armazenamento', e);
       }
     }
 
@@ -70,11 +70,12 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
 
       if (error) {
         if (error.message === 'Invalid login credentials') {
-          Alert.alert('Erro no Login', 'Email ou senha inválidos.');
+          Alert.alert('Erro no Login', 'Email ou senha inválidos');
         } else {
           Alert.alert('Erro no Login', error.message);
         }
       } else {
+        await supabase.auth.signOut({ scope: 'others' });
         const { data: { session } } = await supabase.auth.getSession();
         const user = session?.user || null;
         setSession(session);
@@ -88,7 +89,7 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
         );
       }
     } catch (error: any) {
-      Alert.alert('Erro Inesperado', error.message);
+      Alert.alert('Erro inesperado', error.message);
     } finally {
       setLoading(false);
     }
