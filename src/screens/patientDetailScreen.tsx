@@ -10,6 +10,7 @@ import { createStyles } from '../components/styles/patients.styles';
 import { calculateDetailedAge, formatCPF, formatPhone } from '../utils/utils';
 import { ESCOLARIDADE_OPTIONS, LATERALIDADE_OPTIONS, GENERO_OPTIONS } from '../utils/constants';
 import { View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import ScreenHeader from '../components/ScreenHeader';
 
 interface Responsible {
   nome_completo: string;
@@ -241,24 +242,12 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.backButtonText}>↩</Text>
-        </TouchableOpacity>
-        
-        <Button 
-          variant="soft"
-          size="sm"
-          style={styles.editPatientButton} 
-          onPress={handleEditPatient}
-          disabled={isUpdatingStatus}
-        > 
-          Editar
-        </Button>
-      </View>
+      <ScreenHeader
+        onBackPress={() => navigation.goBack()}
+        isTablet={isTablet}
+        actionText="Editar"
+        onActionPress={handleEditPatient}
+      />
       
       <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.patientsList}>

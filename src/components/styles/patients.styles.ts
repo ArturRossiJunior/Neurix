@@ -143,6 +143,7 @@ export const createStyles = (isTablet: boolean) => {
 
     patientCard: {
       marginVertical: 0,
+      marginTop: isTablet ? hp('0%') : hp('2%'),
       padding: isTablet ? wp('4%') : wp('4%'),
       borderRadius: isTablet ? 20 : 16,
       ...shadows.shadowMedium,

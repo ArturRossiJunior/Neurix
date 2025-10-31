@@ -8,9 +8,10 @@ import { MaskedTextInput } from 'react-native-mask-text';
 import React, { useEffect, useRef, useState } from 'react';
 import { GuardianCreationScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/guardians.styles';
+import { View, Text, ScrollView, TextInput, Alert } from 'react-native';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
-import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { capitalizeName, validateEmail, isValidCPF, isValidPhone, validateFullName} from '../utils/utils';
+import { capitalizeName, validateEmail, isValidCPF, isValidPhone, isValidFullName} from '../utils/utils';
+import ScreenHeader from '../components/ScreenHeader';
 
 const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenProps) => {
   const isEditing = route.params?.guardianId !== undefined;
@@ -68,9 +69,8 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
     const newErrors = { name: '', cpf: '', phone: '', email: '' };
     let hasError = false;
 
-    const nameError = validateFullName(formData.name);
-    if (nameError) {
-      newErrors.name = nameError.replace('Nome', 'Nome do responsável');
+    if (!isValidFullName(formData.name)) {
+      newErrors.name = 'Digite o nome completo (nome e sobrenome)';
       hasError = true;
     }
 
@@ -80,14 +80,11 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
     }
 
     if (!isValidPhone(unmaskedPhone)) {
-      newErrors.phone = 'Telefone inválido (deve ter 10 ou 11 dígitos)';
+      newErrors.phone = 'Telefone inválido';
       hasError = true;
     }
 
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email é obrigatório';
-      hasError = true;
-    } else if (!validateEmail(formData.email.trim())) {
+    if (!validateEmail(formData.email.trim())) {
       newErrors.email = 'Email inválido';
       hasError = true;
     }
@@ -109,10 +106,9 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
       if (fetchPacienteError) throw fetchPacienteError;
 
       if (existingPaciente && existingPaciente.length > 0) {
-        Alert.alert(
-          'Atenção',
-          'Este CPF já está cadastrado como um paciente'
-        );
+        newErrors.cpf = 'Este CPF já está cadastrado como um paciente e não pode ser responsável';
+        hasError = true;
+        setErrors(newErrors);
         setIsSaving(false);
         return;
       }
@@ -120,12 +116,12 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
       const { data: existing, error: fetchError } = await supabase
         .from('responsavel')
         .select('id, cpf, telefone, email')
+        .eq('id_profissional', professionalId)
         .or(`cpf.eq.${unmaskedCPF},telefone.eq.${unmaskedPhone},email.eq.${formData.email.trim()}`);
 
       if (fetchError) throw fetchError;
 
       if (existing && existing.length > 0) {
-        const duplicateMessages: string[] = [];
         let isDuplicate = false;
 
         const hasCPF = existing.some(item => item.cpf === unmaskedCPF && (!isEditing || item.id != guardianId));
@@ -133,20 +129,20 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
         const hasEmail = existing.some(item => item.email === formData.email.trim() && (!isEditing || item.id != guardianId));
 
         if (hasCPF) {
-          duplicateMessages.push('CPF já cadastrado');
+          newErrors.cpf = 'CPF já cadastrado';
           isDuplicate = true;
         }
         if (hasPhone) {
-          duplicateMessages.push('Telefone já cadastrado');
+          newErrors.phone = 'Telefone já cadastrado';
           isDuplicate = true;
         }
         if (hasEmail) {
-          duplicateMessages.push('Email já cadastrado');
+          newErrors.email = 'Email já cadastrado';
           isDuplicate = true;
         }
 
         if (isDuplicate) {
-          Alert.alert('Atenção', duplicateMessages.join('\n'));
+          setErrors(newErrors);
           if (isMounted.current) {
             setIsSaving(false);
           }
@@ -216,11 +212,10 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={handleCancel}>
-          <Text style={styles.backButtonText}>↩</Text>
-        </TouchableOpacity>
-      </View>
+      <ScreenHeader
+        onBackPress={() => handleCancel()}
+        isTablet={isTablet}
+      />
 
       <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.guardiansList}>
@@ -300,7 +295,7 @@ const GuardianCreationScreen = ({ navigation, route }: GuardianCreationScreenPro
             </View>
           </Card>
 
-          <View style={{ paddingBottom: 10 }}>
+          <View style={{ marginTop: isTablet ? 0 : 15 }}>
             <Button
               variant="game"
               size="default"

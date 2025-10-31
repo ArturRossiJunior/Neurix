@@ -37,6 +37,7 @@ export const createStyles = (isTablet: boolean) => StyleSheet.create({
     color: colors.foreground,
     flex: 1,
     paddingBottom: isTablet ? wp('2%') : wp('0%'),
+    marginTop: isTablet ? hp('0%') : hp('2%'),
   },
 
   picker: {

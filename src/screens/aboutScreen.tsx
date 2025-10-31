@@ -1,9 +1,10 @@
 import React from 'react';
 import { Card } from '../components/Card';
 import { useIsTablet } from '../utils/useIsTablet';
+import { View, Text, ScrollView } from 'react-native';
+import ScreenHeader from '../components/ScreenHeader';
 import { AboutScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/about.styles';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 
 const AboutScreen = ({ navigation }: AboutScreenProps) => {
   const isTablet = useIsTablet();
@@ -14,15 +15,10 @@ const AboutScreen = ({ navigation }: AboutScreenProps) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-            <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-            >
-            <Text style={styles.backButtonText}>↩</Text>
-            </TouchableOpacity>
-            <View style={styles.headerSpacer} />
-        </View>
+      <ScreenHeader
+        onBackPress={() => navigation.goBack()}
+        isTablet={isTablet}
+      />
 
       <ScrollView contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
         

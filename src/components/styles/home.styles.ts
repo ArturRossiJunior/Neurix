@@ -45,17 +45,13 @@ export const createStyles = (isTablet: boolean) => {
     },
   
     navigationGrid: {
-      //...commonStyles.centerContent,
       flexDirection: isTablet ? 'row' : 'column',
       flexWrap: isTablet ? 'wrap' : 'nowrap',
-      gap: isTablet ? wp('4%') : hp('2%'),
-      //alignItems: 'stretch',
+      gap: isTablet ? wp('4%') : hp('0%'),
     },
     
     navigationCard: {
-      //marginVertical: 0,
-      //flex: isTablet ? 1 : undefined, 
-      width: isTablet ? wp('43%') : '90%',
+      width: isTablet ? wp('43%') : wp('80%'),
       minHeight: isTablet ? hp('30%') : hp('20%'),
       marginBottom: isTablet ? wp('-2%') : hp('1%'),
     },

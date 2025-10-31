@@ -4,12 +4,13 @@ import { formatPhone } from '../utils/utils';
 import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
+import ScreenHeader from '../components/ScreenHeader';
 import { calculateAge, formatCPF } from '../utils/utils';
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useState, useMemo, useCallback } from 'react';
 import { GuardianDetailScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/guardians.styles';
-import { View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, Alert, ActivityIndicator } from 'react-native';
 
 interface GuardianDetail {
   id: number;
@@ -159,22 +160,12 @@ const GuardianDetailScreen = ({ navigation, route }: GuardianDetailScreenProps) 
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.backButtonText}>↩</Text>
-        </TouchableOpacity>
-        <Button 
-          variant="soft"
-          size="sm"
-          style={styles.editGuardianButton} 
-          onPress={handleEditGuardian}
-        > 
-          Editar
-        </Button>
-      </View>
+      <ScreenHeader
+        onBackPress={() => navigation.goBack()}
+        isTablet={isTablet}
+        actionText="Editar"
+        onActionPress={handleEditGuardian}
+      />
 
       <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.guardiansList}>
@@ -191,7 +182,7 @@ const GuardianDetailScreen = ({ navigation, route }: GuardianDetailScreenProps) 
             </View>
           </Card>
           
-          <Text style={[styles.guardianName, { marginTop: 20, marginBottom: 10 }]}>
+          <Text style={[styles.guardianName, { marginTop: 20, marginBottom: isTablet ? 2 : 22 }]}>
             Pacientes Associados
           </Text>
           

@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { Button } from '../components/Button';
 import { colors } from '../components/styles/colors';
 import { Picker } from '@react-native-picker/picker';
+import ScreenHeader from '../components/ScreenHeader';
 import { TestDetailScreenProps } from '../navigation/types';
 import { createTestsStyles } from '../components/styles/tests.styles';
-import { View, Text, ScrollView, TextInput, Alert, useWindowDimensions, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TextInput, Alert, useWindowDimensions } from 'react-native';
 
 const mockPatients = [
   { id: '1', name: 'Ana Silva' },
@@ -39,15 +40,10 @@ export const TestDetailScreen = ({ route, navigation }: TestDetailScreenProps) =
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.backButtonText}>↩</Text>
-        </TouchableOpacity>
-        <View style={styles.headerSpacer} />
-      </View>
+      <ScreenHeader
+        onBackPress={() => navigation.goBack()}
+        isTablet={isTablet}
+      />
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.formContainer}>

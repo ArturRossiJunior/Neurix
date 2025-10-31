@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card } from '../components/Card';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
+import ScreenHeader from '../components/ScreenHeader';
 import { TestsScreenProps } from '../navigation/types';
 import { createTestsStyles } from '../components/styles/tests.styles';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
@@ -45,15 +46,10 @@ export const TestsListScreen = ({ navigation }: TestsScreenProps) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.backButtonText}>↩</Text>
-        </TouchableOpacity>
-        <View style={styles.headerSpacer} />
-      </View>
+      <ScreenHeader
+        onBackPress={() => navigation.goBack()}
+        isTablet={isTablet}
+      />
 
       <View style={styles.searchSection}>
         <View style={styles.searchContainer}>

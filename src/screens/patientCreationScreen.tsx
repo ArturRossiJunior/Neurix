@@ -5,15 +5,16 @@ import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
 import { Picker } from '@react-native-picker/picker';
+import ScreenHeader from '../components/ScreenHeader';
 import { MaskedTextInput } from 'react-native-mask-text';
 import { useFocusEffect } from '@react-navigation/native';
 import { PatientCreationScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/patients.styles';
+import { View, Text, ScrollView, TextInput, Alert } from 'react-native';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { capitalizeName, isValidDate, isValidCPF, validateFullName } from '../utils/utils';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { ESCOLARIDADE_OPTIONS, LATERALIDADE_OPTIONS } from '../utils/constants';
-import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { capitalizeName, isValidDate, isValidCPF, isValidFullName } from '../utils/utils';
 
 interface Responsible {
   id: number;
@@ -165,9 +166,8 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
     const newErrors: typeof errors = { name: '', birthDate: '', cpf: '', gender: '', escolaridade: '', id_responsavel: '', lateralidade: '' };
     let hasError = false;
 
-    const nameError = validateFullName(formData.name);
-    if (nameError) {
-      newErrors.name = nameError.replace('Nome', 'Nome do paciente');
+    if (!isValidFullName(formData.name)) {
+      newErrors.name = 'Digite o nome completo (nome e sobrenome)';
       hasError = true;
     }
 
@@ -213,6 +213,8 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
       return;
     }
 
+    let hasDuplicationError = false;
+
     setIsSaving(true);
     const capitalizedName = capitalizeName(formData.name.trim());
     const cpf = formData.cpf.replace(/\D/g, '');
@@ -229,13 +231,20 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
         if (existingCPF && existingCPF.length > 0) {
           const isDuplicate = existingCPF.some(p => !isEditing || p.id.toString() !== patientId);
           if (isDuplicate) {
-            Alert.alert('Atenção', 'CPF já cadastrado para outro paciente');
-            setIsSaving(false);
-            return;
+            setErrors(prevErrors => ({
+              ...prevErrors,
+              cpf: 'CPF já cadastrado para outro paciente'
+            }));
+            hasDuplicationError = true;
           }
         }
       }
 
+      if (hasDuplicationError) {
+        setIsSaving(false);
+        return;
+      }
+      
       const [day, month, year] = formData.birthDate.split('/');
       const correctDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
 
@@ -321,11 +330,10 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={handleCancel}>
-          <Text style={styles.backButtonText}>↩</Text>
-        </TouchableOpacity>
-      </View>
+      <ScreenHeader
+        onBackPress={() => handleCancel()}
+        isTablet={isTablet}
+      />
 
       <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.patientsList}>

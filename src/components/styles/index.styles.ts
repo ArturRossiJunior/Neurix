@@ -26,14 +26,12 @@ export const createStyles = (isTablet: boolean) => {
     },
     
     navigationGrid: {
-      //...commonStyles.centerContent,
       flexDirection: isTablet ? 'row' : 'column',
       flexWrap: isTablet ? 'wrap' : 'nowrap',
-      gap: isTablet ? wp('4%') : hp('2%'),
+      gap: isTablet ? wp('4%') : hp('0%'),
     },
     
     navigationCard: {
-      //marginVertical: 0,
       width: isTablet ? wp('43%') : '90%',
       minHeight: isTablet ? hp('30%') : hp('20%'),
       marginBottom: isTablet ? wp('4%') : hp('1%'),
@@ -43,8 +41,8 @@ export const createStyles = (isTablet: boolean) => {
       ...commonStyles.centerContent,
       flex: 1,
       justifyContent: 'space-around',
-      padding: isTablet ? wp('3%') : wp('2%'),
-      gap: isTablet ? hp('2.5%') : hp('1.5%'),
+      padding: isTablet ? wp('3%') : wp('7%'),
+      gap: isTablet ? hp('2.5%') : hp('2.5%'),
     },
     
     iconContainer: {
