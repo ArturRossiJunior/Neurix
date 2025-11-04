@@ -1,0 +1,31 @@
+name: Deploy PRODUÇÃO (Android)
+
+on:
+  workflow_dispatch:
+    inputs:
+      buildId:
+        description: 'ID do Build de HML (preview) para promover a Produção'
+        required: true
+        type: string
+
+jobs:
+  submit-production:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar EAS CLI
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Submit para Google Play (Produção)
+        run: eas submit --platform android --id ${{ inputs.buildId }} --non-interactive --wait
