@@ -1,15 +1,12 @@
-name: Deploy PRODUÇÃO (Android)
+name: Deploy HML (Android)
 
 on:
-  workflow_dispatch:
-    inputs:
-      buildId:
-        description: 'ID do Build de HML (preview) para promover a Produção'
-        required: true
-        type: string
+  push:
+    branches:
+      - develop
 
 jobs:
-  submit-production:
+  build-and-submit-hml:
     runs-on: ubuntu-latest
     
     steps:
@@ -20,6 +17,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Instalar EAS CLI
         uses: expo/expo-github-action@v8
@@ -27,5 +25,11 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Submit para Google Play (Produção)
-        run: eas submit --platform android --id ${{ inputs.buildId }} --non-interactive --wait
+      - name: Instalar dependências (npm)
+        run: npm install
+
+      - name: Build do App (HML)
+        run: eas build --platform android --profile preview --non-interactive --wait
+
+      - name: Submit para Google Play (HML)
+        run: eas submit --platform android --profile preview --latest --non-interactive --wait
