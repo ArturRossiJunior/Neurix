@@ -27,9 +27,14 @@ jobs:
 
       - name: Instalar dependências (npm)
         run: npm install
-
+        
       - name: Build do App (HML)
-        run: eas build --platform android --profile preview --non-interactive --wait
+        id: build
+        run: |
+          build_output=$(eas build --platform android --profile preview --non-interactive --wait --json)
+          
+          build_id=$(echo $build_output | jq -r '.[0].id')
+          echo "build_id=$build_id" >> $GITHUB_OUTPUT
 
       - name: Submit para Google Play (HML)
-        run: eas submit --platform android --profile preview --latest --non-interactive --wait
+        run: eas submit --platform android --id ${{ steps.build.outputs.build_id }} --non-interactive --wait
