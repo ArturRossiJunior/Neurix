@@ -1,7 +1,0 @@
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-
-export PATH="$PATH:/c/Node"
-export PATH="$PATH:/c/Users/artur/AppData/Roaming/npm"
-
-./node_modules/.bin/jest
