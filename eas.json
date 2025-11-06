@@ -2,8 +2,7 @@
   "cli": {
     "version": ">= 16.25.0",
     "appVersionSource": "remote",
-    "requireCommit": false,
-    "packageManager": "pnpm"
+    "requireCommit": false
   },
   "build": {
     "development": {
