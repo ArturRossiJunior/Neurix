@@ -35,6 +35,3 @@ jobs:
 
       - name: Build do App (HML)
         run: eas build --platform android --profile preview --non-interactive --wait
-
-      - name: Enviar Build para Google Play (HML)
-        run: eas submit --platform android --profile preview --latest --non-interactive --wait

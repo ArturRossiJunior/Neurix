@@ -41,7 +41,7 @@ const AboutScreen = ({ navigation }: AboutScreenProps) => {
           <Text style={styles.listItem}>Prof. Dr. Carlos Enrique Lopez Noriega</Text>
         </Card>
 
-        <Text style={styles.versionText}>Versão: 1.0.0</Text>
+        <Text style={styles.versionText}>Versão: 1.0.0 (Teste)</Text>
       </ScrollView>
     </View>
   );
