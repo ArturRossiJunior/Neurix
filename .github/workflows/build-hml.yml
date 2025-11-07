@@ -34,4 +34,4 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build do App (HML)
-        run: eas build --platform android --profile preview --non-interactive --wait
+        run: eas build --platform android --profile preview --non-interactive --wait --auto-submit
