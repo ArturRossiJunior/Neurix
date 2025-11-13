@@ -65,9 +65,12 @@ jobs:
           echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > /tmp/meu-tcc-keystore.keystore
 
       - name: Build do App (HML) - LOCAL
-        run: eas build --platform android --profile preview --local --non-interactive --wait --auto-submit
+        run: eas build --platform android --profile preview --local --non-interactive --output ./build-artifact.aab
         env:
           ANDROID_KEYSTORE_PATH: /tmp/meu-tcc-keystore.keystore
           ANDROID_KEYSTORE_ALIAS: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+      - name: Enviar para a Play Store (HML)
+        run: eas submit --platform android --profile preview --path ./build-artifact.aab --non-interactive
