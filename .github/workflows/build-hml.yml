@@ -1,4 +1,4 @@
-name: Criar Build HML (Android)
+name: Criar Build HML (Android) - Otimizado
 
 on:
   push:
@@ -24,14 +24,50 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
+      - name: Configurar Java (JDK)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: Instalar EAS CLI
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
+      - name: Cache do Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/build.gradle*', '**/*.gradle.kts', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Cache do Android SDK
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk
+          key: ${{ runner.os }}-android-sdk-${{ hashFiles('**/build.gradle*', '**/*.gradle.kts') }}
+          restore-keys: |
+            ${{ runner.os }}-android-sdk-
+      
+      - name: Configurar Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Instalar dependências
         run: pnpm install --frozen-lockfile
 
-      - name: Build do App (HML)
-        run: eas build --platform android --profile preview --non-interactive --wait --auto-submit
+      - name: Configurar Keystore de Assinatura
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > /tmp/meu-tcc-keystore.keystore
+
+      - name: Build do App (HML) - LOCAL
+        run: eas build --platform android --profile preview --local --non-interactive --wait --auto-submit
+        env:
+          ANDROID_KEYSTORE_PATH: /tmp/meu-tcc-keystore.keystore
+          ANDROID_KEYSTORE_ALIAS: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
