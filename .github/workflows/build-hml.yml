@@ -8,7 +8,7 @@ on:
 jobs:
   build-hml:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout código
         uses: actions/checkout@v4
@@ -30,11 +30,8 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Instalar EAS CLI
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+      - name: Configurar Android SDK
+        uses: android-actions/setup-android@v3
 
       - name: Cache do Gradle
         uses: actions/cache@v4
@@ -46,16 +43,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Cache do Android SDK
-        uses: actions/cache@v4
+      - name: Instalar EAS CLI
+        uses: expo/expo-github-action@v8
         with:
-          path: /usr/local/lib/android/sdk
-          key: ${{ runner.os }}-android-sdk-${{ hashFiles('**/build.gradle*', '**/*.gradle.kts') }}
-          restore-keys: |
-            ${{ runner.os }}-android-sdk-
-      
-      - name: Configurar Android SDK
-        uses: android-actions/setup-android@v3
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Pré-aquecer cache de dependências
+        run: pnpm fetch
 
       - name: Instalar dependências
         run: pnpm install --frozen-lockfile
