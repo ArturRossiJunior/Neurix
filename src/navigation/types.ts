@@ -31,6 +31,8 @@ export type RootStackParamList = {
     prefillEmail?: string; 
   } | undefined;
   About: undefined;
+  TestApplication: { testId: string; testName: string; };
+  TestPreparation: { testId: string; testName: string; patientId: string; patientName: string; };
 };
 
 export type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
@@ -46,4 +48,6 @@ export type TestDetailScreenProps = NativeStackScreenProps<RootStackParamList, '
 export type PatientDetailScreenProps = NativeStackScreenProps<RootStackParamList, 'PatientDetail'>;
 export type GuardianDetailScreenProps = NativeStackScreenProps<RootStackParamList, 'GuardianDetail'>;
 export type PatientCreationScreenProps = NativeStackScreenProps<RootStackParamList, 'PatientCreation'>;
+export type TestApplicationScreenProps = NativeStackScreenProps<RootStackParamList, 'TestApplication'>;
+export type TestPreparationScreenProps = NativeStackScreenProps<RootStackParamList, 'TestPreparation'>;
 export type GuardianCreationScreenProps = NativeStackScreenProps<RootStackParamList, 'GuardianCreation'>;

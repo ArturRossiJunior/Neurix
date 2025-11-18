@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { Button } from '../components/Button';
 import { colors } from '../components/styles/colors';
 import { Picker } from '@react-native-picker/picker';
-import ScreenHeader from '../components/ScreenHeader';
 import { TestDetailScreenProps } from '../navigation/types';
 import { createTestsStyles } from '../components/styles/tests.styles';
-import { View, Text, ScrollView, TextInput, Alert, useWindowDimensions } from 'react-native';
+import { View, Text, ScrollView, TextInput, Alert, useWindowDimensions, TouchableOpacity } from 'react-native';
 
 const mockPatients = [
   { id: '1', name: 'Ana Silva' },
@@ -24,26 +23,32 @@ export const TestDetailScreen = ({ route, navigation }: TestDetailScreenProps) =
     const [otherOption, setOtherOption] = useState('');
 
   const handleStartTest = () => {
-    if (!selectedPatient) {
-      Alert.alert('Erro', 'Por favor, selecione um paciente para iniciar o teste.');
-      return;
-    }
-    const patientName = mockPatients.find(p => p.id === selectedPatient)?.name;
-    Alert.alert(
-      'Iniciar Teste',
-      `Você está prestes a iniciar o teste "${testName}" para o paciente ${patientName}.`,
-      [{ text: 'OK', onPress: () => console.log('Teste iniciado!') }]
-    );
-    // Aqui vamos navegar para a tela do teste real, passando os parâmetros necessários
-    // navigation.navigate('ActualTestScreen', { testId, patientId: selectedPatient, otherOption });
-  };
+  if (!selectedPatient) {
+    Alert.alert('Erro', 'Por favor, selecione um paciente para iniciar o teste.');
+    return;
+  }
+  
+  const patientName = mockPatients.find(p => p.id === selectedPatient)?.name || '';
+  
+  navigation.navigate('TestPreparation', {
+    testId,
+    testName,
+    patientId: selectedPatient,
+    patientName,
+  });
+};
 
   return (
     <View style={styles.container}>
-      <ScreenHeader
-        onBackPress={() => navigation.goBack()}
-        isTablet={isTablet}
-      />
+      <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.backButtonText}>↩</Text>
+        </TouchableOpacity>
+        <View style={styles.headerSpacer} />
+      </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.formContainer}>

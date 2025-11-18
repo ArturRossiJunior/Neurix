@@ -4,7 +4,7 @@ import { Button } from '../components/Button';
 import { HomeScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/home.styles';
 import { View, Text, ScrollView, Alert, useWindowDimensions } from 'react-native';
-import { supabase } from '../utils/supabase'; // Importação para autenticação
+import { supabase } from '../utils/supabase';
 
 const Home = ({ navigation }: HomeScreenProps) => {
   const { width } = useWindowDimensions();
