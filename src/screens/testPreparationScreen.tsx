@@ -6,13 +6,34 @@ import type { TestPreparationScreenProps } from '../navigation/types';
 const { width, height } = Dimensions.get('window');
 
 const TestPreparationScreen = ({ navigation, route }: TestPreparationScreenProps) => {
-  const { testId, testName, patientName } = route.params;
+  const { testId, testName, patientId, patientName } = route.params; // ✅ Adicionar patientId
   const [showInstructions, setShowInstructions] = useState(false);
 
+  // Validar se recebeu os parâmetros necessários
+  React.useEffect(() => {
+    console.log('📋 TestPreparation - Parâmetros recebidos:', {
+      testId,
+      testName,
+      patientId,
+      patientName
+    });
+
+    if (!patientId) {
+      console.error('❌ patientId não foi recebido em TestPreparation!');
+    }
+  }, [testId, testName, patientId, patientName]);
+
   const handleStartTest = () => {
+    console.log('🚀 Navegando para TestApplication com:', {
+      testId,
+      testName,
+      patientId
+    });
+
     navigation.navigate('TestApplication', {
       testId,
       testName,
+      patientId, // ✅ PASSAR O patientId
     });
   };
 
@@ -36,7 +57,7 @@ const TestPreparationScreen = ({ navigation, route }: TestPreparationScreenProps
 
           <View style={styles.imageContainer}>
             <Image
-              source={require('../../assets/astrocogni.jpg')}
+              source={require('../../assets/astrocogni.png')}
               style={styles.astronautImage}
               resizeMode="contain"
             />
@@ -128,23 +149,29 @@ const TestPreparationScreen = ({ navigation, route }: TestPreparationScreenProps
           "Com você ao lado, a viagem do Cogni fica muito mais divertida. Vamos explorar o espaço e encontrar os símbolos certos para continuar nossa aventura até o Parque Estelar!"
         </Text>
 
-        <Button
-          variant="default"
-          size="default"
-          onPress={handleStartTest}
-          style={styles.letsGoButton}
-        >
-          Vamos lá!
-        </Button>
-      </ScrollView>
+        {/* Container para o botão e astronauta lado a lado */}
+        <View style={styles.buttonAndAstronautContainer}>
+          <Button
+            variant="default"
+            size="default"
+            onPress={handleStartTest}
+            style={styles.letsGoButton}
+          >
+            Vamos lá!
+          </Button>
 
-      <View style={styles.astronautCorner}>
-        <Image
-          source={require('../../assets/astrocogni.jpg')}
-          style={styles.astronautSmall}
-          resizeMode="contain"
-        />
-      </View>
+          <View style={styles.astronautBesideButton}>
+            <Image
+              source={require('../../assets/astrocogni.png')}
+              style={styles.astronautSmall}
+              resizeMode="contain"
+            />
+          </View>
+        </View>
+
+        {/* Espaçamento extra no final */}
+        <View style={{ height: 60 }} />
+      </ScrollView>
     </View>
   );
 };
@@ -210,7 +237,7 @@ const styles = StyleSheet.create({
   instructionsContent: {
     paddingHorizontal: 25,
     paddingTop: 30,
-    paddingBottom: 150,
+    paddingBottom: 30,
   },
   storyTitle: {
     fontSize: 28,
@@ -266,18 +293,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   letsGoButton: {
-    alignSelf: 'center',
     minWidth: 200,
     backgroundColor: '#9C27B0',
-    marginTop: 50,
-    marginBottom: 60,
+    marginTop: 20,
   },
-  astronautCorner: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    width: 260,
-    height: 260,
+  buttonAndAstronautContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 30,
+    gap: 20,
+  },
+  astronautBesideButton: {
+    width: 120,
+    height: 120,
   },
   astronautSmall: {
     width: '100%',

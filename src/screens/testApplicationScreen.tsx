@@ -3,11 +3,14 @@ import { View, Image, TouchableOpacity, StyleSheet, Dimensions, ScrollView, Text
 import type { TestApplicationScreenProps } from '../navigation/types';
 import { Button } from '../components/Button';
 import { createTestsStyles } from '../components/styles/tests.styles';
+import { supabase } from '../utils/supabase';
+import { useAuth } from '../../AuthContext'; // Importar o useAuth
 
 const { width } = Dimensions.get('window');
 
 const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps) => {
-  const { testId, testName } = route.params;
+  const { testId, testName, patientId } = route.params;
+  const { professionalId } = useAuth(); // Pegar o professionalId do contexto
   const isTablet = width >= 768;
   const styles = createTestsStyles(isTablet);
 
@@ -51,6 +54,27 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
   const [salvando, setSalvando] = useState(false);
   const [imagemModelo, setImagemModelo] = useState(0);
 
+  // Verificar autenticação ao montar o componente
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        Alert.alert(
+          'Não Autenticado',
+          'Você precisa estar autenticado para realizar testes.',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.goBack()
+            }
+          ]
+        );
+      }
+    };
+    
+    checkAuth();
+  }, []);
+
   // Inicializa as imagens com sequência
   useEffect(() => {
     const gerarSequencia = () => {
@@ -77,7 +101,6 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
     const sequenciaFixa = gerarSequencia();
     const imagensPermitidas = Array.from({ length: 18 }, (_, i) => i);
     const imagemCorreta = imagensPermitidas[Math.floor(Math.random() * imagensPermitidas.length)];
-    //const imagemCorreta = Math.floor(Math.random() * imagens.length);
 
     const imagensFixas = sequenciaFixa.map((index, idx) => ({
       id: `img_${idx}`,
@@ -151,43 +174,122 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
   };
 
   const salvarResultadosSupabase = async (resultados: any) => {
+    if (salvando) return; // Previne múltiplos salvamentos
+    
+    setSalvando(true);
+    
     try {
-      setSalvando(true);
+      // Verificar autenticação
+      console.log('🔐 Verificando autenticação...');
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
-      const { supabase } = require('../services/supabase');
+      if (sessionError) {
+        console.error('❌ Erro ao verificar sessão:', sessionError);
+        throw new Error('Erro ao verificar autenticação');
+      }
       
+      if (!session) {
+        console.error('❌ Usuário não autenticado');
+        throw new Error('Você precisa estar autenticado para salvar avaliações');
+      }
+      
+      console.log('✅ Usuário autenticado:', session.user.id);
+      console.log('✅ Professional ID:', professionalId);
+
+      // Verificar se o paciente pertence ao profissional
+      console.log('🔍 Verificando permissão do paciente...');
+      const { data: patientData, error: patientError } = await supabase
+        .from('pacientes')
+        .select('id, id_profissional')
+        .eq('id', patientId)
+        .single();
+
+      if (patientError) {
+        console.error('❌ Erro ao buscar paciente:', patientError);
+        throw new Error('Paciente não encontrado');
+      }
+
+      if (!patientData) {
+        throw new Error('Paciente não encontrado');
+      }
+
+      console.log('✅ Paciente encontrado:', patientData);
+
+      // Dados a serem enviados ao Supabase
+      const dadosParaSalvar = {
+        id_paciente: parseInt(patientId),
+        id_tipo_teste: parseInt(testId),
+        data_aplicacao: new Date().toISOString(),
+        resultado_correto: resultados.marcadasCorretamente,
+        resultado_incorreto: resultados.marcadasIncorretamente,
+        resultado_omisso: resultados.naoMarcadas,
+        tempo_realizacao: parseInt(resultados.tempoGasto.toString()),
+        observacoes_clinicas: `Teste: ${testName} | Acurácia: ${resultados.acuracia}% | Total marcadas: ${resultados.totalMarcadas}/${TOTAL_IMAGENS}`,
+      };
+
+      console.log('📤 Enviando dados:', dadosParaSalvar);
+
+      // Inserir os dados no Supabase
       const { data, error } = await supabase
-        .from('resultados_testes')
-        .insert({
-          test_id: testId,
-          test_name: testName,
-          total_figuras: TOTAL_IMAGENS,
-          total_corretas: resultados.totalCorretas,
-          marcadas_corretamente: resultados.marcadasCorretamente,
-          marcadas_incorretamente: resultados.marcadasIncorretamente,
-          nao_marcadas: resultados.naoMarcadas,
-          total_marcadas: resultados.totalMarcadas,
-          acuracia: parseFloat(resultados.acuracia),
-          tempo_gasto: resultados.tempoGasto,
-          tempo_total: resultados.tempoTotal,
-          data_realizacao: new Date().toISOString(),
-        });
+        .from('avaliacoes')
+        .insert(dadosParaSalvar)
+        .select();
 
       if (error) {
-        console.error('Erro ao salvar no Supabase:', error);
+        console.error('❌ Erro do Supabase:', error);
         throw error;
       }
 
-      console.log('Resultados salvos com sucesso:', data);
+      console.log('✅ Resultados salvos com sucesso:', data);
+      
+      // Mostrar mensagem de sucesso
+      Alert.alert(
+        '✅ Sucesso',
+        'Teste finalizado e resultados salvos com sucesso!',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              navigation.navigate('Home');
+            }
+          }
+        ]
+      );
+
       return data;
       
-    } catch (error) {
-      console.error('Erro ao salvar resultados:', error);
+    } catch (error: any) {
+      console.error('❌ Erro ao salvar resultados:', error);
+      
+      let errorMessage = 'Erro desconhecido';
+      
+      if (error.message) {
+        errorMessage = error.message;
+      } else if (error.code === '42501') {
+        errorMessage = 'Você não tem permissão para salvar esta avaliação. Verifique se o paciente pertence a você.';
+      } else if (error.code === '23503') {
+        errorMessage = 'Paciente ou tipo de teste inválido.';
+      }
+      
       Alert.alert(
-        '⚠️ Aviso',
-        'Não foi possível salvar os resultados. Tente novamente mais tarde.',
-        [{ text: 'OK' }]
+        '❌ Erro ao Salvar',
+        errorMessage,
+        [
+          { 
+            text: 'Tentar Novamente', 
+            onPress: () => salvarResultadosSupabase(resultados) 
+          },
+          { 
+            text: 'Cancelar', 
+            style: 'cancel',
+            onPress: () => {
+              setSalvando(false);
+              navigation.goBack();
+            }
+          }
+        ]
       );
+      
       throw error;
     } finally {
       setSalvando(false);
@@ -195,7 +297,7 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
   };
 
   const finalizarTeste = async () => {
-    if (testeFinalizado) return; // Previne múltiplas execuções
+    if (testeFinalizado || salvando) return; // Previne múltiplas execuções
     
     setTesteFinalizado(true);
     
@@ -204,20 +306,9 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
     
     try {
       await salvarResultadosSupabase(resultados);
-      
-      // navigation.navigate('ResultadosScreen', { 
-      //   resultados,
-      //   testId,
-      //   testName 
-      // });
-      
     } catch (error) {
-      // navigation.navigate('ResultadosScreen', { 
-      //   resultados,
-      //   testId,
-      //   testName,
-      //   erroSalvamento: true
-      // });
+      console.error('Erro ao finalizar teste:', error);
+      // O erro já é tratado dentro de salvarResultadosSupabase
     }
   };
 
@@ -227,11 +318,26 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
     }
 
     Alert.alert(
-      '⏸️ Quer parar agora?',
-      'Tem certeza que quer finalizar o teste?',
+      '⏸️ Finalizar Teste',
+      'Tem certeza que deseja finalizar o teste? Os resultados serão salvos.',
       [
-        { text: '❌ Não, vou continuar!', style: 'cancel' },
-        { text: '✅ Sim, quero parar', onPress: finalizarTeste }
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Finalizar', onPress: finalizarTeste, style: 'destructive' }
+      ]
+    );
+  };
+
+  const handleCancelTest = () => {
+    Alert.alert(
+      '❌ Cancelar Teste',
+      'Deseja realmente cancelar? Os dados NÃO serão salvos.',
+      [
+        { text: 'Continuar Teste', style: 'cancel' },
+        { 
+          text: 'Sim, Cancelar', 
+          onPress: () => navigation.goBack(),
+          style: 'destructive' 
+        }
       ]
     );
   };
@@ -249,6 +355,13 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
           {testName}
         </Text>
 
+        {/* Contador de tempo */}
+        <View style={customStyles.contadorContainer}>
+          <Text style={customStyles.contadorText}>
+            ⏱️ Tempo: {formatarTempo(tempoRestante)}
+          </Text>
+        </View>
+
         <View style={customStyles.modeloContainer}>
           <Text style={customStyles.modeloLabel}>
             Encontre todos iguais a este:
@@ -259,7 +372,7 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
               style={customStyles.modeloImage}
             />
             <View style={customStyles.setaIndicadora}>
-              <Text style={customStyles.setaText}></Text>
+              <Text style={customStyles.setaText}>⬇️</Text>
             </View>
           </View>
         </View>
@@ -283,7 +396,7 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
                 marcadas.includes(item.id) && customStyles.imageWrapperMarcada
               ]}
               activeOpacity={0.7}
-              disabled={testeFinalizado}
+              disabled={testeFinalizado || salvando}
             >
               <Image source={item.src} style={customStyles.image} />
               {marcadas.includes(item.id) && (
@@ -295,15 +408,27 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
           ))}
         </View>
 
-        <Button
-          variant="default"
-          size="default"
-          onPress={handleConfirmSelection}
-          style={{ marginTop: 30, marginBottom: 40, alignSelf: 'center', minWidth: 200, backgroundColor: '#BA68C8' }}
-          disabled={salvando}
-        >
-          {salvando ? 'Salvando...' : 'Finalizar Teste'}
-        </Button>
+        <View style={customStyles.buttonsContainer}>
+          <Button
+            variant="default"
+            size="default"
+            onPress={handleCancelTest}
+            style={customStyles.cancelButton}
+            disabled={salvando}
+          >
+            Cancelar
+          </Button>
+
+          <Button
+            variant="game"
+            size="default"
+            onPress={handleConfirmSelection}
+            style={customStyles.finalizarButton}
+            disabled={salvando}
+          >
+            {salvando ? 'Salvando...' : 'Finalizar Teste'}
+          </Button>
+        </View>
       </ScrollView>
     </View>
   );
@@ -333,7 +458,6 @@ const customStyles = StyleSheet.create({
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
-
   contadorContainer: {
     backgroundColor: '#9C27B0',
     padding: 10,
@@ -452,6 +576,22 @@ const customStyles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 30,
+    marginBottom: 40,
+    paddingHorizontal: 20,
+    gap: 15,
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: '#E0E0E0',
+  },
+  finalizarButton: {
+    flex: 1,
+    backgroundColor: '#BA68C8',
   },
 });
 
