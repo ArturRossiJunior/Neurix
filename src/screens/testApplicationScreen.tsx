@@ -1,24 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { View, Image, TouchableOpacity, StyleSheet, Dimensions, ScrollView, Text, Alert, Animated } from 'react-native';
-import type { TestApplicationScreenProps } from '../navigation/types';
-import { Button } from '../components/Button';
-import { createTestsStyles } from '../components/styles/tests.styles';
+import { useAuth } from '../../AuthContext';
 import { supabase } from '../utils/supabase';
-import { useAuth } from '../../AuthContext'; // Importar o useAuth
+import { Button } from '../components/Button';
+import React, { useState, useEffect } from 'react';
+import type { TestApplicationScreenProps } from '../navigation/types';
+import { createTestsStyles } from '../components/styles/tests.styles';
+import { View, Image, TouchableOpacity, StyleSheet, Dimensions, ScrollView, Text, Alert, Animated } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
 const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps) => {
   const { testId, testName, patientId } = route.params;
-  const { professionalId } = useAuth(); // Pegar o professionalId do contexto
+  const { professionalId } = useAuth();
   const isTablet = width >= 768;
   const styles = createTestsStyles(isTablet);
 
-  // Configurações do teste
-  const TEMPO_LIMITE = 90; //Tempo em segundos
-  const TOTAL_IMAGENS = 180;
+  const TIME_LIMIT = 90;
+  const TOTAL_IMAGES = 180;
 
-  const imagens = [
+  const images = [
     require('../../assets/ondas1.png'),
     require('../../assets/ondas2.png'),
     require('../../assets/ondas3.png'),
@@ -45,23 +44,22 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
     require('../../assets/sol6.png'),
   ];
 
-  const [imagensRandom, setImagensRandom] = useState<{ id: string; src: any; isCorreto: boolean }[]>([]);
-  const [marcadas, setMarcadas] = useState<string[]>([]);
-  const [tempoRestante, setTempoRestante] = useState(TEMPO_LIMITE);
-  const [testeIniciado, setTesteIniciado] = useState(false);
-  const [testeFinalizado, setTesteFinalizado] = useState(false);
+  const [randomImages, setRandomImages] = useState<{ id: string; src: any; isCorrect: boolean }[]>([]);
+  const [markedImages, setMarkedImages] = useState<string[]>([]);
+  const [remainingTime, setRemainingTime] = useState(TIME_LIMIT);
+  const [testStarted, setTestStarted] = useState(false);
+  const [testFinished, setTestFinished] = useState(false);
   const [scaleAnim] = useState(new Animated.Value(1));
-  const [salvando, setSalvando] = useState(false);
-  const [imagemModelo, setImagemModelo] = useState(0);
+  const [saving, setSaving] = useState(false);
+  const [modelImage, setModelImage] = useState(0);
 
-  // Verificar autenticação ao montar o componente
   useEffect(() => {
-    const checkAuth = async () => {
+    const checkAuthentication = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         Alert.alert(
           'Não Autenticado',
-          'Você precisa estar autenticado para realizar testes.',
+          'Você precisa estar autenticado para realizar testes',
           [
             {
               text: 'OK',
@@ -72,55 +70,53 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
       }
     };
     
-    checkAuth();
+    checkAuthentication();
   }, []);
 
-  // Inicializa as imagens com sequência
   useEffect(() => {
-    const gerarSequencia = () => {
-      const sequencia: number[] = [];
-      const totalTipos = imagens.length;
-      const porTipo = Math.floor(TOTAL_IMAGENS / totalTipos);
-      const resto = TOTAL_IMAGENS % totalTipos;
+    const generateSequence = () => {
+      const sequence: number[] = [];
+      const totalTypes = images.length;
+      const perType = Math.floor(TOTAL_IMAGES / totalTypes);
+      const remainder = TOTAL_IMAGES % totalTypes;
       
-      for (let tipo = 0; tipo < totalTipos; tipo++) {
-        const quantidade = tipo < resto ? porTipo + 1 : porTipo;
-        for (let i = 0; i < quantidade; i++) {
-          sequencia.push(tipo);
+      for (let type = 0; type < totalTypes; type++) {
+        const quantity = type < remainder ? perType + 1 : perType;
+        for (let i = 0; i < quantity; i++) {
+          sequence.push(type);
         }
       }
       
-      for (let i = sequencia.length - 1; i > 0; i--) {
+      for (let i = sequence.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [sequencia[i], sequencia[j]] = [sequencia[j], sequencia[i]];
+        [sequence[i], sequence[j]] = [sequence[j], sequence[i]];
       }
       
-      return sequencia;
+      return sequence;
     };
 
-    const sequenciaFixa = gerarSequencia();
-    const imagensPermitidas = Array.from({ length: 18 }, (_, i) => i);
-    const imagemCorreta = imagensPermitidas[Math.floor(Math.random() * imagensPermitidas.length)];
+    const fixedSequence = generateSequence();
+    const allowedImages = Array.from({ length: 18 }, (_, i) => i);
+    const correctImage = allowedImages[Math.floor(Math.random() * allowedImages.length)];
 
-    const imagensFixas = sequenciaFixa.map((index, idx) => ({
+    const fixedImages = fixedSequence.map((index, idx) => ({
       id: `img_${idx}`,
-      src: imagens[index],
-      isCorreto: index === imagemCorreta
+      src: images[index],
+      isCorrect: index === correctImage
     }));
 
-    setImagensRandom(imagensFixas);
-    setImagemModelo(imagemCorreta);
-    setTesteIniciado(true);
+    setRandomImages(fixedImages);
+    setModelImage(correctImage);
+    setTestStarted(true);
   }, []);
 
-  // Temporizador
   useEffect(() => {
-    if (!testeIniciado || testeFinalizado) return;
+    if (!testStarted || testFinished) return;
 
     const interval = setInterval(() => {
-      setTempoRestante((prev) => {
+      setRemainingTime((prev) => {
         if (prev <= 1) {
-          finalizarTeste();
+          finishTest();
           return 0;
         }
         return prev - 1;
@@ -128,10 +124,10 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [testeIniciado, testeFinalizado]);
+  }, [testStarted, testFinished]);
 
-  const toggleMarcada = (id: string) => {
-    if (testeFinalizado) return;
+  const toggleMarked = (id: string) => {
+    if (testFinished) return;
     
     Animated.sequence([
       Animated.timing(scaleAnim, {
@@ -146,58 +142,48 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
       }),
     ]).start();
     
-    setMarcadas((prev) =>
+    setMarkedImages((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
 
-  const calcularResultados = () => {
-    const corretas = imagensRandom.filter(img => img.isCorreto);
-    const incorretas = imagensRandom.filter(img => !img.isCorreto);
+  const calculateResults = () => {
+    const correctImages = randomImages.filter(img => img.isCorrect);
+    const incorrectImages = randomImages.filter(img => !img.isCorrect);
 
-    const marcadasCorretamente = corretas.filter(img => marcadas.includes(img.id)).length;
-    const marcadasIncorretamente = incorretas.filter(img => marcadas.includes(img.id)).length;
-    const naoMarcadas = corretas.filter(img => !marcadas.includes(img.id)).length;
+    const correctlyMarked = correctImages.filter(img => markedImages.includes(img.id)).length;
+    const incorrectlyMarked = incorrectImages.filter(img => markedImages.includes(img.id)).length;
+    const notMarked = correctImages.filter(img => !markedImages.includes(img.id)).length;
 
-    const tempoGasto = TEMPO_LIMITE - tempoRestante;
+    const timeSpent = TIME_LIMIT - remainingTime;
 
     return {
-      totalCorretas: corretas.length,
-      marcadasCorretamente,
-      marcadasIncorretamente,
-      naoMarcadas,
-      totalMarcadas: marcadas.length,
-      acuracia: corretas.length > 0 ? ((marcadasCorretamente / corretas.length) * 100).toFixed(1) : '0',
-      tempoGasto,
-      tempoTotal: TEMPO_LIMITE
+      totalCorrect: correctImages.length,
+      correctlyMarked,
+      incorrectlyMarked,
+      notMarked,
+      totalMarked: markedImages.length,
+      accuracy: correctImages.length > 0 ? ((correctlyMarked / correctImages.length) * 100).toFixed(1) : '0',
+      timeSpent,
+      totalTime: TIME_LIMIT
     };
   };
 
-  const salvarResultadosSupabase = async (resultados: any) => {
-    if (salvando) return; // Previne múltiplos salvamentos
-    
-    setSalvando(true);
+  const saveResultsToSupabase = async (results: any) => {
+    if (saving) return;
+    setSaving(true);
     
     try {
-      // Verificar autenticação
-      console.log('🔐 Verificando autenticação...');
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
-        console.error('❌ Erro ao verificar sessão:', sessionError);
         throw new Error('Erro ao verificar autenticação');
       }
       
       if (!session) {
-        console.error('❌ Usuário não autenticado');
         throw new Error('Você precisa estar autenticado para salvar avaliações');
       }
       
-      console.log('✅ Usuário autenticado:', session.user.id);
-      console.log('✅ Professional ID:', professionalId);
-
-      // Verificar se o paciente pertence ao profissional
-      console.log('🔍 Verificando permissão do paciente...');
       const { data: patientData, error: patientError } = await supabase
         .from('pacientes')
         .select('id, id_profissional')
@@ -205,7 +191,6 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
         .single();
 
       if (patientError) {
-        console.error('❌ Erro ao buscar paciente:', patientError);
         throw new Error('Paciente não encontrado');
       }
 
@@ -213,36 +198,26 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
         throw new Error('Paciente não encontrado');
       }
 
-      console.log('✅ Paciente encontrado:', patientData);
-
-      // Dados a serem enviados ao Supabase
-      const dadosParaSalvar = {
+      const dataToSave = {
         id_paciente: parseInt(patientId),
         id_tipo_teste: parseInt(testId),
         data_aplicacao: new Date().toISOString(),
-        resultado_correto: resultados.marcadasCorretamente,
-        resultado_incorreto: resultados.marcadasIncorretamente,
-        resultado_omisso: resultados.naoMarcadas,
-        tempo_realizacao: parseInt(resultados.tempoGasto.toString()),
-        observacoes_clinicas: `Teste: ${testName} | Acurácia: ${resultados.acuracia}% | Total marcadas: ${resultados.totalMarcadas}/${TOTAL_IMAGENS}`,
+        resultado_correto: results.correctlyMarked,
+        resultado_incorreto: results.incorrectlyMarked,
+        resultado_omisso: results.notMarked,
+        tempo_realizacao: parseInt(results.timeSpent.toString()),
+        observacoes_clinicas: `Teste: ${testName} | Acurácia: ${results.accuracy}% | Total marcadas: ${results.totalMarked}/${TOTAL_IMAGES}`,
       };
 
-      console.log('📤 Enviando dados:', dadosParaSalvar);
-
-      // Inserir os dados no Supabase
       const { data, error } = await supabase
         .from('avaliacoes')
-        .insert(dadosParaSalvar)
+        .insert(dataToSave)
         .select();
 
       if (error) {
-        console.error('❌ Erro do Supabase:', error);
         throw error;
       }
 
-      console.log('✅ Resultados salvos com sucesso:', data);
-      
-      // Mostrar mensagem de sucesso
       Alert.alert(
         '✅ Sucesso',
         'Teste finalizado e resultados salvos com sucesso!',
@@ -259,31 +234,29 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
       return data;
       
     } catch (error: any) {
-      console.error('❌ Erro ao salvar resultados:', error);
-      
       let errorMessage = 'Erro desconhecido';
       
       if (error.message) {
         errorMessage = error.message;
       } else if (error.code === '42501') {
-        errorMessage = 'Você não tem permissão para salvar esta avaliação. Verifique se o paciente pertence a você.';
+        errorMessage = 'Você não tem permissão para salvar esta avaliação. Verifique se o paciente pertence a você';
       } else if (error.code === '23503') {
-        errorMessage = 'Paciente ou tipo de teste inválido.';
+        errorMessage = 'Paciente ou tipo de teste inválido';
       }
       
       Alert.alert(
-        '❌ Erro ao Salvar',
+        'Erro ao Salvar',
         errorMessage,
         [
           { 
             text: 'Tentar Novamente', 
-            onPress: () => salvarResultadosSupabase(resultados) 
+            onPress: () => saveResultsToSupabase(results) 
           },
           { 
             text: 'Cancelar', 
             style: 'cancel',
             onPress: () => {
-              setSalvando(false);
+              setSaving(false);
               navigation.goBack();
             }
           }
@@ -292,28 +265,24 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
       
       throw error;
     } finally {
-      setSalvando(false);
+      setSaving(false);
     }
   };
 
-  const finalizarTeste = async () => {
-    if (testeFinalizado || salvando) return; // Previne múltiplas execuções
-    
-    setTesteFinalizado(true);
-    
-    const resultados = calcularResultados();
-    console.log('Teste finalizado - Resultados:', resultados);
+  const finishTest = async () => {
+    if (testFinished || saving) return;
+    setTestFinished(true);
+    const results = calculateResults();
     
     try {
-      await salvarResultadosSupabase(resultados);
+      await saveResultsToSupabase(results);
     } catch (error) {
-      console.error('Erro ao finalizar teste:', error);
-      // O erro já é tratado dentro de salvarResultadosSupabase
+      throw error;
     }
   };
 
   const handleConfirmSelection = () => {
-    if (testeFinalizado || salvando) {
+    if (testFinished || saving) {
       return;
     }
 
@@ -322,7 +291,7 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
       'Tem certeza que deseja finalizar o teste? Os resultados serão salvos.',
       [
         { text: 'Cancelar', style: 'cancel' },
-        { text: 'Finalizar', onPress: finalizarTeste, style: 'destructive' }
+        { text: 'Finalizar', onPress: finishTest, style: 'destructive' }
       ]
     );
   };
@@ -342,9 +311,9 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
     );
   };
 
-  const formatarTempo = (segundos: number) => {
-    const mins = Math.floor(segundos / 60);
-    const secs = segundos % 60;
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
@@ -355,24 +324,23 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
           {testName}
         </Text>
 
-        {/* Contador de tempo */}
-        <View style={customStyles.contadorContainer}>
-          <Text style={customStyles.contadorText}>
-            ⏱️ Tempo: {formatarTempo(tempoRestante)}
+        <View style={customStyles.timerContainer}>
+          <Text style={customStyles.timerText}>
+            ⏱️ Tempo: {formatTime(remainingTime)}
           </Text>
         </View>
 
-        <View style={customStyles.modeloContainer}>
-          <Text style={customStyles.modeloLabel}>
+        <View style={customStyles.modelContainer}>
+          <Text style={customStyles.modelLabel}>
             Encontre todos iguais a este:
           </Text>
-          <View style={customStyles.modeloImageWrapper}>
+          <View style={customStyles.modelImageWrapper}>
             <Image 
-              source={imagens[imagemModelo]} 
-              style={customStyles.modeloImage}
+              source={images[modelImage]} 
+              style={customStyles.modelImage}
             />
-            <View style={customStyles.setaIndicadora}>
-              <Text style={customStyles.setaText}>⬇️</Text>
+            <View style={customStyles.arrowIndicator}>
+              <Text style={customStyles.arrowText}>⬇️</Text>
             </View>
           </View>
         </View>
@@ -382,26 +350,26 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
         contentContainerStyle={customStyles.scrollContent}
         showsVerticalScrollIndicator={true}
       >
-        <Text style={customStyles.instrucaoText}>
+        <Text style={customStyles.instructionText}>
           Toque nas figuras que são iguais ao modelo acima!
         </Text>
 
         <View style={customStyles.gridContainer}>
-          {imagensRandom.map((item) => (
+          {randomImages.map((item) => (
             <TouchableOpacity
               key={item.id}
-              onPress={() => toggleMarcada(item.id)}
+              onPress={() => toggleMarked(item.id)}
               style={[
                 customStyles.imageWrapper,
-                marcadas.includes(item.id) && customStyles.imageWrapperMarcada
+                markedImages.includes(item.id) && customStyles.imageWrapperMarked
               ]}
               activeOpacity={0.7}
-              disabled={testeFinalizado || salvando}
+              disabled={testFinished || saving}
             >
               <Image source={item.src} style={customStyles.image} />
-              {marcadas.includes(item.id) && (
-                <View style={customStyles.marcaContainer}>
-                  <Text style={customStyles.marcaText}>✓</Text>
+              {markedImages.includes(item.id) && (
+                <View style={customStyles.markContainer}>
+                  <Text style={customStyles.markText}>✓</Text>
                 </View>
               )}
             </TouchableOpacity>
@@ -414,7 +382,7 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
             size="default"
             onPress={handleCancelTest}
             style={customStyles.cancelButton}
-            disabled={salvando}
+            disabled={saving}
           >
             Cancelar
           </Button>
@@ -423,10 +391,10 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
             variant="game"
             size="default"
             onPress={handleConfirmSelection}
-            style={customStyles.finalizarButton}
-            disabled={salvando}
+            style={customStyles.finishButton}
+            disabled={saving}
           >
-            {salvando ? 'Salvando...' : 'Finalizar Teste'}
+            {saving ? 'Salvando...' : 'Finalizar Teste'}
           </Button>
         </View>
       </ScrollView>
@@ -458,7 +426,7 @@ const customStyles = StyleSheet.create({
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
-  contadorContainer: {
+  timerContainer: {
     backgroundColor: '#9C27B0',
     padding: 10,
     borderRadius: 12,
@@ -467,12 +435,12 @@ const customStyles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#7B1FA2',
   },
-  contadorText: {
+  timerText: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
   },
-  modeloContainer: {
+  modelContainer: {
     alignItems: 'center',
     backgroundColor: '#fff',
     padding: 15,
@@ -485,14 +453,14 @@ const customStyles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  modeloLabel: {
+  modelLabel: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
     color: '#9C27B0',
     textAlign: 'center',
   },
-  modeloImageWrapper: {
+  modelImageWrapper: {
     borderWidth: 4,
     borderColor: '#4CAF50',
     borderRadius: 15,
@@ -500,18 +468,18 @@ const customStyles = StyleSheet.create({
     backgroundColor: '#F3E5F5',
     position: 'relative',
   },
-  modeloImage: {
+  modelImage: {
     width: width / 10,
     height: width / 10,
     borderRadius: 10,
     resizeMode: 'contain',
   },
-  setaIndicadora: {
+  arrowIndicator: {
     position: 'absolute',
     bottom: -30,
     alignSelf: 'center',
   },
-  setaText: {
+  arrowText: {
     fontSize: 30,
   },
   scrollContent: {
@@ -519,7 +487,7 @@ const customStyles = StyleSheet.create({
     paddingHorizontal: 10,
     backgroundColor: '#FAFAFA',
   },
-  instrucaoText: {
+  instructionText: {
     fontSize: 18,
     textAlign: 'center',
     marginBottom: 20,
@@ -547,7 +515,7 @@ const customStyles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 2,
   },
-  imageWrapperMarcada: {
+  imageWrapperMarked: {
     borderColor: '#4CAF50',
     borderWidth: 3,
     backgroundColor: '#E8F5E9',
@@ -559,7 +527,7 @@ const customStyles = StyleSheet.create({
     borderRadius: 6,
     resizeMode: 'cover',
   },
-  marcaContainer: {
+  markContainer: {
     position: 'absolute',
     top: 0,
     right: 0,
@@ -572,7 +540,7 @@ const customStyles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#fff',
   },
-  marcaText: {
+  markText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
@@ -589,7 +557,7 @@ const customStyles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#E0E0E0',
   },
-  finalizarButton: {
+  finishButton: {
     flex: 1,
     backgroundColor: '#BA68C8',
   },

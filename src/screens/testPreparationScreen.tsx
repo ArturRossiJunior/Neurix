@@ -1,39 +1,32 @@
+import { Alert } from 'react-native';
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, Dimensions, ScrollView } from 'react-native';
 import { Button } from '../components/Button';
 import type { TestPreparationScreenProps } from '../navigation/types';
+import { View, Text, StyleSheet, Image, Dimensions, ScrollView } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
 const TestPreparationScreen = ({ navigation, route }: TestPreparationScreenProps) => {
-  const { testId, testName, patientId, patientName } = route.params; // ✅ Adicionar patientId
+  const { testId, testName, patientId, patientName } = route.params;
   const [showInstructions, setShowInstructions] = useState(false);
 
-  // Validar se recebeu os parâmetros necessários
   React.useEffect(() => {
-    console.log('📋 TestPreparation - Parâmetros recebidos:', {
-      testId,
-      testName,
-      patientId,
-      patientName
-    });
-
     if (!patientId) {
-      console.error('❌ patientId não foi recebido em TestPreparation!');
+      Alert.alert(
+        'Erro',
+        'ID do paciente não foi recebido. Por favor, volte e selecione um paciente',
+        [
+          { text: 'OK', onPress: () => console.log('Erro de patientId confirmado') }
+        ]
+      );
     }
   }, [testId, testName, patientId, patientName]);
 
   const handleStartTest = () => {
-    console.log('🚀 Navegando para TestApplication com:', {
-      testId,
-      testName,
-      patientId
-    });
-
     navigation.navigate('TestApplication', {
       testId,
       testName,
-      patientId, // ✅ PASSAR O patientId
+      patientId,
     });
   };
 
@@ -149,7 +142,6 @@ const TestPreparationScreen = ({ navigation, route }: TestPreparationScreenProps
           "Com você ao lado, a viagem do Cogni fica muito mais divertida. Vamos explorar o espaço e encontrar os símbolos certos para continuar nossa aventura até o Parque Estelar!"
         </Text>
 
-        {/* Container para o botão e astronauta lado a lado */}
         <View style={styles.buttonAndAstronautContainer}>
           <Button
             variant="default"
@@ -169,7 +161,6 @@ const TestPreparationScreen = ({ navigation, route }: TestPreparationScreenProps
           </View>
         </View>
 
-        {/* Espaçamento extra no final */}
         <View style={{ height: 60 }} />
       </ScrollView>
     </View>

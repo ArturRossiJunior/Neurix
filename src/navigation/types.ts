@@ -31,7 +31,7 @@ export type RootStackParamList = {
     prefillEmail?: string; 
   } | undefined;
   About: undefined;
-  TestApplication: { testId: string; testName: string; };
+  TestApplication: { testId: string; testName: string; patientId: string };
   TestPreparation: { testId: string; testName: string; patientId: string; patientName: string; };
 };
 

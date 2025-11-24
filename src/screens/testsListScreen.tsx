@@ -1,8 +1,8 @@
-import React, { useState, useCallback } from 'react';
 import { Card } from '../components/Card';
 import { supabase } from '../utils/supabase';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
+import React, { useState, useCallback } from 'react';
 import ScreenHeader from '../components/ScreenHeader';
 import { TestsScreenProps } from '../navigation/types';
 import { useFocusEffect } from '@react-navigation/native';
@@ -24,30 +24,22 @@ export const TestsListScreen = ({ navigation }: TestsScreenProps) => {
   const [filteredTests, setFilteredTests] = useState<TestType[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Buscar tipos de teste do Supabase
   const fetchTestTypes = useCallback(async () => {
     setLoading(true);
     try {
-      console.log('🔍 Buscando tipos de teste...');
-      
       const { data, error } = await supabase
         .from('tipos_de_teste')
         .select('id, nome_teste, descricao')
         .order('nome_teste', { ascending: true });
 
       if (error) {
-        console.error('❌ Erro ao buscar tipos de teste:', error);
         throw error;
       }
 
-      console.log('✅ Tipos de teste encontrados:', data);
-      console.log('✅ Total:', data?.length);
-      
       setTestTypes(data || []);
       setFilteredTests(data || []);
 
     } catch (error: any) {
-      console.error('❌ Erro ao carregar tipos de teste:', error);
       Alert.alert(
         'Erro',
         `Não foi possível carregar os tipos de teste: ${error.message}`,
@@ -58,7 +50,6 @@ export const TestsListScreen = ({ navigation }: TestsScreenProps) => {
     }
   }, []);
 
-  // Recarregar ao focar na tela
   useFocusEffect(
     useCallback(() => {
       fetchTestTypes();
@@ -125,9 +116,6 @@ export const TestsListScreen = ({ navigation }: TestsScreenProps) => {
             placeholderTextColor={colors.deactivated}
           />
         </View>
-        <TouchableOpacity style={styles.filterButton} onPress={handleFilter}>
-          <Text style={styles.filterButtonText}>⚙</Text>
-        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
