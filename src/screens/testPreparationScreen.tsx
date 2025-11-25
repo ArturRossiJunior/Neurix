@@ -1,10 +1,10 @@
 import { Alert } from 'react-native';
-import { useIsTablet } from '../utils/useIsTablet';
-import { createTestsStyles } from '../components/styles/tests.styles';
 import React, { useState } from 'react';
 import { Button } from '../components/Button';
-import type { TestPreparationScreenProps } from '../navigation/types';
+import { useIsTablet } from '../utils/useIsTablet';
 import { View, Text, Image, ScrollView } from 'react-native';
+import type { TestPreparationScreenProps } from '../navigation/types';
+import { createTestsStyles } from '../components/styles/tests.styles';
 
 const TestPreparationScreen = ({ navigation, route }: TestPreparationScreenProps) => {
   const isTablet = useIsTablet();

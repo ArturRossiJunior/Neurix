@@ -187,7 +187,7 @@ export const createTestsStyles = (isTablet: boolean) => {
     },
     preparationContainer: {
       flex: 1,
-      backgroundColor: colors.muted,
+      backgroundColor: colors.primaryForeground,
     },
     content: {
       flex: 1,
@@ -243,7 +243,7 @@ export const createTestsStyles = (isTablet: boolean) => {
     },
     instructionsContent: {
       paddingHorizontal: isTablet ? wp('5%') : wp('6%'),
-      paddingTop: hp('3%'),
+      paddingTop: isTablet ? hp('3%') : hp('5%'),
       paddingBottom: hp('3%'),
     },
     storyTitle: {
@@ -317,7 +317,8 @@ export const createTestsStyles = (isTablet: boolean) => {
     },
     applicationContainer: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.primaryForeground,
+      marginTop: isTablet ? hp('2%') : hp('1%'),
     },
     headerContainer: {
       backgroundColor: colors.muted,

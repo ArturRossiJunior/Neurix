@@ -285,7 +285,7 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
 
     Alert.alert(
       'Finalizar Teste',
-      'Tem certeza que deseja finalizar o teste? Os resultados serão salvos.',
+      'Tem certeza que deseja finalizar o teste? Os resultados serão salvos',
       [
         { text: 'Cancelar', style: 'cancel' },
         { text: 'Finalizar', onPress: finishTest, style: 'destructive' }
@@ -296,11 +296,11 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
   const handleCancelTest = () => {
     Alert.alert(
       'Cancelar Teste',
-      'Deseja realmente cancelar? Os dados NÃO serão salvos.',
+      'Deseja realmente cancelar? Os dados NÃO serão salvos',
       [
-        { text: 'Continuar Teste', style: 'cancel' },
+        { text: 'Continuar', style: 'cancel' },
         { 
-          text: 'Sim, Cancelar', 
+          text: 'Cancelar', 
           onPress: () => navigation.goBack(),
           style: 'destructive' 
         }

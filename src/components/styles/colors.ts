@@ -45,4 +45,14 @@ export const colors = {
   purpleLight: '#7B1FA2',
   purpleAccent: '#8E24AA',
   purpleButton: '#9C27B0',
+  
+  dashboardLoadingText: '#000',
+  dashboardLoadingIndicator: '#9C27B0',
+  dashboardStatsBorder: '#000',
+  dashboardNoDataText: '#666',
+  
+  chartCorrect: '#4CAF50',
+  chartIncorrect: '#F44336',
+  chartOmission: '#FFC107',
+  chartLegend: '#000',
 };
