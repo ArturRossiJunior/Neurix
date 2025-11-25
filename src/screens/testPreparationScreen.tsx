@@ -1,12 +1,14 @@
 import { Alert } from 'react-native';
+import { useIsTablet } from '../utils/useIsTablet';
+import { createTestsStyles } from '../components/styles/tests.styles';
 import React, { useState } from 'react';
 import { Button } from '../components/Button';
 import type { TestPreparationScreenProps } from '../navigation/types';
-import { View, Text, StyleSheet, Image, Dimensions, ScrollView } from 'react-native';
-
-const { width, height } = Dimensions.get('window');
+import { View, Text, Image, ScrollView } from 'react-native';
 
 const TestPreparationScreen = ({ navigation, route }: TestPreparationScreenProps) => {
+  const isTablet = useIsTablet();
+  const styles = createTestsStyles(isTablet);
   const { testId, testName, patientId, patientName } = route.params;
   const [showInstructions, setShowInstructions] = useState(false);
 
@@ -36,15 +38,15 @@ const TestPreparationScreen = ({ navigation, route }: TestPreparationScreenProps
 
   if (!showInstructions) {
     return (
-      <View style={styles.container}>
+      <View style={styles.preparationContainer}>
         <View style={styles.content}>
           <Text style={styles.title}>Preparado para começar?</Text>
           
           <Text style={styles.subtitle}>
-            Paciente: {patientName}
+            {patientName}
           </Text>
           
-          <Text style={styles.testName}>
+          <Text style={styles.testNamePreparation}>
             {testName}
           </Text>
 
@@ -65,7 +67,7 @@ const TestPreparationScreen = ({ navigation, route }: TestPreparationScreenProps
             variant="default"
             size="default"
             onPress={handleShowInstructions}
-            style={styles.startButton}
+            style={styles.startButtonPreparation}
           >
             Começar Teste
           </Button>
@@ -75,7 +77,7 @@ const TestPreparationScreen = ({ navigation, route }: TestPreparationScreenProps
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.preparationContainer}>
       <ScrollView 
         style={styles.instructionsContainer}
         contentContainerStyle={styles.instructionsContent}
@@ -160,149 +162,9 @@ const TestPreparationScreen = ({ navigation, route }: TestPreparationScreenProps
             />
           </View>
         </View>
-
-        <View style={{ height: 60 }} />
       </ScrollView>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F3E5F5',
-  },
-  content: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#6A1B9A',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 20,
-    color: '#7B1FA2',
-    marginBottom: 5,
-    textAlign: 'center',
-  },
-  testName: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#8E24AA',
-    marginBottom: 30,
-    textAlign: 'center',
-  },
-  imageContainer: {
-    width: width * 0.6,
-    height: height * 0.4,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  astronautImage: {
-    width: '100%',
-    height: '100%',
-  },
-  instructions: {
-    fontSize: 18,
-    color: '#6A1B9A',
-    textAlign: 'center',
-    marginVertical: 20,
-    paddingHorizontal: 30,
-    lineHeight: 26,
-  },
-  startButton: {
-    marginTop: 20,
-    minWidth: 200,
-    backgroundColor: '#9C27B0',
-  },
-  instructionsContainer: {
-    flex: 1,
-  },
-  instructionsContent: {
-    paddingHorizontal: 25,
-    paddingTop: 30,
-    paddingBottom: 30,
-  },
-  storyTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#6A1B9A',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#7B1FA2',
-    marginTop: 25,
-    marginBottom: 15,
-  },
-  storyText: {
-    fontSize: 18,
-    color: '#4A148C',
-    lineHeight: 28,
-    marginBottom: 15,
-    textAlign: 'justify',
-  },
-  highlight: {
-    fontWeight: 'bold',
-    color: '#6A1B9A',
-  },
-  stepContainer: {
-    flexDirection: 'row',
-    marginBottom: 12,
-    alignItems: 'flex-start',
-  },
-  stepNumber: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#7B1FA2',
-    marginRight: 10,
-    minWidth: 25,
-  },
-  stepText: {
-    fontSize: 18,
-    color: '#4A148C',
-    lineHeight: 26,
-    flex: 1,
-  },
-  finalMessage: {
-    fontSize: 18,
-    color: '#4A148C',
-    lineHeight: 28,
-    marginTop: 10,
-    marginBottom: 30,
-    fontStyle: 'italic',
-    textAlign: 'center',
-    paddingHorizontal: 10,
-  },
-  letsGoButton: {
-    minWidth: 200,
-    backgroundColor: '#9C27B0',
-    marginTop: 20,
-  },
-  buttonAndAstronautContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 30,
-    gap: 20,
-  },
-  astronautBesideButton: {
-    width: 120,
-    height: 120,
-  },
-  astronautSmall: {
-    width: '100%',
-    height: '100%',
-  },
-});
 
 export default TestPreparationScreen;

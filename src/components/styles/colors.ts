@@ -38,5 +38,11 @@ export const colors = {
     primary: ['#3B82F6', '#60A5FA'],
     calm: ['#60A5FA', '#34D399'],
     background: ['#F8FAFC', '#E2E8F0'],
-  }
+  },
+
+  purpleDark: '#4A148C',
+  purpleMedium: '#6A1B9A',
+  purpleLight: '#7B1FA2',
+  purpleAccent: '#8E24AA',
+  purpleButton: '#9C27B0',
 };

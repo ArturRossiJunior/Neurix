@@ -1,17 +1,14 @@
-import { useAuth } from '../../AuthContext';
 import { supabase } from '../utils/supabase';
 import { Button } from '../components/Button';
 import React, { useState, useEffect } from 'react';
+import { useIsTablet } from '../utils/useIsTablet';
 import type { TestApplicationScreenProps } from '../navigation/types';
 import { createTestsStyles } from '../components/styles/tests.styles';
-import { View, Image, TouchableOpacity, StyleSheet, Dimensions, ScrollView, Text, Alert, Animated } from 'react-native';
-
-const { width } = Dimensions.get('window');
+import { View, Image, TouchableOpacity, ScrollView, Text, Alert, Animated } from 'react-native';
 
 const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps) => {
   const { testId, testName, patientId } = route.params;
-  const { professionalId } = useAuth();
-  const isTablet = width >= 768;
+  const isTablet = useIsTablet();
   const styles = createTestsStyles(isTablet);
 
   const TIME_LIMIT = 90;
@@ -219,7 +216,7 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
       }
 
       Alert.alert(
-        '✅ Sucesso',
+        'Sucesso',
         'Teste finalizado e resultados salvos com sucesso!',
         [
           {
@@ -287,7 +284,7 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
     }
 
     Alert.alert(
-      '⏸️ Finalizar Teste',
+      'Finalizar Teste',
       'Tem certeza que deseja finalizar o teste? Os resultados serão salvos.',
       [
         { text: 'Cancelar', style: 'cancel' },
@@ -298,7 +295,7 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
 
   const handleCancelTest = () => {
     Alert.alert(
-      '❌ Cancelar Teste',
+      'Cancelar Teste',
       'Deseja realmente cancelar? Os dados NÃO serão salvos.',
       [
         { text: 'Continuar Teste', style: 'cancel' },
@@ -311,77 +308,62 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
     );
   };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFF9E6' }}>
-      <View style={customStyles.headerContainer}>
-        <Text style={customStyles.titleText}>
+    <View style={styles.applicationContainer}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.titleText}>
           {testName}
         </Text>
 
-        <View style={customStyles.timerContainer}>
-          <Text style={customStyles.timerText}>
-            ⏱️ Tempo: {formatTime(remainingTime)}
-          </Text>
-        </View>
-
-        <View style={customStyles.modelContainer}>
-          <Text style={customStyles.modelLabel}>
+        <View style={styles.modelContainer}>
+          <Text style={styles.modelLabel}>
             Encontre todos iguais a este:
           </Text>
-          <View style={customStyles.modelImageWrapper}>
+          <View style={styles.modelImageWrapper}>
             <Image 
               source={images[modelImage]} 
-              style={customStyles.modelImage}
+              style={styles.modelImage}
             />
-            <View style={customStyles.arrowIndicator}>
-              <Text style={customStyles.arrowText}>⬇️</Text>
-            </View>
           </View>
         </View>
       </View>
 
       <ScrollView 
-        contentContainerStyle={customStyles.scrollContent}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={true}
       >
-        <Text style={customStyles.instructionText}>
+        <Text style={styles.instructionText}>
           Toque nas figuras que são iguais ao modelo acima!
         </Text>
 
-        <View style={customStyles.gridContainer}>
+        <View style={styles.gridContainer}>
           {randomImages.map((item) => (
             <TouchableOpacity
               key={item.id}
               onPress={() => toggleMarked(item.id)}
               style={[
-                customStyles.imageWrapper,
-                markedImages.includes(item.id) && customStyles.imageWrapperMarked
+                styles.imageWrapper,
+                markedImages.includes(item.id) && styles.imageWrapperMarked
               ]}
               activeOpacity={0.7}
               disabled={testFinished || saving}
             >
-              <Image source={item.src} style={customStyles.image} />
+              <Image source={item.src} style={styles.image} />
               {markedImages.includes(item.id) && (
-                <View style={customStyles.markContainer}>
-                  <Text style={customStyles.markText}>✓</Text>
+                <View style={styles.markContainer}>
+                  <Text style={styles.markText}>✓</Text>
                 </View>
               )}
             </TouchableOpacity>
           ))}
         </View>
 
-        <View style={customStyles.buttonsContainer}>
+        <View style={styles.buttonsContainer}>
           <Button
             variant="default"
             size="default"
             onPress={handleCancelTest}
-            style={customStyles.cancelButton}
+            style={styles.cancelButton}
             disabled={saving}
           >
             Cancelar
@@ -391,7 +373,7 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
             variant="game"
             size="default"
             onPress={handleConfirmSelection}
-            style={customStyles.finishButton}
+            style={styles.finishButton}
             disabled={saving}
           >
             {saving ? 'Salvando...' : 'Finalizar Teste'}
@@ -401,166 +383,5 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
     </View>
   );
 };
-
-const customStyles = StyleSheet.create({
-  headerContainer: {
-    backgroundColor: '#F3E5F5',
-    paddingTop: 20,
-    paddingBottom: 15,
-    paddingHorizontal: 16,
-    borderBottomWidth: 3,
-    borderBottomColor: '#CE93D8',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 5,
-  },
-  titleText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 12,
-    textAlign: 'center',
-    color: '#9C27B0',
-    textShadowColor: 'rgba(0, 0, 0, 0.1)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
-  },
-  timerContainer: {
-    backgroundColor: '#9C27B0',
-    padding: 10,
-    borderRadius: 12,
-    marginBottom: 12,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#7B1FA2',
-  },
-  timerText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  modelContainer: {
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 15,
-    borderWidth: 4,
-    borderColor: '#BA68C8',
-    shadowColor: '#9C27B0',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  modelLabel: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#9C27B0',
-    textAlign: 'center',
-  },
-  modelImageWrapper: {
-    borderWidth: 4,
-    borderColor: '#4CAF50',
-    borderRadius: 15,
-    padding: 10,
-    backgroundColor: '#F3E5F5',
-    position: 'relative',
-  },
-  modelImage: {
-    width: width / 10,
-    height: width / 10,
-    borderRadius: 10,
-    resizeMode: 'contain',
-  },
-  arrowIndicator: {
-    position: 'absolute',
-    bottom: -30,
-    alignSelf: 'center',
-  },
-  arrowText: {
-    fontSize: 30,
-  },
-  scrollContent: {
-    paddingVertical: 20,
-    paddingHorizontal: 10,
-    backgroundColor: '#FAFAFA',
-  },
-  instructionText: {
-    fontSize: 18,
-    textAlign: 'center',
-    marginBottom: 20,
-    color: '#9C27B0',
-    paddingHorizontal: 10,
-    fontWeight: 'bold',
-    backgroundColor: '#F3E5F5',
-    padding: 15,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#CE93D8',
-  },
-  gridContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: 6,
-  },
-  imageWrapper: {
-    position: 'relative',
-    margin: 3,
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: '#ddd',
-    backgroundColor: '#fff',
-    padding: 2,
-  },
-  imageWrapperMarked: {
-    borderColor: '#4CAF50',
-    borderWidth: 3,
-    backgroundColor: '#E8F5E9',
-    transform: [{ scale: 0.95 }],
-  },
-  image: {
-    width: 42,
-    height: 42,
-    borderRadius: 6,
-    resizeMode: 'cover',
-  },
-  markContainer: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    backgroundColor: '#4CAF50',
-    borderRadius: 12,
-    width: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
-  markText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 30,
-    marginBottom: 40,
-    paddingHorizontal: 20,
-    gap: 15,
-  },
-  cancelButton: {
-    flex: 1,
-    backgroundColor: '#E0E0E0',
-  },
-  finishButton: {
-    flex: 1,
-    backgroundColor: '#BA68C8',
-  },
-});
 
 export default TestApplicationScreen;
