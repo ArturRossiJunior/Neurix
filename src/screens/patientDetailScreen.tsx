@@ -9,7 +9,7 @@ import { PatientDetailScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/patients.styles';
 import { calculateDetailedAge, formatCPF, formatPhone } from '../utils/utils';
 import { ESCOLARIDADE_OPTIONS, LATERALIDADE_OPTIONS, GENERO_OPTIONS } from '../utils/constants';
-import { View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import ScreenHeader from '../components/ScreenHeader';
 
 interface Responsible {
@@ -41,7 +41,6 @@ interface TestDetail {
   resultado_incorreto: number;
   resultado_omisso: number;
 }
-
 
 const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) => {
   const { patientId } = route.params;
@@ -194,10 +193,6 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
       ]
     );
   };
-  
-  const handleNewTest = () => {
-    navigation.navigate('Tests');
-  };
 
   const handleViewGuardian = () => {
     if (!patient?.id_responsavel) {
@@ -205,14 +200,6 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
       return;
     }
     navigation.replace('GuardianDetail', { guardianId: patient.id_responsavel });
-  };
-
-  const handleViewTest = (testId: string) => {
-    Alert.alert(
-      'Ver Teste',
-      `Visualizando teste ${testId}. Esta funcionalidade será implementada em breve!`,
-      [{ text: 'OK' }]
-    );
   };
 
   const getStatusColor = (status: 'ativo' | 'inativo') => {
@@ -297,52 +284,6 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
               <Text style={styles.patientInput}>{patient.observacoes || 'Nenhuma observação'}</Text>
             </View>
           </Card>
-
-          <Button
-            variant="game"
-            size="default"
-            style={styles.patientCreationButton}
-            onPress={handleNewTest}
-          >
-            + Novo Teste
-          </Button>
-
-          <Text style={[styles.patientName, { marginTop: 20, marginBottom: 10 }]}>
-            Histórico de Testes
-          </Text>
-          
-          {tests.length > 0 ? (
-            tests.map((test) => (
-              <Card
-                key={test.id}
-                variant="default"
-                style={styles.patientCard}
-                onPress={() => handleViewTest(test.id)}
-              >
-                <View style={styles.patientCardContent}>
-                  <View style={styles.patientInfo}>
-                    <Text style={styles.patientName}>{test.nome_teste}</Text>
-                    <View style={styles.patientDetails}>
-                      <Text style={styles.patientInput}>Data: {test.data_aplicacao}</Text>
-                      <Text style={styles.patientInput}>Corretos: {test.resultado_correto}</Text>
-                      <Text style={styles.patientInput}>Incorretos: {test.resultado_incorreto}</Text>
-                      <Text style={styles.patientInput}>Omitidos: {test.resultado_omisso}</Text>
-                    </View>
-                  </View>
-                  <View style={styles.patientActions}>
-                    <TouchableOpacity 
-                      style={styles.viewButton}
-                      onPress={() => handleViewTest(test.id)}
-                    >
-                      <Text style={styles.viewButtonText}>Ver</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </Card>
-            ))
-          ) : (
-            <Text style={styles.textTestNull}>Nenhum teste registrado para este paciente</Text>
-          )}
 
           <Button
             variant="default"

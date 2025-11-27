@@ -8,7 +8,6 @@ export const createStyles = (isTablet: boolean) => StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -20,17 +19,14 @@ export const createStyles = (isTablet: boolean) => StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.outlineBorder,
   },
-
   listContainer: {
     flex: 1,
     paddingHorizontal: isTablet ? wp('4%') : wp('5%'),
     paddingTop: isTablet ? wp('3%') : wp('0%')
   },
-
   patientSelectorContainer: {
     marginBottom: isTablet ? hp('2%') : hp('2%'),
   },
-
   patientSelectorLabel: {
     fontSize: isTablet ? wp('4%') : wp('4.5%'),
     fontWeight: '600',
@@ -39,7 +35,6 @@ export const createStyles = (isTablet: boolean) => StyleSheet.create({
     paddingBottom: isTablet ? wp('2%') : wp('0%'),
     marginTop: isTablet ? hp('0%') : hp('2%'),
   },
-
   picker: {
     height: isTablet ? hp('7%') : hp('6%'),
     width: '100%',
@@ -49,7 +44,6 @@ export const createStyles = (isTablet: boolean) => StyleSheet.create({
     borderColor: colors.outlineBorder,
     paddingHorizontal: isTablet ? wp('4%') : wp('3%'),
   },
-
   chartContainer: {
     backgroundColor: colors.card,
     borderRadius: isTablet ? 16 : 12,
@@ -61,21 +55,18 @@ export const createStyles = (isTablet: boolean) => StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-
   chartTitle: {
     fontSize: isTablet ? wp('4%') : wp('4.5%'),
     fontWeight: 'bold',
     color: colors.primary,
     marginBottom: isTablet ? hp('2%') : hp('1.5%'),
   },
-
   noDataText: {
     textAlign: 'center',
     color: colors.text,
     fontSize: isTablet ? wp('4%') : wp('4.5%'),
     marginTop: isTablet ? hp('4%') : hp('3%'),
   },
-  
   backButton: {
     width: isTablet ? hp('6%') : hp('5%'),
     height: isTablet ? hp('6%') : hp('5%'),
@@ -85,15 +76,109 @@ export const createStyles = (isTablet: boolean) => StyleSheet.create({
     justifyContent: 'center',
     ...shadows.shadowDefault,
   },
-
   backButtonText: {
     fontSize: isTablet ? wp('7%') : wp('5%'),
     fontWeight: '600',
     color: colors.foreground,
     marginTop: isTablet ? wp('-1.5%') : wp('5%'),
   },
-
   headerSpacer: {
     width: isTablet ? hp('3%') : hp('5%'),
+  },
+  loadingContainer: {
+    padding: isTablet ? wp('3%') : wp('5%'),
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: isTablet ? hp('1%') : hp('1.5%'),
+    fontSize: isTablet ? wp('3.5%') : wp('4%'),
+    color: colors.dashboardLoadingText,
+  },
+  summaryCard: {
+    backgroundColor: colors.card,
+    margin: isTablet ? wp('3%') : wp('5%'),
+    padding: isTablet ? wp('4%') : wp('5%'),
+    borderRadius: isTablet ? 20 : 16,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  summaryTitle: {
+    fontSize: isTablet ? wp('4.5%') : wp('5%'),
+    fontWeight: 'bold',
+    marginBottom: isTablet ? hp('1.5%') : hp('2%'),
+    color: colors.dashboardStatsBorder,
+  },
+  summaryContent: {
+    padding: isTablet ? wp('2%') : wp('3%'),
+  },
+  summaryText: {
+    fontSize: isTablet ? wp('3.5%') : wp('4%'),
+    marginBottom: isTablet ? hp('0.8%') : hp('1%'),
+    color: colors.dashboardStatsBorder,
+  },
+  summaryTextLast: {
+    fontSize: isTablet ? wp('3.5%') : wp('4%'),
+    color: colors.dashboardStatsBorder,
+  },
+  summaryBold: {
+    fontWeight: 'bold',
+  },
+  lineChartCard: {
+    backgroundColor: colors.card,
+    margin: isTablet ? wp('3%') : wp('5%'),
+    padding: isTablet ? wp('4%') : wp('5%'),
+    borderRadius: isTablet ? 20 : 16,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  lineChartTitle: {
+    fontSize: isTablet ? wp('4.5%') : wp('5%'),
+    fontWeight: 'bold',
+    marginBottom: isTablet ? hp('1%') : hp('1.5%'),
+    color: colors.dashboardStatsBorder,
+  },
+  lineChartStyle: {
+    marginVertical: isTablet ? hp('1%') : hp('1.5%'),
+    borderRadius: isTablet ? 20 : 16,
+  },
+  pieChartCard: {
+    backgroundColor: colors.card,
+    margin: isTablet ? wp('3%') : wp('5%'),
+    marginBottom: isTablet ? hp('4%') : hp('5%'),
+    padding: isTablet ? wp('4%') : wp('5%'),
+    borderRadius: isTablet ? 20 : 16,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  pieChartTitle: {
+    fontSize: isTablet ? wp('4.5%') : wp('5%'),
+    fontWeight: 'bold',
+    marginBottom: isTablet ? hp('1%') : hp('1.5%'),
+    color: colors.dashboardStatsBorder,
+  },
+  pieChartStyle: {
+    marginVertical: isTablet ? hp('1%') : hp('1.5%'),
+    borderRadius: isTablet ? 20 : 16,
+  },
+  noSelectionText: {
+    textAlign: 'center',
+    padding: isTablet ? wp('5%') : wp('10%'),
+    fontSize: isTablet ? wp('3.5%') : wp('4%'),
+    color: colors.dashboardNoDataText,
+  },
+  noAvaliacoesText: {
+    textAlign: 'center',
+    padding: isTablet ? wp('5%') : wp('10%'),
+    fontSize: isTablet ? wp('3.5%') : wp('4%'),
+    color: colors.dashboardNoDataText,
   },
 });

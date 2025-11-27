@@ -14,6 +14,8 @@ import PatientDetailScreen from '../screens/patientDetailScreen';
 import GuardiansListScreen from '../screens/guardiansListScreen';
 import GuardianDetailScreen from '../screens/guardianDetailScreen';
 import PatientCreationScreen from '../screens/patientCreationScreen';
+import TestPreparationScreen from '../screens/testPreparationScreen';
+import TestApplicationScreen from '../screens/testApplicationScreen';
 import GuardianCreationScreen from '../screens/guardianCreationScreen';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -91,6 +93,16 @@ export default function AppNavigator() {
         <Stack.Screen
           name="About"
           component={AboutScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="TestPreparation"
+          component={TestPreparationScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="TestApplication"
+          component={TestApplicationScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
