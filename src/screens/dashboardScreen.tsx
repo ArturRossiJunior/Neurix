@@ -301,7 +301,7 @@ export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
                 <Text style={styles.lineChartTitle}>Evolução da Acurácia</Text>
                 <LineChart
                   data={lineChartData}
-                  width={screenWidth - 80}
+                  width={screenWidth * 0.7}
                   height={220}
                   yAxisLabel=""
                   yAxisSuffix="%"
@@ -317,7 +317,7 @@ export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
                 <Text style={styles.pieChartTitle}>Distribuição dos Resultados</Text>
                 <PieChart
                   data={pieChartData}
-                  width={screenWidth - 80}
+                  width={screenWidth * 0.7}
                   height={220}
                   chartConfig={chartConfig}
                   accessor="population"
