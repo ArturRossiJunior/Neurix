@@ -81,8 +81,28 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
 
     const crmFormatado = formatCRMForDB(crm);
     const nomeCapitalizado = capitalizeName(name);
-
+    
     try {
+      const telefoneLimpo = telefone.replace(/\D/g, '');
+
+      const { data: existingUser, error: checkError } = await supabase
+        .from('profissionais')
+        .select('telefone, registro_profissional')
+        .or(`telefone.eq.${telefoneLimpo},registro_profissional.eq.${crmFormatado}`)
+        .maybeSingle();
+
+      if (checkError) throw checkError;
+
+      if (existingUser) {
+        const mensagem = existingUser.telefone === telefoneLimpo 
+          ? 'Este número de telefone já está cadastrado' 
+          : 'Este CRM já está cadastrado';
+        
+        Alert.alert('Atenção', mensagem);
+        setLoading(false);
+        return; 
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email: email,
         password: password,
@@ -96,7 +116,10 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
       });
 
       if (error) {
-        Alert.alert('Erro no Cadastro', error.message);
+        if (error.message.includes('already registered'))
+          Alert.alert('Erro no Cadastro', 'Este email já está cadastrado');
+        else
+          Alert.alert('Erro no Cadastro', error.message);
         setLoading(false);
         return;
       }
