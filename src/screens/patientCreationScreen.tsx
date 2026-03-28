@@ -10,7 +10,7 @@ import { MaskedTextInput } from 'react-native-mask-text';
 import { useFocusEffect } from '@react-navigation/native';
 import { PatientCreationScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/patients.styles';
-import { View, Text, ScrollView, TextInput, Alert } from 'react-native';
+import { View, Text, ScrollView, TextInput, Alert, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { ESCOLARIDADE_OPTIONS, LATERALIDADE_OPTIONS } from '../utils/constants';
@@ -104,7 +104,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
       }
     }
   };
-  
+
   useFocusEffect(
     useCallback(() => {
       if (professionalId || isEditing) {
@@ -124,7 +124,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
         console.error('Erro ao buscar responsáveis vinculados:', patientError.message);
         return;
       }
-      
+
       const usedResponsibleIds = [...new Set(patientData.map(p => p.id_responsavel))];
       let deleteQuery = supabase.from('responsavel').delete();
 
@@ -139,12 +139,12 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
       if (deleteError) {
         console.error('Erro ao deletar responsáveis órfãos:', deleteError.message);
       }
-      
+
     } catch (error: any) {
       console.error('Erro na limpeza de responsáveis:', error.message);
     }
   };
-  
+
   const navigateBackAndCleanup = async () => {
     await cleanupOrphanedResponsibles();
     navigation.goBack();
@@ -244,7 +244,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
         setIsSaving(false);
         return;
       }
-      
+
       const [day, month, year] = formData.birthDate.split('/');
       const correctDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
 
@@ -260,7 +260,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
       };
 
       let error;
-      
+
       if (isEditing) {
         const { error: updateError } = await supabase
           .from('pacientes')
@@ -278,7 +278,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
       }
 
       if (error) throw error;
-      
+
       await navigateBackAndCleanup();
 
     } catch (error: any) {
@@ -309,8 +309,8 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
     }
 
     Alert.alert(
-      'Cancelar', 
-      `Deseja cancelar a ${isEditing ? 'edição' : 'criação'}? Os dados não serão salvos`, 
+      'Cancelar',
+      `Deseja cancelar a ${isEditing ? 'edição' : 'criação'}? Os dados não serão salvos`,
       [
         { text: 'Continuar', style: 'cancel' },
         { text: 'Sair', onPress: () => navigateBackAndCleanup() },
@@ -324,8 +324,8 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
   ];
 
   const getPickerContainerStyle = (field: keyof typeof errors) => [
-    styles.searchContainer,
-    errors[field] ? { borderColor: 'red', borderWidth: 1, borderRadius: styles.searchContainer.borderRadius } : {},
+    styles.pickerContainer,
+    errors[field] ? { borderColor: 'red', borderWidth: 1 } : {},
   ];
 
   return (
@@ -374,7 +374,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
                 {errors.birthDate ? <Text style={{ color: 'red', fontSize: 12 }}>{errors.birthDate}</Text> : null}
 
                 <Text style={[styles.patientInput, styles.patientCreationMargin]}>CPF</Text>
-                <View style={styles.searchContainer}>
+                <View style={styles.pickerContainer}>
                   <MaskedTextInput
                     mask="999.999.999-99"
                     style={getInputStyle('cpf')}
@@ -392,7 +392,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
                   <Picker
                     selectedValue={formData.gender}
                     onValueChange={(itemValue: string) => handleInputChange('gender', itemValue)}
-                    style={[styles.searchInput, { marginLeft: wp('3%') }]}
+                    style={{ color: colors.text }}
                     itemStyle={{ color: colors.text }}
                   >
                     {formData.gender === '' && <Picker.Item label="Selecione o gênero" value="" enabled={false} />}
@@ -409,7 +409,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
                   <Picker
                     selectedValue={formData.escolaridade}
                     onValueChange={(itemValue: string) => handleInputChange('escolaridade', itemValue)}
-                    style={[styles.searchInput, { marginLeft: wp('3%') }]}
+                    style={{ color: colors.text }}
                     itemStyle={{ color: colors.text }}
                   >
                     {formData.escolaridade === '' && <Picker.Item label="Selecione a escolaridade" value="" enabled={false} />}
@@ -420,13 +420,22 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
                 </View>
                 {errors.escolaridade ? <Text style={{ color: 'red', fontSize: 12 }}>{errors.escolaridade}</Text> : null}
 
-                <Text style={[styles.patientInput, styles.patientCreationMargin]}>Responsável *</Text>
+                <View style={styles.responsavelLabelRow}>
+                  <Text style={[styles.patientInput, styles.patientCreationMargin]}>Responsável *</Text>
+                  <TouchableOpacity
+                    style={styles.newResponsavelChip}
+                    onPress={handleNewGuardian}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.newResponsavelChipText}>+ Novo</Text>
+                  </TouchableOpacity>
+                </View>
                 <View style={getPickerContainerStyle('id_responsavel')}>
                   <Picker
                     selectedValue={formData.id_responsavel}
                     onValueChange={(itemValue: number) => handleInputChange('id_responsavel', itemValue)}
-                    style={[styles.searchInput, { marginLeft: wp('3%') }]}
-                    itemStyle={{ color: colors.text }}
+                    style={{ color: colors.text }}
+                    itemStyle={{ flex: 1, color: colors.text }}
                     enabled={!loadingResponsibles}
                   >
                     {formData.id_responsavel === -1 && (
@@ -442,15 +451,6 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
                   </Picker>
                 </View>
 
-                <Button
-                  variant="link"
-                  size="sm"
-                  style={styles.patientCreationButton}
-                  onPress={handleNewGuardian}
-                  >
-                  Novo Responsável
-                </Button>
-
                 {errors.id_responsavel ? <Text style={{ color: 'red', fontSize: 12 }}>{errors.id_responsavel}</Text> : null}
 
                 <Text style={[styles.patientInput, styles.patientCreationMargin]}>Lateralidade *</Text>
@@ -458,7 +458,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
                   <Picker
                     selectedValue={formData.lateralidade}
                     onValueChange={(itemValue: string) => handleInputChange('lateralidade', itemValue)}
-                    style={[styles.searchInput, { marginLeft: wp('3%') }]}
+                    style={{ color: colors.text }}
                     itemStyle={{ color: colors.text }}
                   >
                     {formData.lateralidade === '' && <Picker.Item label="Selecione a lateralidade" value="" enabled={false} />}

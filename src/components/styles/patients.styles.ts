@@ -72,6 +72,16 @@ export const createStyles = (isTablet: boolean) => {
       ...shadows.shadowDefault,
     },
 
+    pickerContainer: {
+      backgroundColor: colors.card,
+      borderRadius: isTablet ? 16 : 12,
+      borderWidth: 1,
+      borderColor: colors.outlineBorder,
+      height: isTablet ? hp('5.5%') : hp('6%'),
+      justifyContent: 'center',
+      ...shadows.shadowDefault,
+    },
+
     searchInput: {
       paddingHorizontal: isTablet ? wp('3%') : wp('3%'),
       paddingVertical: isTablet ? hp('1.8%') : hp('2%'),
@@ -83,7 +93,7 @@ export const createStyles = (isTablet: boolean) => {
       width: isTablet ? hp('6%') : hp('5.5%'),
       height: isTablet ? hp('6%') : hp('5.5%'),
       borderRadius: isTablet ? 16 : 12,
-      backgroundColor: colors.card, 
+      backgroundColor: colors.card,
       borderWidth: 1,
       borderColor: colors.outlineBorder,
       alignItems: 'center',
@@ -133,7 +143,7 @@ export const createStyles = (isTablet: boolean) => {
     listContainer: {
       flex: 1,
       paddingHorizontal: isTablet ? wp('4%') : wp('5%'),
-      paddingTop: isTablet ? wp('3%') : wp('0%')
+      paddingTop: isTablet ? wp('3%') : wp('0%'),
     },
 
     patientsList: {
@@ -200,20 +210,20 @@ export const createStyles = (isTablet: boolean) => {
     buttonDeactivate: {
       marginTop: isTablet ? wp('2%') : wp('3%'),
       marginBottom: isTablet ? wp('2%') : wp('3%'),
-      backgroundColor: colors.destructive
+      backgroundColor: colors.destructive,
     },
-    
-    textTestNull:{ 
-      color: colors.text, 
-      textAlign: 'center', 
+
+    textTestNull: {
+      color: colors.text,
+      textAlign: 'center',
       marginTop: isTablet ? wp('2%') : wp('3%'),
-      fontSize: 24 
+      fontSize: 24,
     },
 
     patientCreationMargin: {
-      marginBottom: isTablet ? wp('2%') : wp('3%'), 
+      marginBottom: isTablet ? wp('2%') : wp('3%'),
       marginTop: isTablet ? wp('2%') : wp('3%'),
-      fontWeight: '600'
+      fontWeight: '600',
     },
 
     patientLastTest: {
@@ -257,23 +267,23 @@ export const createStyles = (isTablet: boolean) => {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
 
     modalContent: {
-      width: isTablet ? wp('75%') : wp('90%'), 
+      width: isTablet ? wp('75%') : wp('90%'),
       maxWidth: isTablet ? 700 : 400,
       backgroundColor: colors.card,
-      borderRadius: isTablet ? 20 : 16, 
+      borderRadius: isTablet ? 20 : 16,
       padding: isTablet ? wp('3%') : wp('5%'),
-      ...shadows.shadowMedium, 
+      ...shadows.shadowMedium,
     },
 
     modalTitle: {
-      fontSize: isTablet ? wp('3%') : wp('5.5%'), 
+      fontSize: isTablet ? wp('3%') : wp('5.5%'),
       fontWeight: 'bold',
-      marginBottom: isTablet ? hp('2%') : hp('2.5%'), 
-      color: colors.foreground, 
+      marginBottom: isTablet ? hp('2%') : hp('2.5%'),
+      color: colors.foreground,
       textAlign: 'center',
     },
 
@@ -281,12 +291,12 @@ export const createStyles = (isTablet: boolean) => {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      paddingVertical: isTablet ? hp('1%') : hp('1.5%'), 
+      paddingVertical: isTablet ? hp('1%') : hp('1.5%'),
     },
 
     filterLabel: {
-      fontSize: isTablet ? wp('2.2%') : wp('4%'), 
-      color: colors.foreground, 
+      fontSize: isTablet ? wp('2.2%') : wp('4%'),
+      color: colors.foreground,
     },
 
     filterSectionTitle: {
@@ -309,7 +319,7 @@ export const createStyles = (isTablet: boolean) => {
 
     filterInput: {
       flex: 1,
-      backgroundColor: colors.background, 
+      backgroundColor: colors.background,
       borderColor: colors.outlineBorder,
       borderWidth: 1,
       borderRadius: isTablet ? 12 : 10,
@@ -347,6 +357,26 @@ export const createStyles = (isTablet: boolean) => {
 
     sortButtonTextSelected: {
       color: colors.primaryForeground,
+      fontWeight: '600',
+    },
+
+    responsavelLabelRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+
+    newResponsavelChip: {
+      borderWidth: 1,
+      borderColor: colors.primary,
+      borderRadius: 20,
+      paddingHorizontal: isTablet ? wp('2%') : wp('2.5%'),
+      paddingVertical: isTablet ? hp('0.4%') : hp('0.5%'),
+    },
+
+    newResponsavelChipText: {
+      fontSize: isTablet ? wp('2%') : wp('3%'),
+      color: colors.primary,
       fontWeight: '600',
     },
   });

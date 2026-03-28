@@ -7,7 +7,8 @@ import React, { useState, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { TestDetailScreenProps } from '../navigation/types';
 import { createTestsStyles } from '../components/styles/tests.styles';
-import { View, Text, ScrollView, Alert, useWindowDimensions, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, useWindowDimensions, ActivityIndicator } from 'react-native';
+import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
 interface Patient {
   id: number;
@@ -22,8 +23,12 @@ export const TestDetailScreen = ({ route, navigation }: TestDetailScreenProps) =
 
   const { testId, testName } = route.params;
   const [patients, setPatients] = useState<Patient[]>([]);
-  const [selectedPatient, setSelectedPatient] = useState<number | null>(null);
+  const [selectedPatient, setSelectedPatient] = useState<number | -1>(-1);
   const [loading, setLoading] = useState(true);
+
+  const [errors, setErrors] = useState({
+    patient: '',
+  });
 
   const fetchPatients = useCallback(async () => {
     setLoading(true);
@@ -37,18 +42,14 @@ export const TestDetailScreen = ({ route, navigation }: TestDetailScreenProps) =
         throw error;
       }
 
-      const activePatients = data?.filter(p => 
+      const activePatients = data?.filter(p =>
         p.status === 'ativo' || !p.status
       ) || [];
 
       setPatients(activePatients);
 
     } catch (error: any) {
-      Alert.alert(
-        'Erro',
-        `Não foi possível carregar os pacientes: ${error.message}`,
-        [{ text: 'OK' }]
-      );
+      console.error('Erro ao carregar pacientes:', error.message);
     } finally {
       setLoading(false);
     }
@@ -61,18 +62,14 @@ export const TestDetailScreen = ({ route, navigation }: TestDetailScreenProps) =
   );
 
   const handleStartTest = () => {
-    if (!selectedPatient) {
-      Alert.alert(
-        'Atenção', 
-        'Por favor, selecione um paciente para iniciar o teste',
-        [{ text: 'OK' }]
-      );
+    if (selectedPatient === -1) {
+      setErrors({ patient: 'Selecione um paciente para iniciar o teste' });
       return;
     }
 
     const patient = patients.find(p => p.id === selectedPatient);
     if (!patient) {
-      Alert.alert('Erro', 'Paciente não encontrado');
+      setErrors({ patient: 'Paciente não encontrado' });
       return;
     }
 
@@ -84,6 +81,11 @@ export const TestDetailScreen = ({ route, navigation }: TestDetailScreenProps) =
     });
   };
 
+  const getPickerContainerStyle = (field: keyof typeof errors) => [
+    styles.pickerContainer,
+    errors[field] ? { borderColor: 'red', borderWidth: 1 } : {},
+  ];
+
   return (
     <View style={styles.container}>
       <ScreenHeader
@@ -94,7 +96,7 @@ export const TestDetailScreen = ({ route, navigation }: TestDetailScreenProps) =
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.formContainer}>
           <Text style={styles.label}>Tipo de Teste:</Text>
-          <View style={[styles.input, { backgroundColor: '#F5F5F5'}]}>
+          <View style={[styles.input, { backgroundColor: '#F5F5F5' }]}>
             <Text style={styles.labelTestName}>
               {testName}
             </Text>
@@ -102,37 +104,47 @@ export const TestDetailScreen = ({ route, navigation }: TestDetailScreenProps) =
 
           <Text style={styles.label}>Selecionar Paciente:</Text>
           {loading ? (
-            <View style={[styles.picker]}>
+            <View style={styles.searchContainer}>
               <ActivityIndicator size="small" color={colors.primary} />
               <Text style={{ marginTop: 8, color: colors.mutedForeground }}>
                 Carregando pacientes...
               </Text>
             </View>
           ) : (
-            <Picker
-              style={styles.picker}
-              selectedValue={selectedPatient}
-              onValueChange={(itemValue) => setSelectedPatient(itemValue)}
-              enabled={patients.length > 0}
-            >
-              <Picker.Item 
-                label={"Selecione um paciente..."} 
-                value={null} 
-              />
-              {patients.map((patient) => (
-                <Picker.Item 
-                  key={patient.id} 
-                  label={patient.nome_completo} 
-                  value={patient.id} 
-                />
-              ))}
-            </Picker>
+            <View style={getPickerContainerStyle('patient')}>
+              <Picker
+                selectedValue={selectedPatient}
+                onValueChange={(itemValue) => {
+                  setSelectedPatient(itemValue);
+                  if (errors.patient) setErrors({ patient: '' });
+                }}
+                style={{ color: colors.text }}
+                itemStyle={{ color: colors.text }}
+                enabled={patients.length > 0}
+              >
+                {selectedPatient === -1 && (
+                  <Picker.Item
+                    label={patients.length === 0 ? 'Nenhum paciente encontrado' : 'Selecione um paciente...'}
+                    value={-1}
+                    enabled={false}
+                  />
+                )}
+                {patients.map((patient) => (
+                  <Picker.Item
+                    key={patient.id}
+                    label={patient.nome_completo}
+                    value={patient.id}
+                  />
+                ))}
+              </Picker>
+            </View>
           )}
+          {errors.patient ? <Text style={{ color: 'red', fontSize: 12 }}>{errors.patient}</Text> : null}
 
-          <Button 
-            variant="default" 
-            size="default" 
-            onPress={handleStartTest} 
+          <Button
+            variant="default"
+            size="default"
+            onPress={handleStartTest}
             style={styles.startButton}
             disabled={loading}
           >

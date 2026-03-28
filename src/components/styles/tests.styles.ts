@@ -147,9 +147,10 @@ export const createTestsStyles = (isTablet: boolean) => {
       marginBottom: isTablet ? hp('2.5%') : hp('2%'),
     },
     labelTestName: {
-      color: colors.mutedForeground, 
-      paddingVertical: isTablet ? hp('2%') : hp('2.5%'),
-      fontSize: isTablet ? 26 : 28,
+      color: colors.mutedForeground,
+      paddingVertical: isTablet ? hp('1%') : hp('1.5%'),
+      fontSize: isTablet ? 20 : 14,
+      fontWeight: '600',
     },
     label: {
       fontSize: isTablet ? wp('3.5%') : wp('4%'),
@@ -466,6 +467,15 @@ export const createTestsStyles = (isTablet: boolean) => {
     finishButton: {
       flex: 1,
       backgroundColor: colors.purpleAccent,
+    },
+    pickerContainer: {
+      backgroundColor: colors.card,
+      borderRadius: isTablet ? 16 : 12,
+      borderWidth: 1,
+      borderColor: colors.outlineBorder,
+      height: isTablet ? hp('5.5%') : hp('6%'),
+      justifyContent: 'center',
+      ...shadows.shadowDefault,
     },
   });
 };
