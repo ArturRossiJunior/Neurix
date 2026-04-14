@@ -1,0 +1,1 @@
+pnpm exec jest --runInBand --no-cache
