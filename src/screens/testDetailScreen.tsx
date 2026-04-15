@@ -73,12 +73,24 @@ export const TestDetailScreen = ({ route, navigation }: TestDetailScreenProps) =
       return;
     }
 
-    navigation.navigate('TestPreparation', {
+    const params = {
       testId,
       testName,
       patientId: selectedPatient.toString(),
       patientName: patient.nome_completo,
-    });
+    };
+
+    switch (testId) {
+      case '1':
+        navigation.navigate('TestPreparation', params);
+        break;
+      case '2':
+        navigation.navigate('ConcentrationTestPreparation', params);
+        break;
+      default:
+        navigation.navigate('TestPreparation', params);
+        break;
+    }
   };
 
   const getPickerContainerStyle = (field: keyof typeof errors) => [

@@ -18,6 +18,8 @@ import TestPreparationScreen from '../screens/testPreparationScreen';
 import TestApplicationScreen from '../screens/testApplicationScreen';
 import GuardianCreationScreen from '../screens/guardianCreationScreen';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import ConcentrationTestPreparationScreen from '../screens/concentrationTestPreparationScreen';
+import ConcentrationTestApplicationScreen from '../screens/concentrationTestApplicationScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -103,6 +105,16 @@ export default function AppNavigator() {
         <Stack.Screen
           name="TestApplication"
           component={TestApplicationScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ConcentrationTestPreparation"
+          component={ConcentrationTestPreparationScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ConcentrationTestApplication"
+          component={ConcentrationTestApplicationScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

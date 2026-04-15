@@ -135,7 +135,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
             </View>
           </Card>
 
-          <Card variant="default" style={styles.navigationCard}>
+          {/* <Card variant="default" style={styles.navigationCard}>
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>Configurações</Text>
               <Text style={styles.cardDescription}>
@@ -150,7 +150,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
                 Ajustar
               </Button>
             </View>
-          </Card>
+          </Card> */}
 
           <Card variant="default" style={styles.navigationCard}>
             <View style={styles.cardContent}>

@@ -33,6 +33,8 @@ export type RootStackParamList = {
   About: undefined;
   TestApplication: { testId: string; testName: string; patientId: string };
   TestPreparation: { testId: string; testName: string; patientId: string; patientName: string; };
+  ConcentrationTestPreparation: { testId: string; testName: string; patientId: string; patientName: string; };
+  ConcentrationTestApplication: { testId: string; testName: string; patientId: string };
 };
 
 export type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
@@ -51,3 +53,5 @@ export type PatientCreationScreenProps = NativeStackScreenProps<RootStackParamLi
 export type TestApplicationScreenProps = NativeStackScreenProps<RootStackParamList, 'TestApplication'>;
 export type TestPreparationScreenProps = NativeStackScreenProps<RootStackParamList, 'TestPreparation'>;
 export type GuardianCreationScreenProps = NativeStackScreenProps<RootStackParamList, 'GuardianCreation'>;
+export type ConcentrationTestPreparationScreenProps = NativeStackScreenProps<RootStackParamList, 'ConcentrationTestPreparation'>;
+export type ConcentrationTestApplicationScreenProps = NativeStackScreenProps<RootStackParamList, 'ConcentrationTestApplication'>;

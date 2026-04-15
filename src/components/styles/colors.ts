@@ -1,9 +1,9 @@
 export const colors = {
-  primary: '#60A5FA',
+  primary: '#A78BFA',
   primaryForeground: '#FFFFFF',
   primaryGlow: '#93C5FD',
   
-  calmBlue: '#60A5FA',
+  calmBlue: '#A78BFA',
   softGreen: '#34D399',
   gentlePurple: '#A78BFA',
   warmYellow: '#FDE047',
@@ -40,18 +40,18 @@ export const colors = {
     background: ['#F8FAFC', '#E2E8F0'],
   },
 
-  purpleDark: '#4A148C',
-  purpleMedium: '#6A1B9A',
-  purpleLight: '#7B1FA2',
-  purpleAccent: '#8E24AA',
-  purpleButton: '#9C27B0',
+  purpleDark: '#5E2A8C',
+  purpleMedium: '#7A3DAF',
+  purpleLight: '#8E4FC6',
+  purpleAccent: '#9C5AD1',
+  purpleButton: '#A78BFA',
   
   dashboardLoadingText: '#000',
   dashboardLoadingIndicator: '#9C27B0',
   dashboardStatsBorder: '#000',
   dashboardNoDataText: '#666',
   
-  chartCorrect: '#4CAF50',
+  chartCorrect: '#34D399',
   chartIncorrect: '#F44336',
   chartOmission: '#FFC107',
   chartLegend: '#000',

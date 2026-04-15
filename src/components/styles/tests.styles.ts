@@ -199,7 +199,7 @@ export const createTestsStyles = (isTablet: boolean) => {
     title: {
       fontSize: isTablet ? wp('4.5%') : wp('8%'),
       fontWeight: 'bold',
-      color: colors.purpleMedium,
+      color: colors.purpleLight,
       marginBottom: hp('1%'),
       textAlign: 'center',
     },
@@ -212,7 +212,7 @@ export const createTestsStyles = (isTablet: boolean) => {
     testNamePreparation: {
       fontSize: isTablet ? wp('3.5%') : wp('6%'),
       fontWeight: '600',
-      color: colors.purpleAccent,
+      color: colors.purpleLight,
       marginBottom: hp('3%'),
       textAlign: 'center',
     },
@@ -223,13 +223,13 @@ export const createTestsStyles = (isTablet: boolean) => {
       alignItems: 'center',
       marginVertical: hp('2%'),
     },
-    astronautImage: {
+    cogniImage: {
       width: '100%',
       height: '100%',
     },
     instructions: {
       fontSize: isTablet ? wp('4%') : wp('7%'),
-      color: colors.purpleMedium,
+      color: colors.purpleLight,
       textAlign: 'center',
       marginVertical: hp('2%'),
       lineHeight: isTablet ? hp('3%') : hp('4%'),
@@ -250,7 +250,7 @@ export const createTestsStyles = (isTablet: boolean) => {
     storyTitle: {
       fontSize: isTablet ? wp('4%') : wp('7%'),
       fontWeight: 'bold',
-      color: colors.purpleMedium,
+      color: colors.purpleLight,
       marginBottom: hp('1%'),
       textAlign: 'center',
     },
@@ -263,14 +263,14 @@ export const createTestsStyles = (isTablet: boolean) => {
     },
     storyText: {
       fontSize: isTablet ? wp('3%') : wp('5.5%'),
-      color: colors.purpleDark,
+      color: colors.purpleLight,
       lineHeight: isTablet ? hp('2%') : hp('2.5%'),
       marginBottom: hp('1.5%'),
       textAlign: 'justify',
     },
     highlight: {
       fontWeight: 'bold',
-      color: colors.purpleMedium,
+      color: colors.purpleLight,
     },
     stepContainer: {
       flexDirection: 'row',
@@ -285,13 +285,13 @@ export const createTestsStyles = (isTablet: boolean) => {
     },
     stepText: {
       fontSize: isTablet ? wp('2.5%') : wp('4.5%'),
-      color: colors.purpleDark,
+      color: colors.purpleLight,
       lineHeight: isTablet ? hp('2%') : hp('3%'),
       flex: 1,
     },
     finalMessage: {
       fontSize: isTablet ? wp('2.5%') : wp('4.5%'),
-      color: colors.purpleDark,
+      color: colors.purpleLight,
       lineHeight: isTablet ? hp('2%') : hp('2.5%'),
       fontStyle: 'italic',
       textAlign: 'center',
@@ -302,17 +302,17 @@ export const createTestsStyles = (isTablet: boolean) => {
       backgroundColor: colors.purpleButton,
       marginTop: hp('1%'),
     },
-    buttonAndAstronautContainer: {
+    buttonAndImageContainer: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       gap: isTablet ? wp('3%') : wp('5%'),
     },
-    astronautBesideButton: {
+    imageBesideButton: {
       width: isTablet ? wp('10%') : wp('30%'),
       height: isTablet ? hp('10%') : hp('15%'),
     },
-    astronautSmall: {
+    imageSmall: {
       width: '100%',
       height: '100%',
     },
@@ -466,7 +466,7 @@ export const createTestsStyles = (isTablet: boolean) => {
     },
     finishButton: {
       flex: 1,
-      backgroundColor: colors.purpleAccent,
+      backgroundColor: colors.purpleButton,
     },
     pickerContainer: {
       backgroundColor: colors.card,
