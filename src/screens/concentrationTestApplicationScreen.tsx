@@ -14,6 +14,7 @@ import {
   StyleSheet,
   Dimensions,
   StatusBar,
+  Modal,
 } from 'react-native';
 
 const TOTAL_ROUNDS      = 14;
@@ -95,19 +96,20 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
   const isTablet = useIsTablet();
   const insets = useSafeAreaInsets();
 
-  const [currentRound, setCurrentRound]   = useState(1);
-  const [roundImages, setRoundImages]     = useState<ImageItem[]>([]);
-  const [markedIds, setMarkedIds]         = useState<string[]>([]);
-  const [remainingTime, setRemainingTime] = useState(ROUND_TIME);
-  const [roundResults, setRoundResults]   = useState<RoundResult[]>([]);
-  const [saving, setSaving]               = useState(false);
-  const [testFinished, setTestFinished]   = useState(false);
-  const [idAvaliacao, setIdAvaliacao]     = useState<number | null>(null);
+  const [currentRound, setCurrentRound]         = useState(1);
+  const [roundImages, setRoundImages]           = useState<ImageItem[]>([]);
+  const [markedIds, setMarkedIds]               = useState<string[]>([]);
+  const [remainingTime, setRemainingTime]       = useState(ROUND_TIME);
+  const [roundResults, setRoundResults]         = useState<RoundResult[]>([]);
+  const [saving, setSaving]                     = useState(false);
+  const [testFinished, setTestFinished]         = useState(false);
+  const [idAvaliacao, setIdAvaliacao]           = useState<number | null>(null);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
 
-  const scaleAnim      = useRef(new Animated.Value(1)).current;
-  const processingRef  = useRef(false);
-  const markedIdsRef   = useRef<string[]>([]);
-  const roundImagesRef = useRef<ImageItem[]>([]);
+  const scaleAnim        = useRef(new Animated.Value(1)).current;
+  const processingRef    = useRef(false);
+  const markedIdsRef     = useRef<string[]>([]);
+  const roundImagesRef   = useRef<ImageItem[]>([]);
   const remainingTimeRef = useRef(ROUND_TIME);
   const idAvaliacaoRef   = useRef<number | null>(null);
   const roundResultsRef  = useRef<RoundResult[]>([]);
@@ -115,14 +117,14 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
   const testFinishedRef  = useRef(false);
   const savingRef        = useRef(false);
 
-  useEffect(() => { markedIdsRef.current   = markedIds; },    [markedIds]);
-  useEffect(() => { roundImagesRef.current = roundImages; },  [roundImages]);
-  useEffect(() => { remainingTimeRef.current = remainingTime; }, [remainingTime]);
-  useEffect(() => { idAvaliacaoRef.current   = idAvaliacao; },   [idAvaliacao]);
-  useEffect(() => { roundResultsRef.current  = roundResults; },  [roundResults]);
-  useEffect(() => { currentRoundRef.current  = currentRound; },  [currentRound]);
-  useEffect(() => { testFinishedRef.current  = testFinished; },  [testFinished]);
-  useEffect(() => { savingRef.current        = saving; },        [saving]);
+  useEffect(() => { markedIdsRef.current     = markedIds; },      [markedIds]);
+  useEffect(() => { roundImagesRef.current   = roundImages; },    [roundImages]);
+  useEffect(() => { remainingTimeRef.current = remainingTime; },  [remainingTime]);
+  useEffect(() => { idAvaliacaoRef.current   = idAvaliacao; },    [idAvaliacao]);
+  useEffect(() => { roundResultsRef.current  = roundResults; },   [roundResults]);
+  useEffect(() => { currentRoundRef.current  = currentRound; },   [currentRound]);
+  useEffect(() => { testFinishedRef.current  = testFinished; },   [testFinished]);
+  useEffect(() => { savingRef.current        = saving; },         [saving]);
 
   useEffect(() => {
     const createAvaliacao = async () => {
@@ -256,9 +258,7 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
 
       if (error) throw error;
 
-      Alert.alert('Sucesso', 'Teste finalizado e resultados salvos com sucesso!', [
-        { text: 'OK', onPress: () => navigation.navigate('Home') },
-      ]);
+      setShowCompletionModal(true);
     } catch (error: any) {
       const msg = error?.message ?? (error?.code === '42501' ? 'Sem permissão para salvar esta avaliação.' : 'Erro desconhecido');
       Alert.alert('Erro ao Finalizar', msg, [
@@ -393,6 +393,45 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
           </Text>
         </TouchableOpacity>
       </View>
+
+      <Modal
+        visible={showCompletionModal}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+      >
+        <View style={{
+          flex: 1,
+          backgroundColor: 'rgba(0,0,0,0.6)',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 24,
+        }}>
+          <View style={{
+            backgroundColor: '#fff',
+            borderRadius: 20,
+            padding: 32,
+            alignItems: 'center',
+            width: '100%',
+            maxWidth: 340,
+          }}>
+            <Image
+              source={require('../../assets/cognitive_end.png')}
+              style={{ width: 220, height: 220, resizeMode: 'contain', marginBottom: 24 }}
+            />
+            <TouchableOpacity
+              style={[styles.btnNext, styles.btnConclude, { width: '100%', paddingVertical: 14 }]}
+              onPress={() => {
+                setShowCompletionModal(false);
+                navigation.navigate('Home');
+              }}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.btnNextText}>Concluir</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };

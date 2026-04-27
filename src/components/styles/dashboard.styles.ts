@@ -181,4 +181,54 @@ export const createStyles = (isTablet: boolean) => StyleSheet.create({
     fontSize: isTablet ? wp('3.5%') : wp('4%'),
     color: colors.dashboardNoDataText,
   },
+  lineChartScrollContent: {
+    alignItems: 'center',
+  },
+  lineLegendContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    flexWrap: 'wrap',
+    marginTop: isTablet ? hp('1%') : hp('0.8%'),
+    paddingHorizontal: isTablet ? wp('2%') : wp('1%'),
+  },
+  lineLegendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: isTablet ? wp('2%') : wp('1.5%'),
+    marginVertical: isTablet ? hp('0.5%') : hp('0.4%'),
+  },
+  lineLegendDot: {
+    width: isTablet ? 14 : 12,
+    height: isTablet ? 14 : 12,
+    borderRadius: isTablet ? 7 : 6,
+    marginRight: isTablet ? wp('1.5%') : wp('1%'),
+  },
+  lineLegendText: {
+    fontSize: isTablet ? wp('3.5%') : wp('3.5%'),
+    color: colors.chartLegend,
+  },
+ 
+  pieLegendContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    flexWrap: 'wrap',
+    marginTop: isTablet ? hp('1.5%') : hp('1%'),
+    paddingHorizontal: isTablet ? wp('2%') : wp('1%'),
+  },
+  pieLegendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: isTablet ? wp('2%') : wp('1.5%'),
+    marginVertical: isTablet ? hp('0.5%') : hp('0.4%'),
+  },
+  pieLegendDot: {
+    width: isTablet ? 14 : 12,
+    height: isTablet ? 14 : 12,
+    borderRadius: isTablet ? 7 : 6,
+    marginRight: isTablet ? wp('1.5%') : wp('1%'),
+  },
+  pieLegendText: {
+    fontSize: isTablet ? wp('3.5%') : wp('3.5%'),
+    color: colors.chartLegend,
+  },
 });

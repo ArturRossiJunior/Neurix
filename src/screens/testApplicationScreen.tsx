@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useIsTablet } from '../utils/useIsTablet';
 import type { TestApplicationScreenProps } from '../navigation/types';
 import { createTestsStyles } from '../components/styles/tests.styles';
-import { View, Image, TouchableOpacity, ScrollView, Text, Alert, Animated } from 'react-native';
+import { View, Image, TouchableOpacity, ScrollView, Text, Alert, Animated, Modal } from 'react-native';
 
 const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps) => {
   const { testId, testName, patientId } = route.params;
@@ -49,6 +49,7 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
   const [scaleAnim] = useState(new Animated.Value(1));
   const [saving, setSaving] = useState(false);
   const [modelImage, setModelImage] = useState(0);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
 
   useEffect(() => {
     const checkAuthentication = async () => {
@@ -66,7 +67,7 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
         );
       }
     };
-    
+
     checkAuthentication();
   }, []);
 
@@ -76,19 +77,19 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
       const totalTypes = images.length;
       const perType = Math.floor(TOTAL_IMAGES / totalTypes);
       const remainder = TOTAL_IMAGES % totalTypes;
-      
+
       for (let type = 0; type < totalTypes; type++) {
         const quantity = type < remainder ? perType + 1 : perType;
         for (let i = 0; i < quantity; i++) {
           sequence.push(type);
         }
       }
-      
+
       for (let i = sequence.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [sequence[i], sequence[j]] = [sequence[j], sequence[i]];
       }
-      
+
       return sequence;
     };
 
@@ -125,7 +126,7 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
 
   const toggleMarked = (id: string) => {
     if (testFinished) return;
-    
+
     Animated.sequence([
       Animated.timing(scaleAnim, {
         toValue: 1.2,
@@ -138,7 +139,7 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
         useNativeDriver: true,
       }),
     ]).start();
-    
+
     setMarkedImages((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
@@ -169,18 +170,18 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
   const saveResultsToSupabase = async (results: any) => {
     if (saving) return;
     setSaving(true);
-    
+
     try {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
+
       if (sessionError) {
         throw new Error('Erro ao verificar autenticação');
       }
-      
+
       if (!session) {
         throw new Error('Você precisa estar autenticado para salvar avaliações');
       }
-      
+
       const { data: patientData, error: patientError } = await supabase
         .from('pacientes')
         .select('id, id_profissional')
@@ -215,24 +216,13 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
         throw error;
       }
 
-      Alert.alert(
-        'Sucesso',
-        'Teste finalizado e resultados salvos com sucesso!',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              navigation.navigate('Home');
-            }
-          }
-        ]
-      );
+      setShowCompletionModal(true);
 
       return data;
-      
+
     } catch (error: any) {
       let errorMessage = 'Erro desconhecido';
-      
+
       if (error.message) {
         errorMessage = error.message;
       } else if (error.code === '42501') {
@@ -240,17 +230,17 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
       } else if (error.code === '23503') {
         errorMessage = 'Paciente ou tipo de teste inválido';
       }
-      
+
       Alert.alert(
         'Erro ao Salvar',
         errorMessage,
         [
-          { 
-            text: 'Tentar Novamente', 
-            onPress: () => saveResultsToSupabase(results) 
+          {
+            text: 'Tentar Novamente',
+            onPress: () => saveResultsToSupabase(results)
           },
-          { 
-            text: 'Cancelar', 
+          {
+            text: 'Cancelar',
             style: 'cancel',
             onPress: () => {
               setSaving(false);
@@ -259,7 +249,7 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
           }
         ]
       );
-      
+
       throw error;
     } finally {
       setSaving(false);
@@ -270,7 +260,7 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
     if (testFinished || saving) return;
     setTestFinished(true);
     const results = calculateResults();
-    
+
     try {
       await saveResultsToSupabase(results);
     } catch (error) {
@@ -299,10 +289,10 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
       'Deseja realmente cancelar? Os dados NÃO serão salvos',
       [
         { text: 'Continuar', style: 'cancel' },
-        { 
-          text: 'Cancelar', 
+        {
+          text: 'Cancelar',
           onPress: () => navigation.goBack(),
-          style: 'destructive' 
+          style: 'destructive'
         }
       ]
     );
@@ -320,15 +310,15 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
             Encontre todos iguais a este:
           </Text>
           <View style={styles.modelImageWrapper}>
-            <Image 
-              source={images[modelImage]} 
+            <Image
+              source={images[modelImage]}
               style={styles.modelImage}
             />
           </View>
         </View>
       </View>
 
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={true}
       >
@@ -380,6 +370,46 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
           </Button>
         </View>
       </ScrollView>
+
+      <Modal
+        visible={showCompletionModal}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+      >
+        <View style={{
+          flex: 1,
+          backgroundColor: 'rgba(0,0,0,0.6)',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 24,
+        }}>
+          <View style={{
+            backgroundColor: '#fff',
+            borderRadius: 20,
+            padding: 32,
+            alignItems: 'center',
+            width: '100%',
+            maxWidth: 340,
+          }}>
+            <Image
+              source={require('../../assets/astrocogni_end.png')}
+              style={{ width: 220, height: 220, resizeMode: 'contain', marginBottom: 24 }}
+            />
+            <Button
+              variant="game"
+              size="default"
+              onPress={() => {
+                setShowCompletionModal(false);
+                navigation.navigate('Home');
+              }}
+              style={{ width: '100%' }}
+            >
+              Concluir
+            </Button>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
