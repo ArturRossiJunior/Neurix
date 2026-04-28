@@ -8,7 +8,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { DashboardScreenProps } from '../navigation/types';
 import { LineChart, PieChart } from 'react-native-chart-kit';
 import { createStyles } from '../components/styles/dashboard.styles';
-import { View, Text, ScrollView, Dimensions, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, ScrollView, Dimensions, ActivityIndicator, Alert, TouchableOpacity } from 'react-native';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -65,40 +65,11 @@ const PieLegend = ({ c, i, o }: PieLegendProps) => {
   ];
 
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        flexWrap: 'wrap',
-        marginTop: 12,
-        paddingHorizontal: 4,
-      }}
-    >
+    <View style={{ flexDirection: 'row', justifyContent: 'space-around', flexWrap: 'wrap', marginTop: 12, paddingHorizontal: 4 }}>
       {items.map(item => (
-        <View
-          key={item.label}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginHorizontal: 6,
-            marginVertical: 4,
-          }}
-        >
-          <View
-            style={{
-              width: 12,
-              height: 12,
-              borderRadius: 6,
-              backgroundColor: item.color,
-              marginRight: 5,
-            }}
-          />
-          <Text
-            style={{
-              fontSize: 13,
-              color: colors.chartLegend,
-            }}
-          >
+        <View key={item.label} style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 6, marginVertical: 4 }}>
+          <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: item.color, marginRight: 5 }} />
+          <Text style={{ fontSize: 13, color: colors.chartLegend }}>
             {item.label}: {item.value} ({pct(item.value)}%)
           </Text>
         </View>
@@ -119,8 +90,30 @@ export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
   const [roundsMap, setRoundsMap] = useState<RoundsMap>({});
   const [loading, setLoading] = useState(false);
   const [loadingFilters, setLoadingFilters] = useState(true);
+  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
+  const [tooltip, setTooltip] = useState<{ roundIndex: number; c: number; i: number; o: number } | null>(null);
+  const [activeAssessmentId, setActiveAssessmentId] = useState<number | null>(null);
 
   const isRoundBasedTest = selectedTestType === TEST_ID_WITH_ROUNDS;
+
+  const toggleExpanded = (id: number) => {
+    setExpandedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const chartConfig = {
+    backgroundColor: '#EDE9FE',
+    backgroundGradientFrom: '#EDE9FE',
+    backgroundGradientTo: '#EDE9FE',
+    decimalPlaces: 0,
+    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    style: { borderRadius: 16 },
+    propsForDots: { r: '5', strokeWidth: '2', stroke: colors.purpleButton },
+  };
 
   const fetchFilters = useCallback(async () => {
     setLoadingFilters(true);
@@ -175,6 +168,9 @@ export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
 
       const avaliacoes = avaliacoesData || [];
       setAssessments(avaliacoes);
+      setExpandedIds(new Set());
+      setTooltip(null);
+      setActiveAssessmentId(null);
 
       if (selectedTestType === TEST_ID_WITH_ROUNDS && avaliacoes.length > 0) {
         const ids = avaliacoes.map(a => a.id);
@@ -222,11 +218,7 @@ export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
   };
 
   const getPieDataDirect = (assessment: Assessment) =>
-    buildPieSlices(
-      assessment.resultado_correto,
-      assessment.resultado_incorreto,
-      assessment.resultado_omisso,
-    );
+    buildPieSlices(assessment.resultado_correto, assessment.resultado_incorreto, assessment.resultado_omisso);
 
   const getPieDataFromRounds = (rounds: AssessmentRound[]) =>
     buildPieSlices(
@@ -247,17 +239,6 @@ export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
     };
   };
 
-  const chartConfig = {
-    backgroundColor: colors.card,
-    backgroundGradientFrom: colors.card,
-    backgroundGradientTo: colors.card,
-    decimalPlaces: 0,
-    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-    style: { borderRadius: 16 },
-    propsForDots: { r: '5', strokeWidth: '2', stroke: colors.purpleButton },
-  };
-
   const renderAssessmentCard = (assessment: Assessment) => {
     const dateLabel = new Date(assessment.data_aplicacao).toLocaleDateString('pt-BR', {
       day: '2-digit',
@@ -267,63 +248,161 @@ export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
       minute: '2-digit',
     });
 
-    if (isRoundBasedTest) {
-      const rounds = roundsMap[assessment.id] || [];
-      const pieData = getPieDataFromRounds(rounds);
-      const lineData = getLineDataFromRounds(rounds);
-      const totalCorrect   = rounds.reduce((s, r) => s + r.resultado_correto, 0);
-      const totalIncorrect = rounds.reduce((s, r) => s + r.resultado_incorreto, 0);
-      const totalOmission  = rounds.reduce((s, r) => s + r.resultado_omisso, 0);
-      const totalTime      = rounds.reduce((s, r) => s + (20 - r.tempo_restante), 0);
-      const avgTime        = rounds.length > 0 ? (totalTime / rounds.length).toFixed(1) : '0';
+    const isExpanded = expandedIds.has(assessment.id);
+    const activeTooltip = activeAssessmentId === assessment.id ? tooltip : null;
+
+    const renderContent = () => {
+      if (isRoundBasedTest) {
+        const rounds = roundsMap[assessment.id] || [];
+        const pieData = getPieDataFromRounds(rounds);
+        const lineData = getLineDataFromRounds(rounds);
+        const totalCorrect   = rounds.reduce((s, r) => s + r.resultado_correto, 0);
+        const totalIncorrect = rounds.reduce((s, r) => s + r.resultado_incorreto, 0);
+        const totalOmission  = rounds.reduce((s, r) => s + r.resultado_omisso, 0);
+        const totalTime      = rounds.reduce((s, r) => s + (20 - r.tempo_restante), 0);
+        const avgTime        = rounds.length > 0 ? (totalTime / rounds.length).toFixed(1) : '0';
+
+        return (
+          <>
+            <Text style={styles.summaryText}>
+              Rodadas registradas: <Text style={styles.summaryBold}>{rounds.length}</Text>
+            </Text>
+            <Text style={styles.summaryText}>
+              Tempo total de realização: <Text style={styles.summaryBold}>{totalTime}s</Text>
+            </Text>
+            <Text style={styles.summaryText}>
+              Tempo médio por rodada: <Text style={styles.summaryBold}>{avgTime}s</Text>
+            </Text>
+
+            {lineData && (() => {
+              const allValues = rounds.flatMap(r => [r.resultado_correto, r.resultado_incorreto, r.resultado_omisso]);
+              const maxVal = Math.max(...allValues, 1);
+              const ySteps = 5;
+              const yLabels = Array.from({ length: ySteps + 1 }, (_, i) =>
+                String(Math.round((maxVal / ySteps) * (ySteps - i)))
+              );
+
+              return (
+                <View style={styles.lineChartCard}>
+                  <Text style={styles.lineChartTitle}>Evolução por Rodada</Text>
+                  <View style={{ flexDirection: 'row' }}>
+                    {/* Eixo Y fixo */}
+                    <View style={{ justifyContent: 'space-between', paddingVertical: 8, paddingRight: 4, height: 220 }}>
+                      {yLabels.map((label, idx) => (
+                        <Text key={idx} style={{ fontSize: 10, color: '#555', textAlign: 'right', width: 28 }}>
+                          {label}
+                        </Text>
+                      ))}
+                    </View>
+
+                    {/* Gráfico rolável */}
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.lineChartScrollContent}>
+                      <View>
+                        <LineChart
+                          data={lineData}
+                          width={Math.max(screenWidth * 0.75, rounds.length * 72)}
+                          height={220}
+                          chartConfig={{ ...chartConfig, propsForVerticalLabels: { fill: 'transparent' } }}
+                          withHorizontalLabels={false}
+                          bezier
+                          style={styles.lineChartStyle}
+                          onDataPointClick={({ index }) => {
+                            const round = rounds[index];
+                            if (!round) return;
+                            setActiveAssessmentId(assessment.id);
+                            setTooltip({
+                              roundIndex: index,
+                              c: round.resultado_correto,
+                              i: round.resultado_incorreto,
+                              o: round.resultado_omisso,
+                            });
+                          }}
+                        />
+                        {activeTooltip && (
+                          <View style={{
+                            position: 'absolute',
+                            top: 4,
+                            left: 8,
+                            backgroundColor: 'rgba(0,0,0,0.78)',
+                            borderRadius: 8,
+                            padding: 8,
+                            minWidth: 140,
+                          }}>
+                            {/* Botão X */}
+                            <TouchableOpacity
+                              onPress={() => setTooltip(null)}
+                              style={{ position: 'absolute', top: 6, right: 6 }}
+                              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                            >
+                              <Text style={{ color: '#aaa', fontSize: 12, fontWeight: '700' }}>✕</Text>
+                            </TouchableOpacity>
+
+                            <Text style={{ color: '#fff', fontWeight: '700', fontSize: 12, marginBottom: 4, paddingRight: 16 }}>
+                              Rodada {rounds[activeTooltip.roundIndex]?.rodada}
+                            </Text>
+                            <Text style={{ color: 'rgba(76,175,80,1)', fontSize: 12 }}>✓ Corretos: {activeTooltip.c}</Text>
+                            <Text style={{ color: 'rgba(244,67,54,1)', fontSize: 12 }}>✗ Incorretos: {activeTooltip.i}</Text>
+                            <Text style={{ color: 'rgba(255,152,0,1)', fontSize: 12 }}>○ Omissões: {activeTooltip.o}</Text>
+                          </View>
+                        )}
+                      </View>
+                    </ScrollView>
+                  </View>
+
+                  <View style={styles.lineLegendContainer}>
+                    <View style={styles.lineLegendItem}>
+                      <View style={[styles.lineLegendDot, { backgroundColor: 'rgba(76, 175, 80, 1)' }]} />
+                      <Text style={styles.lineLegendText}>Corretos</Text>
+                    </View>
+                    <View style={styles.lineLegendItem}>
+                      <View style={[styles.lineLegendDot, { backgroundColor: 'rgba(244, 67, 54, 1)' }]} />
+                      <Text style={styles.lineLegendText}>Incorretos</Text>
+                    </View>
+                    <View style={styles.lineLegendItem}>
+                      <View style={[styles.lineLegendDot, { backgroundColor: 'rgba(255, 152, 0, 1)' }]} />
+                      <Text style={styles.lineLegendText}>Omissões</Text>
+                    </View>
+                  </View>
+                </View>
+              );
+            })()}
+
+            {pieData && (
+              <View style={styles.pieChartCard}>
+                <Text style={styles.pieChartTitle}>Distribuição dos Resultados</Text>
+                <PieChart
+                  data={pieData}
+                  width={screenWidth * 0.82}
+                  height={180}
+                  chartConfig={chartConfig}
+                  accessor="population"
+                  backgroundColor="transparent"
+                  paddingLeft="15"
+                  hasLegend={false}
+                  absolute
+                  style={styles.pieChartStyle}
+                />
+                <PieLegend c={totalCorrect} i={totalIncorrect} o={totalOmission} />
+              </View>
+            )}
+
+            {rounds.length === 0 && (
+              <Text style={styles.noAvaliacoesText}>Nenhuma rodada registrada para esta avaliação.</Text>
+            )}
+          </>
+        );
+      }
+
+      const pieData = getPieDataDirect(assessment);
+      const total = assessment.resultado_correto + assessment.resultado_incorreto + assessment.resultado_omisso;
 
       return (
-        <View key={assessment.id} style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>Avaliação — {dateLabel}</Text>
-          <Text style={styles.summaryText}>
-            Rodadas registradas: <Text style={styles.summaryBold}>{rounds.length}</Text>
-          </Text>
-          <Text style={styles.summaryText}>
-            Tempo total de realização: <Text style={styles.summaryBold}>{totalTime}s</Text>
-          </Text>
-          <Text style={styles.summaryText}>
-            Tempo médio por rodada: <Text style={styles.summaryBold}>{avgTime}s</Text>
-          </Text>
-
-          {lineData && (
-            <View style={styles.lineChartCard}>
-              <Text style={styles.lineChartTitle}>Evolução por Rodada</Text>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.lineChartScrollContent}
-              >
-                <LineChart
-                  data={lineData}
-                  width={Math.max(screenWidth * 0.82, rounds.length * 72)}
-                  height={220}
-                  chartConfig={chartConfig}
-                  bezier
-                  style={styles.lineChartStyle}
-                />
-              </ScrollView>
-              <View style={styles.lineLegendContainer}>
-                <View style={styles.lineLegendItem}>
-                  <View style={[styles.lineLegendDot, { backgroundColor: 'rgba(76, 175, 80, 1)' }]} />
-                  <Text style={styles.lineLegendText}>Corretos</Text>
-                </View>
-                <View style={styles.lineLegendItem}>
-                  <View style={[styles.lineLegendDot, { backgroundColor: 'rgba(244, 67, 54, 1)' }]} />
-                  <Text style={styles.lineLegendText}>Incorretos</Text>
-                </View>
-                <View style={styles.lineLegendItem}>
-                  <View style={[styles.lineLegendDot, { backgroundColor: 'rgba(255, 152, 0, 1)' }]} />
-                  <Text style={styles.lineLegendText}>Omissões</Text>
-                </View>
-              </View>
-            </View>
+        <>
+          {assessment.tempo_realizacao > 0 && (
+            <Text style={styles.summaryText}>
+              Tempo de realização: <Text style={styles.summaryBold}>{assessment.tempo_realizacao}s</Text>
+            </Text>
           )}
-
           {pieData && (
             <View style={styles.pieChartCard}>
               <Text style={styles.pieChartTitle}>Distribuição dos Resultados</Text>
@@ -339,54 +418,39 @@ export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
                 absolute
                 style={styles.pieChartStyle}
               />
-              <PieLegend c={totalCorrect} i={totalIncorrect} o={totalOmission} />
+              <PieLegend
+                c={assessment.resultado_correto}
+                i={assessment.resultado_incorreto}
+                o={assessment.resultado_omisso}
+              />
             </View>
           )}
-
-          {rounds.length === 0 && (
-            <Text style={styles.noAvaliacoesText}>Nenhuma rodada registrada para esta avaliação.</Text>
+          {total === 0 && (
+            <Text style={styles.noAvaliacoesText}>Sem respostas registradas nesta avaliação.</Text>
           )}
-        </View>
+        </>
       );
-    }
-
-    const pieData = getPieDataDirect(assessment);
-    const total = assessment.resultado_correto + assessment.resultado_incorreto + assessment.resultado_omisso;
+    };
 
     return (
       <View key={assessment.id} style={styles.summaryCard}>
-        <Text style={styles.summaryTitle}>Avaliação — {dateLabel}</Text>
-        {assessment.tempo_realizacao > 0 && (
-          <Text style={styles.summaryText}>
-            Tempo de realização: <Text style={styles.summaryBold}>{assessment.tempo_realizacao}s</Text>
+        <TouchableOpacity
+          onPress={() => toggleExpanded(assessment.id)}
+          activeOpacity={0.7}
+          style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
+        >
+          <Text style={[styles.summaryTitle, { marginBottom: 0 }]}>
+            Avaliação — {dateLabel}
           </Text>
-        )}
+          <Text style={{ fontSize: 18, color: '#64748B', marginLeft: 8 }}>
+            {isExpanded ? '▲' : '▼'}
+          </Text>
+        </TouchableOpacity>
 
-        {pieData && (
-          <View style={styles.pieChartCard}>
-            <Text style={styles.pieChartTitle}>Distribuição dos Resultados</Text>
-            <PieChart
-              data={pieData}
-              width={screenWidth * 0.82}
-              height={180}
-              chartConfig={chartConfig}
-              accessor="population"
-              backgroundColor="transparent"
-              paddingLeft="15"
-              hasLegend={false}
-              absolute
-              style={styles.pieChartStyle}
-            />
-            <PieLegend
-              c={assessment.resultado_correto}
-              i={assessment.resultado_incorreto}
-              o={assessment.resultado_omisso}
-            />
+        {isExpanded && (
+          <View style={{ marginTop: 12 }}>
+            {renderContent()}
           </View>
-        )}
-
-        {total === 0 && (
-          <Text style={styles.noAvaliacoesText}>Sem respostas registradas nesta avaliação.</Text>
         )}
       </View>
     );

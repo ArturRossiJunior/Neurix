@@ -1,4 +1,5 @@
 import { supabase } from '../utils/supabase';
+import { Button } from '../components/Button';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useIsTablet } from '../utils/useIsTablet';
 import type { ConcentrationTestApplicationScreenProps } from '../navigation/types';
@@ -410,25 +411,27 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
           <View style={{
             backgroundColor: '#fff',
             borderRadius: 20,
-            padding: 32,
+            padding: 20,
             alignItems: 'center',
             width: '100%',
             maxWidth: 340,
           }}>
             <Image
               source={require('../../assets/cognitive_end.png')}
-              style={{ width: 220, height: 220, resizeMode: 'contain', marginBottom: 24 }}
+              style={{ width: '100%', height: 220, resizeMode: 'contain', marginBottom: 24 }}
             />
-            <TouchableOpacity
-              style={[styles.btnNext, styles.btnConclude, { width: '100%', paddingVertical: 14 }]}
+            {/* Mesmo padrão do TestApplicationScreen */}
+            <Button
+              variant="game"
+              size="default"
               onPress={() => {
                 setShowCompletionModal(false);
                 navigation.navigate('Home');
               }}
-              activeOpacity={0.8}
+              style={{ width: '100%', backgroundColor: '#34D399' }}
             >
-              <Text style={styles.btnNextText}>Concluir</Text>
-            </TouchableOpacity>
+              Concluir
+            </Button>
           </View>
         </View>
       </Modal>

@@ -387,14 +387,14 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
           <View style={{
             backgroundColor: '#fff',
             borderRadius: 20,
-            padding: 32,
+            padding: 20,
             alignItems: 'center',
             width: '100%',
             maxWidth: 340,
           }}>
             <Image
               source={require('../../assets/astrocogni_end.png')}
-              style={{ width: 220, height: 220, resizeMode: 'contain', marginBottom: 24 }}
+              style={{ width: '100%', height: 220, resizeMode: 'contain', marginBottom: 24 }}
             />
             <Button
               variant="game"
