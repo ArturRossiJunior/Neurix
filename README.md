@@ -63,7 +63,7 @@ Certifique-se de ter instalado em sua máquina:
 4. **Teste o aplicativo:**
    - Leia o **QR Code** gerado no terminal usando o app do **Expo Go** no seu celular.
    - Para abrir no emulador Android, pressione `a` no terminal.
-   - Para abrir no simulador iOS, pressione `i`.
+   - Para abrir no simulador iOS, pressione `i`
 
 ## 📁 Estrutura Principal do Projeto
 
