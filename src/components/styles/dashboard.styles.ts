@@ -128,7 +128,7 @@ export const createStyles = (isTablet: boolean) => StyleSheet.create({
   },
   lineChartCard: {
     backgroundColor: colors.card,
-    margin: isTablet ? wp('3%') : wp('5%'),
+    margin: isTablet ? wp('2%') : wp('3%'),
     padding: isTablet ? wp('4%') : wp('5%'),
     borderRadius: isTablet ? 20 : 16,
     shadowColor: colors.shadow,

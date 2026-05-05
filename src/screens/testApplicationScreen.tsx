@@ -4,12 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { useIsTablet } from '../utils/useIsTablet';
 import type { TestApplicationScreenProps } from '../navigation/types';
 import { createTestsStyles } from '../components/styles/tests.styles';
-import { View, Image, TouchableOpacity, ScrollView, Text, Alert, Animated, Modal } from 'react-native';
+import { View, Image, TouchableOpacity, ScrollView, Text, Alert, Animated, Modal, useWindowDimensions } from 'react-native';
 
 const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps) => {
   const { testId, testName, patientId } = route.params;
   const isTablet = useIsTablet();
   const styles = createTestsStyles(isTablet);
+  const { width: winWidth, height: winHeight } = useWindowDimensions();
 
   const TIME_LIMIT = 90;
   const TOTAL_IMAGES = 180;
@@ -390,11 +391,16 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
             padding: 20,
             alignItems: 'center',
             width: '100%',
-            maxWidth: 340,
+            maxWidth: isTablet ? 500 : 380,
           }}>
             <Image
               source={require('../../assets/astrocogni_end.png')}
-              style={{ width: '100%', height: 220, resizeMode: 'contain', marginBottom: 24 }}
+              style={{
+                width: winWidth * 0.8,
+                height: winHeight * 0.6,
+                resizeMode: 'contain',
+                marginBottom: 20,
+              }}
             />
             <Button
               variant="game"

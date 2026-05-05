@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useIsTablet } from '../utils/useIsTablet';
 import type { ConcentrationTestApplicationScreenProps } from '../navigation/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import {
   View,
   Image,
@@ -13,9 +14,9 @@ import {
   Alert,
   Animated,
   StyleSheet,
-  Dimensions,
   StatusBar,
   Modal,
+  useWindowDimensions,
 } from 'react-native';
 
 const TOTAL_ROUNDS      = 14;
@@ -96,15 +97,16 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
   const { testId, testName, patientId } = route.params;
   const isTablet = useIsTablet();
   const insets = useSafeAreaInsets();
+  const { width: winWidth, height: winHeight } = useWindowDimensions();
 
-  const [currentRound, setCurrentRound]         = useState(1);
-  const [roundImages, setRoundImages]           = useState<ImageItem[]>([]);
-  const [markedIds, setMarkedIds]               = useState<string[]>([]);
-  const [remainingTime, setRemainingTime]       = useState(ROUND_TIME);
-  const [roundResults, setRoundResults]         = useState<RoundResult[]>([]);
-  const [saving, setSaving]                     = useState(false);
-  const [testFinished, setTestFinished]         = useState(false);
-  const [idAvaliacao, setIdAvaliacao]           = useState<number | null>(null);
+  const [currentRound, setCurrentRound]               = useState(1);
+  const [roundImages, setRoundImages]                 = useState<ImageItem[]>([]);
+  const [markedIds, setMarkedIds]                     = useState<string[]>([]);
+  const [remainingTime, setRemainingTime]             = useState(ROUND_TIME);
+  const [roundResults, setRoundResults]               = useState<RoundResult[]>([]);
+  const [saving, setSaving]                           = useState(false);
+  const [testFinished, setTestFinished]               = useState(false);
+  const [idAvaliacao, setIdAvaliacao]                 = useState<number | null>(null);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
 
   const scaleAnim        = useRef(new Animated.Value(1)).current;
@@ -118,14 +120,14 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
   const testFinishedRef  = useRef(false);
   const savingRef        = useRef(false);
 
-  useEffect(() => { markedIdsRef.current     = markedIds; },      [markedIds]);
-  useEffect(() => { roundImagesRef.current   = roundImages; },    [roundImages]);
-  useEffect(() => { remainingTimeRef.current = remainingTime; },  [remainingTime]);
-  useEffect(() => { idAvaliacaoRef.current   = idAvaliacao; },    [idAvaliacao]);
-  useEffect(() => { roundResultsRef.current  = roundResults; },   [roundResults]);
-  useEffect(() => { currentRoundRef.current  = currentRound; },   [currentRound]);
-  useEffect(() => { testFinishedRef.current  = testFinished; },   [testFinished]);
-  useEffect(() => { savingRef.current        = saving; },         [saving]);
+  useEffect(() => { markedIdsRef.current     = markedIds; },     [markedIds]);
+  useEffect(() => { roundImagesRef.current   = roundImages; },   [roundImages]);
+  useEffect(() => { remainingTimeRef.current = remainingTime; }, [remainingTime]);
+  useEffect(() => { idAvaliacaoRef.current   = idAvaliacao; },   [idAvaliacao]);
+  useEffect(() => { roundResultsRef.current  = roundResults; },  [roundResults]);
+  useEffect(() => { currentRoundRef.current  = currentRound; },  [currentRound]);
+  useEffect(() => { testFinishedRef.current  = testFinished; },  [testFinished]);
+  useEffect(() => { savingRef.current        = saving; },        [saving]);
 
   useEffect(() => {
     const createAvaliacao = async () => {
@@ -174,7 +176,6 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
     markedIdsRef.current = [];
     setRemainingTime(ROUND_TIME);
     remainingTimeRef.current = ROUND_TIME;
-    processingRef.current = false;
   }, [currentRound]);
 
   useEffect(() => {
@@ -227,18 +228,6 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
     [],
   );
 
-  const saveRodada = useCallback(async (result: RoundResult, avaliacaoId: number) => {
-    const { error } = await supabase.from('avaliacoes_rodadas').insert({
-      id_avaliacao:        avaliacaoId,
-      rodada:              result.round,
-      resultado_correto:   result.correctlyMarked,
-      resultado_incorreto: result.incorrectlyMarked,
-      resultado_omisso:    result.notMarked,
-      tempo_restante:      result.timeRemaining,
-    });
-    if (error) console.warn(`Erro ao salvar rodada ${result.round}:`, error);
-  }, []);
-
   const finalizarTeste = useCallback(async (results: RoundResult[]) => {
     if (savingRef.current) return;
     setSaving(true);
@@ -247,6 +236,21 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
     testFinishedRef.current = true;
 
     try {
+      const rodadasPayload = results.map(r => ({
+        id_avaliacao:        idAvaliacaoRef.current,
+        rodada:              r.round,
+        resultado_correto:   r.correctlyMarked,
+        resultado_incorreto: r.incorrectlyMarked,
+        resultado_omisso:    r.notMarked,
+        tempo_restante:      r.timeRemaining,
+      }));
+
+      const { error: rodadasError } = await supabase
+        .from('avaliacoes_rodadas')
+        .insert(rodadasPayload);
+
+      if (rodadasError) throw rodadasError;
+
       const { error } = await supabase
         .from('avaliacoes')
         .update({
@@ -287,17 +291,14 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
     setRoundResults(updated);
     roundResultsRef.current = updated;
 
-    if (idAvaliacaoRef.current) {
-      saveRodada(result, idAvaliacaoRef.current);
-    }
-
     if (round >= TOTAL_ROUNDS) {
       finalizarTeste(updated);
     } else {
       setCurrentRound(r => r + 1);
       currentRoundRef.current = round + 1;
+      processingRef.current = false;
     }
-  }, [calcResult, saveRodada, finalizarTeste]);
+  }, [calcResult, finalizarTeste]);
 
   const handleRoundEndRef = useRef(handleRoundEnd);
   useEffect(() => { handleRoundEndRef.current = handleRoundEnd; }, [handleRoundEnd]);
@@ -319,6 +320,8 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
   };
 
   const isLastRound = currentRound >= TOTAL_ROUNDS;
+  const cellSize = isTablet ? wp('8%') : wp('18%');
+  const imageSize = isTablet ? wp('6.5%') : wp('15%');
 
   return (
     <View style={styles.container}>
@@ -357,11 +360,19 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
               <TouchableOpacity
                 key={item.id}
                 onPress={() => toggleMarked(item.id)}
-                style={[styles.cell, marked && styles.cellMarked]}
+                style={[
+                  styles.cell,
+                  marked && styles.cellMarked,
+                  { width: cellSize, height: cellSize },
+                ]}
                 activeOpacity={0.75}
                 disabled={testFinished || saving}
               >
-                <Image source={item.src} style={styles.cellImage} resizeMode="contain" />
+                <Image
+                  source={item.src}
+                  style={[styles.cellImage, { width: imageSize, height: imageSize }]}
+                  resizeMode="contain"
+                />
                 {marked && (
                   <View style={styles.checkBadge}>
                     <Text style={styles.checkText}>✓</Text>
@@ -414,13 +425,17 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
             padding: 20,
             alignItems: 'center',
             width: '100%',
-            maxWidth: 340,
+            maxWidth: isTablet ? 500 : 380,
           }}>
             <Image
               source={require('../../assets/cognitive_end.png')}
-              style={{ width: '100%', height: 220, resizeMode: 'contain', marginBottom: 24 }}
+              style={{
+                width: winWidth * 0.8,
+                height: winHeight * 0.6,
+                resizeMode: 'contain',
+                marginBottom: 20,
+              }}
             />
-            {/* Mesmo padrão do TestApplicationScreen */}
             <Button
               variant="game"
               size="default"
@@ -517,8 +532,6 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   cell: {
-    width: 62,
-    height: 62,
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
     borderWidth: 1.5,
@@ -532,8 +545,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F0FDF4',
   },
   cellImage: {
-    width: 52,
-    height: 52,
+    borderRadius: 4,
   },
   checkBadge: {
     position: 'absolute',
