@@ -2,13 +2,13 @@ import React from 'react';
 import { Card } from '../components/Card';
 import { Header } from '../components/Header';
 import { Button } from '../components/Button';
+import { useIsTablet } from '../utils/useIsTablet';
 import { IndexScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/index.styles';
-import { View, Text, ScrollView, Alert, useWindowDimensions } from 'react-native';
+import { View, Text, ScrollView, Alert } from 'react-native';
 
 const IndexScreen = ({ navigation }: IndexScreenProps) => {
-  const { width } = useWindowDimensions();
-  const isTablet = width >= 768;
+  const isTablet = useIsTablet();
   const styles = createStyles(isTablet);
 
   return (

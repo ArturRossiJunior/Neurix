@@ -3,12 +3,13 @@ import { supabase } from '../utils/supabase';
 import { colors } from '../components/styles/colors';
 import { Picker } from '@react-native-picker/picker';
 import PickerInput from '../components/PickerInput';
+import { useIsTablet } from '../utils/useIsTablet';
 import ScreenHeader from '../components/ScreenHeader';
 import React, { useState, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { TestDetailScreenProps } from '../navigation/types';
 import { createTestsStyles } from '../components/styles/tests.styles';
-import { View, Text, ScrollView, useWindowDimensions, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
 interface Patient {
@@ -18,8 +19,7 @@ interface Patient {
 }
 
 export const TestDetailScreen = ({ route, navigation }: TestDetailScreenProps) => {
-  const { width } = useWindowDimensions();
-  const isTablet = width >= 768;
+  const isTablet = useIsTablet();
   const styles = createTestsStyles(isTablet);
 
   const { testId, testName } = route.params;

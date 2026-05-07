@@ -5,6 +5,7 @@ import PickerInput from '../components/PickerInput';
 import React, { useState, useCallback } from 'react';
 import { colors } from '../components/styles/colors';
 import ScreenHeader from '../components/ScreenHeader';
+import { useToast } from '../utils/ToastContext';
 import { useFocusEffect } from '@react-navigation/native';
 import { DashboardScreenProps } from '../navigation/types';
 import { LineChart } from 'react-native-chart-kit';
@@ -97,6 +98,7 @@ const MetricCards = ({ c, i, o }: MetricCardsProps) => {
 export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
   const isTablet = useIsTablet();
   const styles = createStyles(isTablet);
+  const { showToast } = useToast();
   const { width: screenWidth } = useWindowDimensions();
 
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -140,7 +142,7 @@ export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
 
       setTestTypes(testsData || []);
     } catch (error: any) {
-      Alert.alert('Erro', 'Não foi possível carregar os filtros: ' + error.message);
+      showToast('Não foi possível carregar os filtros: ' + error.message);
     } finally {
       setLoadingFilters(false);
     }
@@ -195,7 +197,7 @@ export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
         setRoundsMap({});
       }
     } catch (error: any) {
-      Alert.alert('Erro', 'Não foi possível carregar as avaliações: ' + error.message);
+      showToast('Não foi possível carregar as avaliações: ' + error.message);
       setAssessments([]);
       setRoundsMap({});
     } finally {

@@ -1,15 +1,17 @@
 import React from 'react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
+import { useIsTablet } from '../utils/useIsTablet';
 import { HomeScreenProps } from '../navigation/types';
 import { createStyles } from '../components/styles/home.styles';
-import { View, Text, ScrollView, Alert, useWindowDimensions } from 'react-native';
+import { View, Text, ScrollView, Alert } from 'react-native';
 import { supabase } from '../utils/supabase';
+import { useToast } from '../utils/ToastContext';
 
 const Home = ({ navigation }: HomeScreenProps) => {
-  const { width } = useWindowDimensions();
-  const isTablet = width >= 768;
+  const isTablet = useIsTablet();
   const styles = createStyles(isTablet);
+  const { showToast } = useToast();
 
   const handleNavigation = (destination: string) => {
     if (destination === 'Novo Teste') {
@@ -43,7 +45,7 @@ const Home = ({ navigation }: HomeScreenProps) => {
             const { error } = await supabase.auth.signOut();
 
             if (error) {
-              Alert.alert('Erro ao Sair', error.message);
+              showToast('Erro ao sair: ' + error.message);
             } else {
               navigation.reset({
                 index: 0,

@@ -5,6 +5,7 @@ import { calculateAge } from '../utils/utils';
 import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
+import { useToast } from '../utils/ToastContext';
 import ScreenHeader from '../components/ScreenHeader';
 import { PatientsScreenProps } from '../navigation/types';
 import React, { useState, useCallback, useEffect } from 'react';
@@ -36,6 +37,7 @@ interface Patient {
 const PatientsScreen = ({ navigation }: PatientsScreenProps) => {
   const isTablet = useIsTablet();
   const styles = createStyles(isTablet);
+  const { showToast } = useToast();
   const [searchText, setSearchText] = useState('');
   const [patients, setPatients] = useState<Patient[]>([]);
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
@@ -57,55 +59,35 @@ const PatientsScreen = ({ navigation }: PatientsScreenProps) => {
 
     setLoading(true);
     try {
-      const { data: patientsData, error: patientsError } = await supabase
+      const { data, error } = await supabase
         .from('pacientes')
-        .select('id, nome_completo, data_nascimento, status')
+        .select('id, nome_completo, data_nascimento, status, avaliacoes(data_aplicacao)')
         .eq('id_profissional', professionalId);
 
-      if (patientsError) {
-        throw patientsError;
-      }
+      if (error) throw error;
 
-      const patientsWithDetails: Patient[] = await Promise.all(
-        patientsData.map(async (patient) => {
-          const { data: lastTestData, error: lastTestError } = await supabase
-            .from('avaliacoes')
-            .select('data_aplicacao')
-            .eq('id_paciente', patient.id)
-            .order('data_aplicacao', { ascending: false })
-            .limit(1);
+      const patientsWithDetails: Patient[] = (data || []).map((patient) => {
+        const avaliacoes: { data_aplicacao: string }[] = patient.avaliacoes || [];
+        const sorted = [...avaliacoes].sort(
+          (a, b) => new Date(b.data_aplicacao).getTime() - new Date(a.data_aplicacao).getTime()
+        );
+        const lastTest = sorted[0]
+          ? new Date(sorted[0].data_aplicacao).toLocaleDateString('pt-BR')
+          : undefined;
 
-          if (lastTestError) {
-            console.error('Erro ao buscar último teste:', lastTestError);
-          }
-
-          const lastTest =
-            lastTestData && lastTestData.length > 0
-              ? new Date(lastTestData[0].data_aplicacao).toLocaleDateString(
-                  'pt-BR'
-                )
-              : undefined;
-
-          const { count: testsCount, error: countError } = await supabase
-            .from('avaliacoes')
-            .select('*', { count: 'exact' })
-            .eq('id_paciente', patient.id);
-
-          if (countError) {
-            console.error('Erro ao contar testes:', countError);
-          }
-
-          return {
-            ...patient,
-            lastTest,
-            testsCount: testsCount || 0,
-          };
-        })
-      );
+        return {
+          id: patient.id,
+          nome_completo: patient.nome_completo,
+          data_nascimento: patient.data_nascimento,
+          status: patient.status,
+          lastTest,
+          testsCount: avaliacoes.length,
+        };
+      });
 
       setPatients(patientsWithDetails);
     } catch (error: any) {
-      Alert.alert('Erro', 'Erro ao carregar pacientes: ' + error.message);
+      showToast('Erro ao carregar pacientes: ' + error.message);
       console.error('Erro ao carregar pacientes:', error);
     } finally {
       setLoading(false);

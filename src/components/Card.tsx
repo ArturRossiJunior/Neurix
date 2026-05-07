@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 import { createStyles } from './styles/card.styles';
-import { View, TouchableOpacity, TouchableOpacityProps, useWindowDimensions } from 'react-native';
+import { useIsTablet } from '../utils/useIsTablet';
+import { View, TouchableOpacity, TouchableOpacityProps } from 'react-native';
 
 interface CardProps extends TouchableOpacityProps {
   children: ReactNode;
@@ -14,8 +15,7 @@ export const Card = ({
   style, 
   ...props 
 }: CardProps) => {
-  const { width } = useWindowDimensions();
-  const isTablet = width >= 768;
+  const isTablet = useIsTablet();
   const styles = createStyles(isTablet);
 
   const cardStyle = [

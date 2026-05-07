@@ -5,6 +5,7 @@ import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
 import ScreenHeader from '../components/ScreenHeader';
+import { useToast } from '../utils/ToastContext';
 import { calculateAge, formatCPF } from '../utils/utils';
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useState, useMemo, useCallback } from 'react';
@@ -32,6 +33,7 @@ interface PatientAssociated {
 const GuardianDetailScreen = ({ navigation, route }: GuardianDetailScreenProps) => {
   const { guardianId } = route.params;
   const isTablet = useIsTablet();
+  const { showToast } = useToast();
   const styles = useMemo(() => createStyles(isTablet), [isTablet]);
 
   const [guardian, setGuardian] = useState<GuardianDetail | null>(null);
@@ -57,59 +59,35 @@ const GuardianDetailScreen = ({ navigation, route }: GuardianDetailScreenProps) 
 
       const { data: patientsData, error: patientsError } = await supabase
         .from('pacientes')
-        .select('id, nome_completo, data_nascimento, status')
+        .select('id, nome_completo, data_nascimento, status, avaliacoes(data_aplicacao)')
         .eq('id_responsavel', guardianId)
         .order('nome_completo', { ascending: true });
 
-      if (patientsError) {
-        throw patientsError;
-      }
+      if (patientsError) throw patientsError;
+
+      const patientsWithDetails: PatientAssociated[] = (patientsData || []).map((patient) => {
+        const avaliacoes: { data_aplicacao: string }[] = (patient as any).avaliacoes || [];
+        const sorted = [...avaliacoes].sort(
+          (a, b) => new Date(b.data_aplicacao).getTime() - new Date(a.data_aplicacao).getTime()
+        );
+        return {
+          id: patient.id,
+          nome_completo: patient.nome_completo,
+          data_nascimento: patient.data_nascimento,
+          status: patient.status,
+          lastTest: sorted[0]
+            ? new Date(sorted[0].data_aplicacao).toLocaleDateString('pt-BR')
+            : undefined,
+          testsCount: avaliacoes.length,
+        };
+      });
       
-      if (!patientsData) {
-        setPatients([]);
-        return;
-      }
-
-      const patientsWithDetails: PatientAssociated[] = await Promise.all(
-        patientsData.map(async (patient) => {
-          const { data: lastTestData, error: lastTestError } = await supabase
-            .from('avaliacoes')
-            .select('data_aplicacao')
-            .eq('id_paciente', patient.id)
-            .order('data_aplicacao', { ascending: false })
-            .limit(1);
-
-          if (lastTestError) {
-            console.error('Erro ao buscar último teste:', lastTestError);
-          }
-          
-          const lastTest = lastTestData && lastTestData.length > 0
-            ? new Date(lastTestData[0].data_aplicacao).toLocaleDateString('pt-BR')
-            : undefined;
-
-          const { count: testsCount, error: countError } = await supabase
-            .from('avaliacoes')
-            .select('*', { count: 'exact' })
-            .eq('id_paciente', patient.id);
-
-          if (countError) {
-            console.error('Erro ao contar testes:', countError);
-          }
-          
-          return {
-            ...patient,
-            lastTest,
-            testsCount: testsCount || 0,
-          };
-        })
-      );
-      
-      setPatients(patientsWithDetails || []);
+      setPatients(patientsWithDetails);
 
     } catch (err: any) {
       console.error('Erro ao buscar detalhes do responsável:', err);
       setError('Erro ao carregar os detalhes do responsável: ' + err.message);
-      Alert.alert('Erro', 'Não foi possível carregar os detalhes do responsável');
+      showToast('Não foi possível carregar os detalhes do responsável');
     } finally {
       setLoading(false);
     }
