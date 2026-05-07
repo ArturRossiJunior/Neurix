@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "icon": "./assets/splash.png",
+    "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -24,9 +24,7 @@
       "package": "com.arturrossijunior.Neurix"
     },
     "web": {},
-    "plugins": [
-      "expo-router"
-    ],
+    "plugins": [],
     "extra": {
       "router": {},
       "eas": {
