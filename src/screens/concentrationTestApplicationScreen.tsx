@@ -19,10 +19,10 @@ import {
   useWindowDimensions,
 } from 'react-native';
 
-const TOTAL_ROUNDS      = 14;
-const IMAGES_PER_ROUND  = 47;
+const TOTAL_ROUNDS = 14;
+const IMAGES_PER_ROUND = 47;
 const CORRECT_PER_ROUND = 21;
-const ROUND_TIME        = 20;
+const ROUND_TIME = 20;
 
 interface ImageItem {
   id: string;
@@ -99,35 +99,35 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
   const insets = useSafeAreaInsets();
   const { width: winWidth, height: winHeight } = useWindowDimensions();
 
-  const [currentRound, setCurrentRound]               = useState(1);
-  const [roundImages, setRoundImages]                 = useState<ImageItem[]>([]);
-  const [markedIds, setMarkedIds]                     = useState<string[]>([]);
-  const [remainingTime, setRemainingTime]             = useState(ROUND_TIME);
-  const [roundResults, setRoundResults]               = useState<RoundResult[]>([]);
-  const [saving, setSaving]                           = useState(false);
-  const [testFinished, setTestFinished]               = useState(false);
-  const [idAvaliacao, setIdAvaliacao]                 = useState<number | null>(null);
+  const [currentRound, setCurrentRound] = useState(1);
+  const [roundImages, setRoundImages] = useState<ImageItem[]>([]);
+  const [markedIds, setMarkedIds] = useState<string[]>([]);
+  const [remainingTime, setRemainingTime] = useState(ROUND_TIME);
+  const [roundResults, setRoundResults] = useState<RoundResult[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [testFinished, setTestFinished] = useState(false);
+  const [idAvaliacao, setIdAvaliacao] = useState<number | null>(null);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
 
-  const scaleAnim        = useRef(new Animated.Value(1)).current;
-  const processingRef    = useRef(false);
-  const markedIdsRef     = useRef<string[]>([]);
-  const roundImagesRef   = useRef<ImageItem[]>([]);
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const processingRef = useRef(false);
+  const markedIdsRef = useRef<string[]>([]);
+  const roundImagesRef = useRef<ImageItem[]>([]);
   const remainingTimeRef = useRef(ROUND_TIME);
-  const idAvaliacaoRef   = useRef<number | null>(null);
-  const roundResultsRef  = useRef<RoundResult[]>([]);
-  const currentRoundRef  = useRef(1);
-  const testFinishedRef  = useRef(false);
-  const savingRef        = useRef(false);
+  const idAvaliacaoRef = useRef<number | null>(null);
+  const roundResultsRef = useRef<RoundResult[]>([]);
+  const currentRoundRef = useRef(1);
+  const testFinishedRef = useRef(false);
+  const savingRef = useRef(false);
 
-  useEffect(() => { markedIdsRef.current     = markedIds; },     [markedIds]);
-  useEffect(() => { roundImagesRef.current   = roundImages; },   [roundImages]);
+  useEffect(() => { markedIdsRef.current = markedIds; }, [markedIds]);
+  useEffect(() => { roundImagesRef.current = roundImages; }, [roundImages]);
   useEffect(() => { remainingTimeRef.current = remainingTime; }, [remainingTime]);
-  useEffect(() => { idAvaliacaoRef.current   = idAvaliacao; },   [idAvaliacao]);
-  useEffect(() => { roundResultsRef.current  = roundResults; },  [roundResults]);
-  useEffect(() => { currentRoundRef.current  = currentRound; },  [currentRound]);
-  useEffect(() => { testFinishedRef.current  = testFinished; },  [testFinished]);
-  useEffect(() => { savingRef.current        = saving; },        [saving]);
+  useEffect(() => { idAvaliacaoRef.current = idAvaliacao; }, [idAvaliacao]);
+  useEffect(() => { roundResultsRef.current = roundResults; }, [roundResults]);
+  useEffect(() => { currentRoundRef.current = currentRound; }, [currentRound]);
+  useEffect(() => { testFinishedRef.current = testFinished; }, [testFinished]);
+  useEffect(() => { savingRef.current = saving; }, [saving]);
 
   useEffect(() => {
     const createAvaliacao = async () => {
@@ -142,13 +142,13 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
       const { data, error } = await supabase
         .from('avaliacoes')
         .insert({
-          id_paciente:          parseInt(patientId),
-          id_tipo_teste:        parseInt(testId),
-          data_aplicacao:       new Date().toISOString(),
-          resultado_correto:    0,
-          resultado_incorreto:  0,
-          resultado_omisso:     0,
-          tempo_realizacao:     0,
+          id_paciente: parseInt(patientId),
+          id_tipo_teste: parseInt(testId),
+          data_aplicacao: new Date().toISOString(),
+          resultado_correto: 0,
+          resultado_incorreto: 0,
+          resultado_omisso: 0,
+          tempo_realizacao: 0,
           observacoes_clinicas: `Teste: ${testName} | ${TOTAL_ROUNDS} rodadas`,
         })
         .select('id')
@@ -202,7 +202,7 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
 
     Animated.sequence([
       Animated.timing(scaleAnim, { toValue: 1.15, duration: 80, useNativeDriver: true }),
-      Animated.timing(scaleAnim, { toValue: 1,    duration: 80, useNativeDriver: true }),
+      Animated.timing(scaleAnim, { toValue: 1, duration: 80, useNativeDriver: true }),
     ]).start();
 
     setMarkedIds(prev => {
@@ -214,14 +214,14 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
 
   const calcResult = useCallback(
     (images: ImageItem[], marked: string[], timeRemaining: number, round: number): RoundResult => {
-      const corrects   = images.filter(i => i.isCorrect);
+      const corrects = images.filter(i => i.isCorrect);
       const incorrects = images.filter(i => !i.isCorrect);
       return {
         round,
-        correctlyMarked:   corrects.filter(i => marked.includes(i.id)).length,
+        correctlyMarked: corrects.filter(i => marked.includes(i.id)).length,
         incorrectlyMarked: incorrects.filter(i => marked.includes(i.id)).length,
-        notMarked:         corrects.filter(i => !marked.includes(i.id)).length,
-        timeSpent:         ROUND_TIME - timeRemaining,
+        notMarked: corrects.filter(i => !marked.includes(i.id)).length,
+        timeSpent: ROUND_TIME - timeRemaining,
         timeRemaining,
       };
     },
@@ -237,12 +237,12 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
 
     try {
       const rodadasPayload = results.map(r => ({
-        id_avaliacao:        idAvaliacaoRef.current,
-        rodada:              r.round,
-        resultado_correto:   r.correctlyMarked,
+        id_avaliacao: idAvaliacaoRef.current,
+        rodada: r.round,
+        resultado_correto: r.correctlyMarked,
         resultado_incorreto: r.incorrectlyMarked,
-        resultado_omisso:    r.notMarked,
-        tempo_restante:      r.timeRemaining,
+        resultado_omisso: r.notMarked,
+        tempo_restante: r.timeRemaining,
       }));
 
       const { error: rodadasError } = await supabase
@@ -254,10 +254,10 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
       const { error } = await supabase
         .from('avaliacoes')
         .update({
-          resultado_correto:   results.reduce((s, r) => s + r.correctlyMarked,   0),
+          resultado_correto: results.reduce((s, r) => s + r.correctlyMarked, 0),
           resultado_incorreto: results.reduce((s, r) => s + r.incorrectlyMarked, 0),
-          resultado_omisso:    results.reduce((s, r) => s + r.notMarked,         0),
-          tempo_realizacao:    results.reduce((s, r) => s + r.timeSpent,         0),
+          resultado_omisso: results.reduce((s, r) => s + r.notMarked, 0),
+          tempo_realizacao: results.reduce((s, r) => s + r.timeSpent, 0),
         })
         .eq('id', idAvaliacaoRef.current);
 
@@ -280,12 +280,12 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
     if (processingRef.current || testFinishedRef.current || savingRef.current) return;
     processingRef.current = true;
 
-    const time   = remainingTimeRef.current;
+    const time = remainingTimeRef.current;
     const marked = markedIdsRef.current;
     const images = roundImagesRef.current;
-    const round  = currentRoundRef.current;
+    const round = currentRoundRef.current;
 
-    const result  = calcResult(images, marked, time, round);
+    const result = calcResult(images, marked, time, round);
     const updated = [...roundResultsRef.current, result];
 
     setRoundResults(updated);
@@ -341,7 +341,7 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
             key={i}
             style={[
               styles.dot,
-              i + 1 < currentRound  && styles.dotDone,
+              i + 1 < currentRound && styles.dotDone,
               i + 1 === currentRound && styles.dotCurrent,
             ]}
           />
@@ -570,6 +570,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: '#E2E8F0',
+    marginBottom: 15
   },
   btnCancel: {
     flex: 1,

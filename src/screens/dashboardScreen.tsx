@@ -1,6 +1,7 @@
 import { supabase } from '../utils/supabase';
 import { useIsTablet } from '../utils/useIsTablet';
 import { Picker } from '@react-native-picker/picker';
+import PickerInput from '../components/PickerInput';
 import React, { useState, useCallback } from 'react';
 import { colors } from '../components/styles/colors';
 import ScreenHeader from '../components/ScreenHeader';
@@ -387,11 +388,11 @@ export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
           <>
             <View style={styles.patientSelectorContainer}>
               <Text style={styles.patientSelectorLabel}>Selecionar Paciente:</Text>
-              <Picker
+              <PickerInput
                 selectedValue={selectedPatient}
                 onValueChange={(itemValue) => setSelectedPatient(itemValue)}
-                style={styles.picker}
                 enabled={patients.length > 0}
+                containerStyle={styles.pickerContainer}
               >
                 <Picker.Item
                   label={patients.length === 0 ? 'Nenhum paciente encontrado' : 'Selecione um paciente'}
@@ -400,16 +401,16 @@ export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
                 {patients.map((patient) => (
                   <Picker.Item key={patient.id} label={patient.nome_completo} value={patient.id} />
                 ))}
-              </Picker>
+              </PickerInput>
             </View>
 
             <View style={styles.patientSelectorContainer}>
               <Text style={styles.patientSelectorLabel}>Selecionar Tipo de Teste:</Text>
-              <Picker
+              <PickerInput
                 selectedValue={selectedTestType}
                 onValueChange={(itemValue) => setSelectedTestType(itemValue)}
-                style={styles.picker}
                 enabled={testTypes.length > 0}
+                containerStyle={styles.pickerContainer}
               >
                 <Picker.Item
                   label={testTypes.length === 0 ? 'Nenhum teste encontrado' : 'Selecione um tipo de teste'}
@@ -418,7 +419,7 @@ export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
                 {testTypes.map((testType) => (
                   <Picker.Item key={testType.id} label={testType.nome_teste} value={testType.id} />
                 ))}
-              </Picker>
+              </PickerInput>
             </View>
 
             {loading && (

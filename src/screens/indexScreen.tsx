@@ -28,7 +28,7 @@ const IndexScreen = ({ navigation }: IndexScreenProps) => {
                 </Text>
               </View>
               <Button
-                variant="game"
+                variant="calm"
                 size="default"
                 style={styles.actionButton}
                 onPress={() => navigation.navigate('Login')}

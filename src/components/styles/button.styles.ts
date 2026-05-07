@@ -35,7 +35,7 @@ const buttonVariants = {
     text: { color: colors.linkText, textDecorationLine: 'underline', fontWeight: '500' },
   },
   game: {
-    container: { 
+    container: {
       backgroundColor: colors.calmBlue,
       borderRadius: 16,
       elevation: 4,
@@ -44,7 +44,7 @@ const buttonVariants = {
     text: { color: colors.primaryForeground, fontWeight: '700' },
   },
   calm: {
-    container: { 
+    container: {
       backgroundColor: colors.softGreen,
       borderRadius: 12,
       elevation: 3,
@@ -53,7 +53,7 @@ const buttonVariants = {
     text: { color: colors.primaryForeground, fontWeight: '600' },
   },
   soft: {
-    container: { 
+    container: {
       backgroundColor: colors.gentlePurple,
       borderRadius: 12,
       elevation: 3,
@@ -65,43 +65,43 @@ const buttonVariants = {
 
 const buttonSizes = (isTablet: boolean) => ({
   sm: {
-    container: { 
+    container: {
       paddingVertical: isTablet ? hp('1.5%') : hp('1.2%'),
-      paddingHorizontal: isTablet ? wp('4%') : wp('3.5%'), 
-      borderRadius: isTablet ? 14 : 10 
+      paddingHorizontal: isTablet ? wp('4%') : wp('3.5%'),
+      borderRadius: isTablet ? 14 : 10
     },
     text: { fontSize: isTablet ? wp('3%') : wp('3.5%') },
   },
   default: {
-    container: { 
+    container: {
       paddingVertical: isTablet ? hp('1.5%') : hp('1.8%'),
-      paddingHorizontal: isTablet ? wp('5%') : wp('5%'), 
-      borderRadius: isTablet ? 16 : 12 
+      paddingHorizontal: isTablet ? wp('5%') : wp('5%'),
+      borderRadius: isTablet ? 16 : 12
     },
-    text: { fontSize: isTablet ? wp('2.8%') : wp('4%') },
+    text: { fontSize: isTablet ? wp('2.6%') : wp('4%') },
   },
   lg: {
-    container: { 
+    container: {
       paddingVertical: isTablet ? hp('2.2%') : hp('2%'),
-      paddingHorizontal: isTablet ? wp('6%') : wp('6%'), 
-      borderRadius: isTablet ? 18 : 14 
+      paddingHorizontal: isTablet ? wp('6%') : wp('6%'),
+      borderRadius: isTablet ? 18 : 14
     },
     text: { fontSize: isTablet ? wp('4%') : wp('4.5%') },
   },
   xl: {
-    container: { 
+    container: {
       paddingVertical: isTablet ? hp('2.5%') : hp('2.2%'),
-      paddingHorizontal: isTablet ? wp('7%') : wp('7%'), 
-      borderRadius: isTablet ? 20 : 16 
+      paddingHorizontal: isTablet ? wp('7%') : wp('7%'),
+      borderRadius: isTablet ? 20 : 16
     },
     text: { fontSize: isTablet ? wp('4.5%') : wp('5%') },
   },
   icon: {
-    container: { 
-      height: isTablet ? hp('7%') : hp('5.5%'), 
+    container: {
+      height: isTablet ? hp('7%') : hp('5.5%'),
       width: isTablet ? hp('7%') : hp('5.5%'),
-      paddingHorizontal: 0, 
-      borderRadius: isTablet ? 16 : 12 
+      paddingHorizontal: 0,
+      borderRadius: isTablet ? 16 : 12
     },
     text: {},
   },

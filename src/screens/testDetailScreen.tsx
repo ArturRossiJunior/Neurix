@@ -2,6 +2,7 @@ import { Button } from '../components/Button';
 import { supabase } from '../utils/supabase';
 import { colors } from '../components/styles/colors';
 import { Picker } from '@react-native-picker/picker';
+import PickerInput from '../components/PickerInput';
 import ScreenHeader from '../components/ScreenHeader';
 import React, { useState, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
@@ -123,33 +124,30 @@ export const TestDetailScreen = ({ route, navigation }: TestDetailScreenProps) =
               </Text>
             </View>
           ) : (
-            <View style={getPickerContainerStyle('patient')}>
-              <Picker
-                selectedValue={selectedPatient}
-                onValueChange={(itemValue) => {
-                  setSelectedPatient(itemValue);
-                  if (errors.patient) setErrors({ patient: '' });
-                }}
-                style={{ color: colors.text }}
-                itemStyle={{ color: colors.text }}
-                enabled={patients.length > 0}
-              >
-                {selectedPatient === -1 && (
-                  <Picker.Item
-                    label={patients.length === 0 ? 'Nenhum paciente encontrado' : 'Selecione um paciente...'}
-                    value={-1}
-                    enabled={false}
-                  />
-                )}
-                {patients.map((patient) => (
-                  <Picker.Item
-                    key={patient.id}
-                    label={patient.nome_completo}
-                    value={patient.id}
-                  />
-                ))}
-              </Picker>
-            </View>
+            <PickerInput
+              selectedValue={selectedPatient}
+              onValueChange={(itemValue) => {
+                setSelectedPatient(itemValue);
+                if (errors.patient) setErrors({ patient: '' });
+              }}
+              enabled={patients.length > 0}
+              containerStyle={getPickerContainerStyle('patient')}
+            >
+              {selectedPatient === -1 && (
+                <Picker.Item
+                  label={patients.length === 0 ? 'Nenhum paciente encontrado' : 'Selecione um paciente...'}
+                  value={-1}
+                  enabled={false}
+                />
+              )}
+              {patients.map((patient) => (
+                <Picker.Item
+                  key={patient.id}
+                  label={patient.nome_completo}
+                  value={patient.id}
+                />
+              ))}
+            </PickerInput>
           )}
           {errors.patient ? <Text style={{ color: 'red', fontSize: 12 }}>{errors.patient}</Text> : null}
 

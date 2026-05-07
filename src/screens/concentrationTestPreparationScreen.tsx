@@ -100,7 +100,7 @@ const ConcentrationTestPreparationScreen = ({ navigation, route }: Concentration
         <Text style={styles.storyText}>
           A pista certa é o número 9 com duas bolinhas. Elas podem estar em cima, embaixo ou misturadas!
         </Text>
-        
+
         <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 10 }}>
           {CORRECT_IMAGES.map((img, index) => (
             <Image
@@ -127,14 +127,6 @@ const ConcentrationTestPreparationScreen = ({ navigation, route }: Concentration
           >
             Vamos lá!
           </Button>
-
-          <View style={styles.imageBesideButton}>
-            <Image
-              source={require('../../assets/cognitive.png')}
-              style={styles.imageSmall}
-              resizeMode="contain"
-            />
-          </View>
         </View>
       </ScrollView>
     </View>

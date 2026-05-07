@@ -79,13 +79,30 @@ export const createStyles = (isTablet: boolean) => {
       borderColor: colors.outlineBorder,
       height: isTablet ? hp('5.5%') : hp('6%'),
       justifyContent: 'center',
+      overflow: 'hidden',
       ...shadows.shadowDefault,
+    },
+
+    pickerFill: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      color: colors.foreground,
     },
 
     searchInput: {
       paddingHorizontal: isTablet ? wp('3%') : wp('3%'),
       paddingVertical: isTablet ? hp('1.8%') : hp('2%'),
       fontSize: isTablet ? wp('3.5%') : wp('4%'),
+      color: colors.foreground,
+    },
+
+    creationInput: {
+      paddingHorizontal: isTablet ? wp('3%') : wp('3%'),
+      paddingVertical: isTablet ? hp('1%') : hp('2%'),
+      fontSize: isTablet ? wp('3%') : wp('4%'),
       color: colors.foreground,
     },
 
