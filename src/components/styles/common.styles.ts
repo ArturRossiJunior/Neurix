@@ -67,7 +67,7 @@ export const createCommonStyles = (isTablet: boolean) => StyleSheet.create({
     height: isTablet ? hp('8%') : hp('7%'),
     borderRadius: isTablet ? hp('4%') : hp('3.5%'),
   },
-  
+
   iconContainerSmall: {
     width: isTablet ? hp('6%') : hp('5%'),
     height: isTablet ? hp('6%') : hp('5%'),

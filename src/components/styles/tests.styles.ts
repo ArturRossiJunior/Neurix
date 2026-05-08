@@ -180,7 +180,7 @@ export const createTestsStyles = (isTablet: boolean) => {
       justifyContent: 'center',
       paddingHorizontal: wp('1%'),
       marginBottom: isTablet ? hp('2.5%') : hp('2%'),
-      alignItems: 'center', 
+      alignItems: 'center',
       paddingVertical: isTablet ? hp('2%') : hp('2.5%'),
     },
     startButton: {
@@ -475,7 +475,16 @@ export const createTestsStyles = (isTablet: boolean) => {
       borderColor: colors.outlineBorder,
       height: isTablet ? hp('5.5%') : hp('6%'),
       justifyContent: 'center',
+      overflow: 'hidden',
       ...shadows.shadowDefault,
+    },
+    pickerFill: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      color: colors.foreground,
     },
   });
 };

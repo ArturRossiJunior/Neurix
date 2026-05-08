@@ -35,14 +35,23 @@ export const createStyles = (isTablet: boolean) => StyleSheet.create({
     paddingBottom: isTablet ? wp('2%') : wp('0%'),
     marginTop: isTablet ? hp('0%') : hp('2%'),
   },
-  picker: {
-    height: isTablet ? hp('7%') : hp('6%'),
-    width: '100%',
+  pickerContainer: {
     backgroundColor: colors.card,
-    borderRadius: isTablet ? 12 : 10,
+    borderRadius: isTablet ? 16 : 12,
     borderWidth: 1,
     borderColor: colors.outlineBorder,
-    paddingHorizontal: isTablet ? wp('4%') : wp('3%'),
+    height: isTablet ? hp('5.5%') : hp('6%'),
+    justifyContent: 'center',
+    overflow: 'hidden',
+    ...shadows.shadowDefault,
+  },
+  picker: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    color: colors.foreground,
   },
   chartContainer: {
     backgroundColor: colors.card,
@@ -128,7 +137,7 @@ export const createStyles = (isTablet: boolean) => StyleSheet.create({
   },
   lineChartCard: {
     backgroundColor: colors.card,
-    margin: isTablet ? wp('3%') : wp('5%'),
+    margin: isTablet ? wp('2%') : wp('3%'),
     padding: isTablet ? wp('4%') : wp('5%'),
     borderRadius: isTablet ? 20 : 16,
     shadowColor: colors.shadow,

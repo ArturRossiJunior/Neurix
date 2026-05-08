@@ -3,6 +3,7 @@ import { supabase } from '../utils/supabase';
 import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
+import { useToast } from '../utils/ToastContext';
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useState, useMemo, useCallback } from 'react';
 import { PatientDetailScreenProps } from '../navigation/types';
@@ -45,6 +46,7 @@ interface TestDetail {
 const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) => {
   const { patientId } = route.params;
   const isTablet = useIsTablet();
+  const { showToast } = useToast();
   const styles = useMemo(() => createStyles(isTablet), [isTablet]);
 
   const [patient, setPatient] = useState<PatientDetail | null>(null);
@@ -106,7 +108,7 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
     } catch (err: any) {
       console.error('Erro ao buscar detalhes do paciente:', err);
       setError('Erro ao carregar os detalhes do paciente: ' + err.message);
-      Alert.alert('Erro', 'Não foi possível carregar os detalhes do paciente');
+      showToast('Não foi possível carregar os detalhes do paciente');
     } finally {
       setLoading(false);
     }
@@ -184,7 +186,7 @@ const PatientDetailScreen = ({ navigation, route }: PatientDetailScreenProps) =>
 
             } catch (err: any) {
               console.error(`Erro ao ${actionText} paciente:`, err);
-              Alert.alert('Erro', `Não foi possível ${actionText} o paciente: ${err.message}`);
+              showToast(`Não foi possível ${actionText} o paciente: ${err.message}`);
             } finally {
               setIsUpdatingStatus(false);
             }

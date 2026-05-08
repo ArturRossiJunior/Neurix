@@ -5,6 +5,7 @@ import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
 import { Picker } from '@react-native-picker/picker';
+import PickerInput from '../components/PickerInput';
 import ScreenHeader from '../components/ScreenHeader';
 import { MaskedTextInput } from 'react-native-mask-text';
 import { useFocusEffect } from '@react-navigation/native';
@@ -319,7 +320,7 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
   };
 
   const getInputStyle = (field: keyof typeof errors) => [
-    styles.searchInput,
+    styles.creationInput,
     errors[field] ? { borderColor: 'red', borderWidth: 1, borderRadius: styles.searchContainer.borderRadius } : {},
   ];
 
@@ -388,36 +389,30 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
                 {errors.cpf ? <Text style={{ color: 'red', fontSize: 12 }}>{errors.cpf}</Text> : null}
 
                 <Text style={[styles.patientInput, styles.patientCreationMargin]}>Gênero *</Text>
-                <View style={getPickerContainerStyle('gender')}>
-                  <Picker
-                    selectedValue={formData.gender}
-                    onValueChange={(itemValue: string) => handleInputChange('gender', itemValue)}
-                    style={{ color: colors.text }}
-                    itemStyle={{ color: colors.text }}
-                  >
-                    {formData.gender === '' && <Picker.Item label="Selecione o gênero" value="" enabled={false} />}
-                    <Picker.Item label="Masculino" value="masculino" />
-                    <Picker.Item label="Feminino" value="feminino" />
-                    <Picker.Item label="Outro" value="outro" />
-                    <Picker.Item label="Prefiro não informar" value="prefiro_nao_informar" />
-                  </Picker>
-                </View>
+                <PickerInput
+                  selectedValue={formData.gender}
+                  onValueChange={(itemValue: string) => handleInputChange('gender', itemValue)}
+                  containerStyle={getPickerContainerStyle('gender')}
+                >
+                  {formData.gender === '' && <Picker.Item label="Selecione o gênero" value="" enabled={false} />}
+                  <Picker.Item label="Masculino" value="masculino" />
+                  <Picker.Item label="Feminino" value="feminino" />
+                  <Picker.Item label="Outro" value="outro" />
+                  <Picker.Item label="Prefiro não informar" value="prefiro_nao_informar" />
+                </PickerInput>
                 {errors.gender ? <Text style={{ color: 'red', fontSize: 12 }}>{errors.gender}</Text> : null}
 
                 <Text style={[styles.patientInput, styles.patientCreationMargin]}>Escolaridade *</Text>
-                <View style={getPickerContainerStyle('escolaridade')}>
-                  <Picker
-                    selectedValue={formData.escolaridade}
-                    onValueChange={(itemValue: string) => handleInputChange('escolaridade', itemValue)}
-                    style={{ color: colors.text }}
-                    itemStyle={{ color: colors.text }}
-                  >
-                    {formData.escolaridade === '' && <Picker.Item label="Selecione a escolaridade" value="" enabled={false} />}
-                    {ESCOLARIDADE_OPTIONS.map(option => (
-                      <Picker.Item key={option.value} label={option.label} value={option.value} />
-                    ))}
-                  </Picker>
-                </View>
+                <PickerInput
+                  selectedValue={formData.escolaridade}
+                  onValueChange={(itemValue: string) => handleInputChange('escolaridade', itemValue)}
+                  containerStyle={getPickerContainerStyle('escolaridade')}
+                >
+                  {formData.escolaridade === '' && <Picker.Item label="Selecione a escolaridade" value="" enabled={false} />}
+                  {ESCOLARIDADE_OPTIONS.map(option => (
+                    <Picker.Item key={option.value} label={option.label} value={option.value} />
+                  ))}
+                </PickerInput>
                 {errors.escolaridade ? <Text style={{ color: 'red', fontSize: 12 }}>{errors.escolaridade}</Text> : null}
 
                 <View style={styles.responsavelLabelRow}>
@@ -430,49 +425,43 @@ const PatientCreationScreen = ({ navigation, route }: PatientCreationScreenProps
                     <Text style={styles.newResponsavelChipText}>+ Novo</Text>
                   </TouchableOpacity>
                 </View>
-                <View style={getPickerContainerStyle('id_responsavel')}>
-                  <Picker
-                    selectedValue={formData.id_responsavel}
-                    onValueChange={(itemValue: number) => handleInputChange('id_responsavel', itemValue)}
-                    style={{ color: colors.text }}
-                    itemStyle={{ flex: 1, color: colors.text }}
-                    enabled={!loadingResponsibles}
-                  >
-                    {formData.id_responsavel === -1 && (
-                      <Picker.Item
-                        label={loadingResponsibles ? 'Carregando...' : (responsibles.length === 0 ? 'Nenhum responsável encontrado' : 'Selecione o responsável')}
-                        value={-1}
-                        enabled={false}
-                      />
-                    )}
-                    {responsibles.map(responsible => (
-                      <Picker.Item key={responsible.id} label={responsible.nome_completo} value={responsible.id} />
-                    ))}
-                  </Picker>
-                </View>
+                <PickerInput
+                  selectedValue={formData.id_responsavel}
+                  onValueChange={(itemValue: number) => handleInputChange('id_responsavel', itemValue)}
+                  enabled={!loadingResponsibles}
+                  containerStyle={getPickerContainerStyle('id_responsavel')}
+                >
+                  {formData.id_responsavel === -1 && (
+                    <Picker.Item
+                      label={loadingResponsibles ? 'Carregando...' : (responsibles.length === 0 ? 'Nenhum responsável encontrado' : 'Selecione o responsável')}
+                      value={-1}
+                      enabled={false}
+                    />
+                  )}
+                  {responsibles.map(responsible => (
+                    <Picker.Item key={responsible.id} label={responsible.nome_completo} value={responsible.id} />
+                  ))}
+                </PickerInput>
 
                 {errors.id_responsavel ? <Text style={{ color: 'red', fontSize: 12 }}>{errors.id_responsavel}</Text> : null}
 
                 <Text style={[styles.patientInput, styles.patientCreationMargin]}>Lateralidade *</Text>
-                <View style={getPickerContainerStyle('lateralidade')}>
-                  <Picker
-                    selectedValue={formData.lateralidade}
-                    onValueChange={(itemValue: string) => handleInputChange('lateralidade', itemValue)}
-                    style={{ color: colors.text }}
-                    itemStyle={{ color: colors.text }}
-                  >
-                    {formData.lateralidade === '' && <Picker.Item label="Selecione a lateralidade" value="" enabled={false} />}
-                    {LATERALIDADE_OPTIONS.map(option => (
-                      <Picker.Item key={option.value} label={option.label} value={option.value} />
-                    ))}
-                  </Picker>
-                </View>
+                <PickerInput
+                  selectedValue={formData.lateralidade}
+                  onValueChange={(itemValue: string) => handleInputChange('lateralidade', itemValue)}
+                  containerStyle={getPickerContainerStyle('lateralidade')}
+                >
+                  {formData.lateralidade === '' && <Picker.Item label="Selecione a lateralidade" value="" enabled={false} />}
+                  {LATERALIDADE_OPTIONS.map(option => (
+                    <Picker.Item key={option.value} label={option.label} value={option.value} />
+                  ))}
+                </PickerInput>
                 {errors.lateralidade ? <Text style={{ color: 'red', fontSize: 12 }}>{errors.lateralidade}</Text> : null}
 
                 <Text style={[styles.patientInput, styles.patientCreationMargin]}>Observações</Text>
                 <View style={[styles.searchContainer, { height: 100 }]}>
                   <TextInput
-                    style={[styles.searchInput, { height: '100%', textAlignVertical: 'top' }]}
+                    style={[styles.creationInput, { height: '100%', textAlignVertical: 'top' }]}
                     placeholder="Observações sobre o paciente..."
                     value={formData.notes}
                     onChangeText={value => handleInputChange('notes', value)}

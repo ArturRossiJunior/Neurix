@@ -1,21 +1,22 @@
 import { supabase } from './src/utils/supabase';
+import { Session, User } from '@supabase/supabase-js';
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 
 interface AuthContextType {
-  session: any | null;
-  user: any | null;
+  session: Session | null;
+  user: User | null;
   professionalId: string | null;
   loading: boolean;
-  setSession: (session: any | null) => void;
-  setUser: (user: any | null) => void;
+  setSession: (session: Session | null) => void;
+  setUser: (user: User | null) => void;
   setProfessionalId: (id: string | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [session, setSession] = useState<any | null>(null);
-  const [user, setUser] = useState<any | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [professionalId, setProfessionalId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 

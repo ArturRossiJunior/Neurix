@@ -41,11 +41,11 @@ const TestPreparationScreen = ({ navigation, route }: TestPreparationScreenProps
       <View style={styles.preparationContainer}>
         <View style={styles.content}>
           <Text style={styles.title}>Preparado para começar?</Text>
-          
+
           <Text style={styles.subtitle}>
             {patientName}
           </Text>
-          
+
           <Text style={styles.testNamePreparation}>
             {testName}
           </Text>
@@ -78,35 +78,35 @@ const TestPreparationScreen = ({ navigation, route }: TestPreparationScreenProps
 
   return (
     <View style={styles.preparationContainer}>
-      <ScrollView 
+      <ScrollView
         style={styles.instructionsContainer}
         contentContainerStyle={styles.instructionsContent}
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.storyTitle}>O Caminho para o Parque Estelar</Text>
-        
+
         <Text style={styles.storyText}>
           O astronauta Cogni está viajando pelo espaço para chegar ao Parque Estelar, um lugar cheio de brincadeiras e aventuras.
         </Text>
-        
+
         <Text style={styles.storyText}>
           E ele quer muito que você seja o copiloto nessa jornada!
         </Text>
 
         <Text style={styles.sectionTitle}>Sua Missão Especial</Text>
-        
+
         <Text style={styles.storyText}>
           No painel da nave aparece o <Text style={styles.highlight}>Símbolo Guia</Text>.
         </Text>
-        
+
         <Text style={styles.storyText}>
           Esse símbolo mostra o caminho seguro para continuar a viagem.
         </Text>
-        
+
         <Text style={styles.storyText}>
           Pelo espaço, existem vários outros símbolos. Alguns parecem iguais, outros são bem diferentes.
         </Text>
-        
+
         <Text style={styles.storyText}>
           Seu trabalho é observar com calma e descobrir quais símbolos são iguais ao Símbolo Guia.
         </Text>
@@ -120,14 +120,6 @@ const TestPreparationScreen = ({ navigation, route }: TestPreparationScreenProps
           >
             Vamos lá!
           </Button>
-
-          <View style={styles.imageBesideButton}>
-            <Image
-              source={require('../../assets/astrocogni.png')}
-              style={styles.imageSmall}
-              resizeMode="contain"
-            />
-          </View>
         </View>
       </ScrollView>
     </View>

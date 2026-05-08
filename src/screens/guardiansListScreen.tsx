@@ -5,6 +5,7 @@ import { formatPhone } from '../utils/utils';
 import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
+import { useToast } from '../utils/ToastContext';
 import ScreenHeader from '../components/ScreenHeader';
 import { useFocusEffect } from '@react-navigation/native';
 import { GuardiansScreenProps } from '../navigation/types';
@@ -37,6 +38,7 @@ interface Guardian {
 const GuardiansScreen = ({ navigation }: GuardiansScreenProps) => {
   const isTablet = useIsTablet();
   const styles = createStyles(isTablet);
+  const { showToast } = useToast();
   const [searchText, setSearchText] = useState('');
   const [guardians, setGuardians] = useState<Guardian[]>([]);
   const [filteredGuardians, setFilteredGuardians] = useState<Guardian[]>([]);
@@ -105,7 +107,7 @@ const GuardiansScreen = ({ navigation }: GuardiansScreenProps) => {
 
       setGuardians(guardiansWithDetails);
     } catch (error: any) {
-      Alert.alert('Erro', 'Erro ao carregar responsáveis: ' + error.message);
+      showToast('Erro ao carregar responsáveis: ' + error.message);
       console.error('Erro ao carregar responsáveis:', error);
     } finally {
       setLoading(false);

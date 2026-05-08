@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../utils/supabase';
 import { Button } from '../components/Button';
+import { useIsTablet } from '../utils/useIsTablet';
 import { colors } from '../components/styles/colors';
 import { RegisterScreenProps } from '../navigation/types';
 import { createRegisterStyles } from '../components/styles/register.styles';
@@ -19,12 +20,10 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
-  useWindowDimensions,
 } from 'react-native';
 
 export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
-  const { width } = useWindowDimensions();
-  const isTablet = width >= 768;
+  const isTablet = useIsTablet();
   const styles = createRegisterStyles(isTablet);
 
   const [name, setName] = useState('');

@@ -2,20 +2,20 @@ import CheckBox from 'expo-checkbox';
 import { useAuth } from '../../AuthContext';
 import { supabase } from '../utils/supabase';
 import { Button } from '../components/Button';
+import { useIsTablet } from '../utils/useIsTablet';
 import React, { useState, useEffect } from 'react';
 import { colors } from '../components/styles/colors';
 import { LoginScreenProps } from '../navigation/types';
 import { CommonActions } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createLoginStyles } from '../components/styles/login.styles';
-import { View, Text, TextInput, TouchableOpacity, Alert, useWindowDimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 
 const STORAGE_KEY = '@remember_me';
 
 export const LoginScreen = ({ navigation }: LoginScreenProps) => {
   const { setSession, setUser, setProfessionalId } = useAuth();
-  const { width } = useWindowDimensions();
-  const isTablet = width >= 768;
+  const isTablet = useIsTablet();
   const styles = createLoginStyles(isTablet);
   
   const [email, setEmail] = useState('');

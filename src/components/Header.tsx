@@ -1,12 +1,12 @@
 import React from 'react';
 import { createStyles } from './styles/header.styles';
-import { View, Text, Image, useWindowDimensions } from 'react-native';
+import { useIsTablet } from '../utils/useIsTablet';
+import { View, Text, Image } from 'react-native';
 
 const image = require('../../assets/hero-illustration.jpg');
 
 export const Header = () => {
-  const { width } = useWindowDimensions();
-  const isTablet = width >= 768;
+  const isTablet = useIsTablet();
   const styles = createStyles(isTablet);
 
   return (
