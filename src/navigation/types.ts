@@ -1,7 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 export type RootStackParamList = {
-  Index: undefined;
   Home: undefined;
   Patients: undefined;
   PatientDetail: { patientId: string };
@@ -38,7 +37,6 @@ export type RootStackParamList = {
 };
 
 export type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
-export type IndexScreenProps = NativeStackScreenProps<RootStackParamList, 'Index'>;
 export type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 export type TestsScreenProps = NativeStackScreenProps<RootStackParamList, 'Tests'>;
 export type AboutScreenProps = NativeStackScreenProps<RootStackParamList, 'About'>;

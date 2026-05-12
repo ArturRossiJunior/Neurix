@@ -106,7 +106,6 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
   const [roundResults, setRoundResults] = useState<RoundResult[]>([]);
   const [saving, setSaving] = useState(false);
   const [testFinished, setTestFinished] = useState(false);
-  const [idAvaliacao, setIdAvaliacao] = useState<number | null>(null);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -114,7 +113,6 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
   const markedIdsRef = useRef<string[]>([]);
   const roundImagesRef = useRef<ImageItem[]>([]);
   const remainingTimeRef = useRef(ROUND_TIME);
-  const idAvaliacaoRef = useRef<number | null>(null);
   const roundResultsRef = useRef<RoundResult[]>([]);
   const currentRoundRef = useRef(1);
   const testFinishedRef = useRef(false);
@@ -123,50 +121,11 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
   useEffect(() => { markedIdsRef.current = markedIds; }, [markedIds]);
   useEffect(() => { roundImagesRef.current = roundImages; }, [roundImages]);
   useEffect(() => { remainingTimeRef.current = remainingTime; }, [remainingTime]);
-  useEffect(() => { idAvaliacaoRef.current = idAvaliacao; }, [idAvaliacao]);
   useEffect(() => { roundResultsRef.current = roundResults; }, [roundResults]);
   useEffect(() => { currentRoundRef.current = currentRound; }, [currentRound]);
   useEffect(() => { testFinishedRef.current = testFinished; }, [testFinished]);
   useEffect(() => { savingRef.current = saving; }, [saving]);
 
-  useEffect(() => {
-    const createAvaliacao = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        Alert.alert('Não Autenticado', 'Você precisa estar autenticado para realizar testes', [
-          { text: 'OK', onPress: () => navigation.goBack() },
-        ]);
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from('avaliacoes')
-        .insert({
-          id_paciente: parseInt(patientId),
-          id_tipo_teste: parseInt(testId),
-          data_aplicacao: new Date().toISOString(),
-          resultado_correto: 0,
-          resultado_incorreto: 0,
-          resultado_omisso: 0,
-          tempo_realizacao: 0,
-          observacoes_clinicas: `Teste: ${testName} | ${TOTAL_ROUNDS} rodadas`,
-        })
-        .select('id')
-        .single();
-
-      if (error || !data) {
-        Alert.alert('Erro', 'Não foi possível iniciar o teste. Tente novamente.', [
-          { text: 'OK', onPress: () => navigation.goBack() },
-        ]);
-        return;
-      }
-
-      setIdAvaliacao(data.id);
-      idAvaliacaoRef.current = data.id;
-    };
-
-    createAvaliacao();
-  }, []);
 
   useEffect(() => {
     const images = buildRoundImages();
@@ -236,8 +195,33 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
     testFinishedRef.current = true;
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        Alert.alert('Não Autenticado', 'Você precisa estar autenticado para salvar o teste.', [
+          { text: 'OK', onPress: () => navigation.goBack() },
+        ]);
+        return;
+      }
+
+      const { data: avaliacaoData, error: avaliacaoError } = await supabase
+        .from('avaliacoes')
+        .insert({
+          id_paciente: parseInt(patientId),
+          id_tipo_teste: parseInt(testId),
+          data_aplicacao: new Date().toISOString(),
+          resultado_correto: results.reduce((s, r) => s + r.correctlyMarked, 0),
+          resultado_incorreto: results.reduce((s, r) => s + r.incorrectlyMarked, 0),
+          resultado_omisso: results.reduce((s, r) => s + r.notMarked, 0),
+          tempo_realizacao: results.reduce((s, r) => s + r.timeSpent, 0),
+          observacoes_clinicas: `Teste: ${testName} | ${TOTAL_ROUNDS} rodadas`,
+        })
+        .select('id')
+        .single();
+
+      if (avaliacaoError || !avaliacaoData) throw avaliacaoError ?? new Error('Erro ao criar avaliação');
+
       const rodadasPayload = results.map(r => ({
-        id_avaliacao: idAvaliacaoRef.current,
+        id_avaliacao: avaliacaoData.id,
         rodada: r.round,
         resultado_correto: r.correctlyMarked,
         resultado_incorreto: r.incorrectlyMarked,
@@ -250,18 +234,6 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
         .insert(rodadasPayload);
 
       if (rodadasError) throw rodadasError;
-
-      const { error } = await supabase
-        .from('avaliacoes')
-        .update({
-          resultado_correto: results.reduce((s, r) => s + r.correctlyMarked, 0),
-          resultado_incorreto: results.reduce((s, r) => s + r.incorrectlyMarked, 0),
-          resultado_omisso: results.reduce((s, r) => s + r.notMarked, 0),
-          tempo_realizacao: results.reduce((s, r) => s + r.timeSpent, 0),
-        })
-        .eq('id', idAvaliacaoRef.current);
-
-      if (error) throw error;
 
       setShowCompletionModal(true);
     } catch (error: any) {
@@ -441,7 +413,7 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
               size="default"
               onPress={() => {
                 setShowCompletionModal(false);
-                navigation.navigate('Home');
+                navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
               }}
               style={{ width: '100%', backgroundColor: '#34D399' }}
             >

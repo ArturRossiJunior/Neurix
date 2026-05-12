@@ -407,7 +407,7 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
               size="default"
               onPress={() => {
                 setShowCompletionModal(false);
-                navigation.navigate('Home');
+                navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
               }}
               style={{ width: '100%' }}
             >

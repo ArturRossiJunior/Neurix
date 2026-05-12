@@ -4,6 +4,7 @@ import { colors } from '../components/styles/colors';
 import { Picker } from '@react-native-picker/picker';
 import PickerInput from '../components/PickerInput';
 import { useIsTablet } from '../utils/useIsTablet';
+import { useToast } from '../utils/ToastContext';
 import ScreenHeader from '../components/ScreenHeader';
 import React, { useState, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
@@ -21,6 +22,7 @@ interface Patient {
 export const TestDetailScreen = ({ route, navigation }: TestDetailScreenProps) => {
   const isTablet = useIsTablet();
   const styles = createTestsStyles(isTablet);
+  const { showToast, clearToasts } = useToast();
 
   const { testId, testName } = route.params;
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -30,6 +32,16 @@ export const TestDetailScreen = ({ route, navigation }: TestDetailScreenProps) =
   const [errors, setErrors] = useState({
     patient: '',
   });
+
+  React.useEffect(() => {
+    if (!isTablet) {
+      showToast(
+        '📱 Para melhor experiência, realize os testes em um tablet',
+        'warning',
+        6000
+      );
+    }
+  }, []);
 
   const fetchPatients = useCallback(async () => {
     setLoading(true);
@@ -80,6 +92,8 @@ export const TestDetailScreen = ({ route, navigation }: TestDetailScreenProps) =
       patientId: selectedPatient.toString(),
       patientName: patient.nome_completo,
     };
+
+    clearToasts();
 
     switch (testId) {
       case '1':

@@ -1,7 +1,6 @@
 import React from 'react';
 import { RootStackParamList } from './types';
 import HomeScreen from '../screens/homeScreen';
-import IndexScreen from '../screens/indexScreen';
 import AboutScreen from '../screens/aboutScreen';
 import { LoginScreen } from '../screens/loginScreen';
 import PatientsScreen from '../screens/patientsListScreen';
@@ -26,7 +25,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 export default function AppNavigator() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Index">
+      <Stack.Navigator initialRouteName="Login">
         <Stack.Screen
           name="Login"
           component={LoginScreen}
@@ -35,11 +34,6 @@ export default function AppNavigator() {
         <Stack.Screen
           name="Register"
           component={RegisterScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Index"
-          component={IndexScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen 
