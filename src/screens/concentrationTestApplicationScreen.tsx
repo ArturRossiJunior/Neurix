@@ -292,8 +292,8 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
   };
 
   const isLastRound = currentRound >= TOTAL_ROUNDS;
-  const cellSize = isTablet ? wp('8%') : wp('18%');
-  const imageSize = isTablet ? wp('6.5%') : wp('15%');
+  const cellSize = isTablet ? wp('12%') : wp('18%');
+  const imageSize = isTablet ? wp('10%') : wp('15%');
 
   return (
     <View style={styles.container}>
@@ -322,7 +322,10 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
 
       <ScrollView
         style={styles.gridArea}
-        contentContainerStyle={styles.gridContent}
+        contentContainerStyle={[
+          styles.gridContent,
+          isTablet && { paddingHorizontal: wp('10%') },
+        ]}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.grid}>
@@ -402,8 +405,8 @@ const ConcentrationTestApplicationScreen = ({ navigation, route }: Concentration
             <Image
               source={require('../../assets/cognitive_end.png')}
               style={{
-                width: winWidth * 0.8,
-                height: winHeight * 0.6,
+                width: '100%',
+                height: isTablet ? 260 : winHeight * 0.45,
                 resizeMode: 'contain',
                 marginBottom: 20,
               }}
@@ -500,7 +503,7 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     gap: 6,
   },
   cell: {

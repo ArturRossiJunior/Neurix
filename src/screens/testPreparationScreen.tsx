@@ -2,9 +2,13 @@ import { Alert } from 'react-native';
 import React, { useState } from 'react';
 import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
-import { View, Text, Image, ScrollView } from 'react-native';
+import { View, Text, Image, ScrollView, StyleSheet } from 'react-native';
 import type { TestPreparationScreenProps } from '../navigation/types';
 import { createTestsStyles } from '../components/styles/tests.styles';
+
+const TASI_TIME_LIMIT = 90; // segundos
+const TASI_MIN = Math.floor(TASI_TIME_LIMIT / 60);
+const TASI_SEC = TASI_TIME_LIMIT % 60;
 
 const TestPreparationScreen = ({ navigation, route }: TestPreparationScreenProps) => {
   const isTablet = useIsTablet();
@@ -111,6 +115,16 @@ const TestPreparationScreen = ({ navigation, route }: TestPreparationScreenProps
           Seu trabalho é observar com calma e descobrir quais símbolos são iguais ao Símbolo Guia.
         </Text>
 
+        <View style={durationStyles.durationBox}>
+          <Text style={durationStyles.durationIcon}>⏱</Text>
+          <View>
+            <Text style={durationStyles.durationLabel}>Tempo total do teste</Text>
+            <Text style={durationStyles.durationValue}>
+              {TASI_MIN}min{TASI_SEC > 0 ? ` ${TASI_SEC}s` : ''}
+            </Text>
+          </View>
+        </View>
+
         <View style={styles.buttonAndImageContainer}>
           <Button
             variant="default"
@@ -125,5 +139,36 @@ const TestPreparationScreen = ({ navigation, route }: TestPreparationScreenProps
     </View>
   );
 };
+
+const durationStyles = StyleSheet.create({
+  durationBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EFF6FF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#93C5FD',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginTop: 16,
+    gap: 12,
+  },
+  durationIcon: {
+    fontSize: 28,
+  },
+  durationLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#1D4ED8',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  durationValue: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#1E3A8A',
+    marginTop: 2,
+  },
+});
 
 export default TestPreparationScreen;

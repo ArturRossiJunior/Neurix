@@ -396,8 +396,8 @@ const TestApplicationScreen = ({ navigation, route }: TestApplicationScreenProps
             <Image
               source={require('../../assets/astrocogni_end.png')}
               style={{
-                width: winWidth * 0.8,
-                height: winHeight * 0.6,
+                width: '100%',
+                height: isTablet ? 260 : winHeight * 0.45,
                 resizeMode: 'contain',
                 marginBottom: 20,
               }}

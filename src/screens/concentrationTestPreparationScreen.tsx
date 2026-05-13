@@ -2,9 +2,15 @@ import { Alert, ImageSourcePropType } from 'react-native';
 import React, { useState } from 'react';
 import { Button } from '../components/Button';
 import { useIsTablet } from '../utils/useIsTablet';
-import { View, Text, Image, ScrollView } from 'react-native';
+import { View, Text, Image, ScrollView, StyleSheet } from 'react-native';
 import type { ConcentrationTestPreparationScreenProps } from '../navigation/types';
 import { createTestsStyles } from '../components/styles/tests.styles';
+
+const TOTAL_ROUNDS = 14;
+const ROUND_TIME = 20;
+const TOTAL_SECONDS = TOTAL_ROUNDS * ROUND_TIME;
+const TOTAL_MIN = Math.floor(TOTAL_SECONDS / 60);
+const TOTAL_SEC = TOTAL_SECONDS % 60;
 
 const ConcentrationTestPreparationScreen = ({ navigation, route }: ConcentrationTestPreparationScreenProps) => {
   const isTablet = useIsTablet();
@@ -118,6 +124,16 @@ const ConcentrationTestPreparationScreen = ({ navigation, route }: Concentration
           Existem pistas parecidas que podem te confundir: o 9 com uma bolinha, o 9 com três bolinhas e até números que parecem o 9, como o 6.
         </Text>
 
+        <View style={durationStyles.durationBox}>
+          <Text style={durationStyles.durationIcon}>⏱</Text>
+          <View>
+            <Text style={durationStyles.durationLabel}>Tempo total do teste</Text>
+            <Text style={durationStyles.durationValue}>
+              {TOTAL_ROUNDS} rodadas × {ROUND_TIME}s = {TOTAL_MIN}min {TOTAL_SEC > 0 ? `${TOTAL_SEC}s` : ''}
+            </Text>
+          </View>
+        </View>
+
         <View style={styles.buttonAndImageContainer}>
           <Button
             variant="default"
@@ -132,5 +148,36 @@ const ConcentrationTestPreparationScreen = ({ navigation, route }: Concentration
     </View>
   );
 };
+
+const durationStyles = StyleSheet.create({
+  durationBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EFF6FF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#93C5FD',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginTop: 16,
+    gap: 12,
+  },
+  durationIcon: {
+    fontSize: 28,
+  },
+  durationLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#1D4ED8',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  durationValue: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#1E3A8A',
+    marginTop: 2,
+  },
+});
 
 export default ConcentrationTestPreparationScreen;
