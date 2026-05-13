@@ -13,6 +13,12 @@ export const createLoginStyles = (isTablet: boolean) => {
       alignItems: 'center',
       padding: commonStyles.cardContainer.padding,
     },
+    infoButtonContainer: {
+      position: 'absolute',
+      top: isTablet ? hp('4%') : hp('6%'),
+      right: isTablet ? wp('4%') : wp('6%'),
+      zIndex: 10,
+    },
     card: {
       width: isTablet ? '50%' : '90%',
       maxWidth: 500,

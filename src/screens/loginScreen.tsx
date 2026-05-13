@@ -10,6 +10,7 @@ import { CommonActions } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createLoginStyles } from '../components/styles/login.styles';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const STORAGE_KEY = '@remember_me';
 
@@ -97,6 +98,13 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity 
+        style={styles.infoButtonContainer} 
+        onPress={() => navigation.navigate('About')}
+      >
+        <Icon name="information-outline" size={28} color={colors.foreground} />
+      </TouchableOpacity>
+
       <View style={styles.card}>
         <Text style={styles.title}>Login</Text>
         <TextInput
