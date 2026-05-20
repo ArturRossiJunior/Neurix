@@ -3,7 +3,7 @@
     "name": "Neurix",
     "slug": "Neurix",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "icon": "./assets/icon.png",

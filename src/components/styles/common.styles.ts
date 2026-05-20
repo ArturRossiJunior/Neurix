@@ -1,8 +1,14 @@
 import { colors } from './colors';
-import { StyleSheet } from 'react-native';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { StyleSheet, Dimensions } from 'react-native';
 
-export const createCommonStyles = (isTablet: boolean) => StyleSheet.create({
+export const createCommonStyles = (isTablet: boolean) => {
+  const { width, height } = Dimensions.get('window');
+  const vmin = Math.min(width, height);
+  const vmax = Math.max(width, height);
+  const wp = (p: string) => (vmin * parseFloat(p)) / 100;
+  const hp = (p: string) => (vmax * parseFloat(p)) / 100;
+
+  return StyleSheet.create({
   baseContainer: {
     borderRadius: isTablet ? 18 : 12,
     paddingHorizontal: wp('4%'),
@@ -74,3 +80,4 @@ export const createCommonStyles = (isTablet: boolean) => StyleSheet.create({
     borderRadius: isTablet ? hp('3%') : hp('2.5%'),
   },
 });
+};

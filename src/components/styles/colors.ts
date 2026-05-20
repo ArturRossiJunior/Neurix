@@ -47,7 +47,7 @@ export const colors = {
   purpleButton: '#A78BFA',
   
   dashboardLoadingText: '#000',
-  dashboardLoadingIndicator: '#9C27B0',
+  dashboardLoadingIndicator: '#A78BFA',
   dashboardStatsBorder: '#000',
   dashboardNoDataText: '#666',
   

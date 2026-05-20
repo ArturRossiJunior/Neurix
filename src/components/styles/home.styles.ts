@@ -1,9 +1,14 @@
 import { colors } from './colors';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 import { createCommonStyles } from './common.styles';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 export const createStyles = (isTablet: boolean) => {
+  const { width, height } = Dimensions.get('window');
+  const vmin = Math.min(width, height);
+  const vmax = Math.max(width, height);
+  const wp = (p: string) => (vmin * parseFloat(p)) / 100;
+  const hp = (p: string) => (vmax * parseFloat(p)) / 100;
+
   const commonStyles = createCommonStyles(isTablet);
   return StyleSheet.create({
     container: {
@@ -47,6 +52,7 @@ export const createStyles = (isTablet: boolean) => {
     navigationGrid: {
       flexDirection: isTablet ? 'row' : 'column',
       flexWrap: isTablet ? 'wrap' : 'nowrap',
+      justifyContent: isTablet ? 'center' : 'flex-start',
       gap: isTablet ? wp('4%') : hp('0%'),
     },
 

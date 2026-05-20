@@ -1,7 +1,13 @@
 import { colors } from './colors';
 import { shadows } from './shadows';
 import { createCommonStyles } from './common.styles';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { Dimensions } from 'react-native';
+
+const { width, height } = Dimensions.get('window');
+const vmin = Math.min(width, height);
+const vmax = Math.max(width, height);
+const wp = (p: string) => (vmin * parseFloat(p)) / 100;
+const hp = (p: string) => (vmax * parseFloat(p)) / 100;
 
 const buttonVariants = {
   default: {

@@ -2,7 +2,7 @@ import { supabase } from '../utils/supabase';
 import { useIsTablet } from '../utils/useIsTablet';
 import { Picker } from '@react-native-picker/picker';
 import PickerInput from '../components/PickerInput';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { colors } from '../components/styles/colors';
 import ScreenHeader from '../components/ScreenHeader';
 import { useToast } from '../utils/ToastContext';
@@ -10,7 +10,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { DashboardScreenProps } from '../navigation/types';
 import { LineChart } from 'react-native-chart-kit';
 import { createStyles } from '../components/styles/dashboard.styles';
-import { View, Text, ScrollView, ActivityIndicator, Alert, TouchableOpacity, useWindowDimensions } from 'react-native';
+import { ChartFullscreenModal } from '../components/ChartFullscreenModal';
+import { View, Text, ScrollView, ActivityIndicator, Alert, TouchableOpacity, useWindowDimensions, TouchableWithoutFeedback } from 'react-native';
 
 const TEST_ID_WITH_ROUNDS = 2;
 
@@ -100,6 +101,7 @@ export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
   const styles = createStyles(isTablet);
   const { showToast } = useToast();
   const { width: screenWidth } = useWindowDimensions();
+  const lastTapRef = useRef<number>(0);
 
   const [patients, setPatients] = useState<Patient[]>([]);
   const [testTypes, setTestTypes] = useState<TestType[]>([]);
@@ -110,6 +112,7 @@ export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
   const [loading, setLoading] = useState(false);
   const [loadingFilters, setLoadingFilters] = useState(true);
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
+  const [fullscreenChart, setFullscreenChart] = useState<{ data: ReturnType<typeof getLineDataFromRounds>; segments: number } | null>(null);
 
   const isRoundBasedTest = selectedTestType === TEST_ID_WITH_ROUNDS;
 
@@ -229,10 +232,15 @@ export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
     backgroundGradientTo: '#EDE9FE',
     decimalPlaces: 0,
     color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-    labelColor: (opacity = 1) => `rgba(80, 80, 80, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(100, 100, 100, ${opacity})`,
     style: { borderRadius: 12 },
     propsForDots: { r: '5', strokeWidth: '2', stroke: colors.purpleButton },
-    propsForBackgroundLines: { stroke: '#D8B4FE' },
+    propsForBackgroundLines: {
+      stroke: '#C4B5FD',
+      strokeOpacity: 0.35,
+      strokeWidth: '1',
+      strokeDasharray: '0',
+    },
     fillShadowGradientFrom: '#EDE9FE',
     fillShadowGradientTo: '#EDE9FE',
     fillShadowGradientFromOpacity: 0,
@@ -261,6 +269,11 @@ export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
         const totalTime      = rounds.reduce((s, r) => s + (20 - r.tempo_restante), 0);
         const avgTime        = rounds.length > 0 ? (totalTime / rounds.length).toFixed(1) : '0';
 
+        const maxRoundValue = rounds.reduce((max, r) => Math.max(max, r.resultado_correto, r.resultado_incorreto, r.resultado_omisso), 0);
+        const chartSegments = Math.max(4, Math.min(maxRoundValue + 2, 22));
+        const chartHeight   = isTablet ? 420 : 400;
+        const chartWidth    = Math.max(screenWidth * 0.80, rounds.length * 80);
+
         return (
           <>
             <Text style={styles.summaryText}>
@@ -280,24 +293,52 @@ export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
 
             {lineData && (
               <View style={[styles.lineChartCard, { marginTop: 16 }]}>
-                <Text style={styles.lineChartTitle}>Evolução por Rodada</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <Text style={styles.lineChartTitle}>Evolução por Rodada</Text>
+                  <TouchableOpacity
+                    onPress={() => setFullscreenChart({ data: lineData, segments: chartSegments })}
+                    style={{
+                      backgroundColor: '#EDE9FE',
+                      borderRadius: 8,
+                      padding: 12,
+                      borderWidth: 1,
+                      borderColor: '#C4B5FD',
+                    }}
+                    hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                  >
+                    <Text style={{ fontSize: 20 }}>⛶</Text>
+                  </TouchableOpacity>
+                </View>
                 <ScrollView
                   horizontal
-                  showsHorizontalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={true}
                   contentContainerStyle={styles.lineChartScrollContent}
+                  persistentScrollbar={true}
                 >
-                  <LineChart
-                    data={lineData}
-                    width={Math.max(screenWidth * 0.90, rounds.length * 100)}
-                    height={500}
-                    chartConfig={chartConfig}
-                    bezier
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      const now = Date.now();
+                      if (now - lastTapRef.current < 300) {
+                        setFullscreenChart({ data: lineData, segments: chartSegments });
+                      }
+                      lastTapRef.current = now;
+                    }}
+                  >
+                    <View>
+                      <LineChart
+                        data={lineData}
+                        width={chartWidth}
+                        height={chartHeight}
+                        chartConfig={chartConfig}
+                        bezier
                     fromZero
-                    segments={22}
+                    segments={chartSegments}
                     yAxisInterval={1}
                     withShadow={false}
                     style={styles.lineChartStyle}
                   />
+                    </View>
+                  </TouchableWithoutFeedback>
                 </ScrollView>
                 <View style={styles.lineLegendContainer}>
                   <View style={styles.lineLegendItem}>
@@ -447,6 +488,16 @@ export const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
           </>
         )}
       </ScrollView>
+
+      {fullscreenChart !== null && fullscreenChart.data !== null && (
+        <ChartFullscreenModal
+          visible={true}
+          onClose={() => setFullscreenChart(null)}
+          lineData={fullscreenChart.data!}
+          chartConfig={chartConfig}
+          segments={fullscreenChart.segments}
+        />
+      )}
     </View>
   );
 };

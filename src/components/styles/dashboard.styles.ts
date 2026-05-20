@@ -1,10 +1,16 @@
 import { shadows } from './shadows';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 import { colors } from './colors';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
-export const createStyles = (isTablet: boolean) => StyleSheet.create({
-  container: {
+export const createStyles = (isTablet: boolean) => {
+  const { width, height } = Dimensions.get('window');
+  const vmin = Math.min(width, height);
+  const vmax = Math.max(width, height);
+  const wp = (p: string) => (vmin * parseFloat(p)) / 100;
+  const hp = (p: string) => (vmax * parseFloat(p)) / 100;
+
+  return StyleSheet.create({
+    container: {
     flex: 1,
     backgroundColor: colors.background,
   },
@@ -105,7 +111,7 @@ export const createStyles = (isTablet: boolean) => StyleSheet.create({
   },
   summaryCard: {
     backgroundColor: colors.card,
-    margin: isTablet ? wp('3%') : wp('5%'),
+    marginVertical: isTablet ? wp('3%') : wp('5%'),
     padding: isTablet ? wp('4%') : wp('5%'),
     borderRadius: isTablet ? 20 : 16,
     shadowColor: colors.shadow,
@@ -137,7 +143,7 @@ export const createStyles = (isTablet: boolean) => StyleSheet.create({
   },
   lineChartCard: {
     backgroundColor: colors.card,
-    margin: isTablet ? wp('2%') : wp('3%'),
+    marginVertical: isTablet ? wp('2%') : wp('3%'),
     padding: isTablet ? wp('4%') : wp('5%'),
     borderRadius: isTablet ? 20 : 16,
     shadowColor: colors.shadow,
@@ -149,7 +155,6 @@ export const createStyles = (isTablet: boolean) => StyleSheet.create({
   lineChartTitle: {
     fontSize: isTablet ? wp('4.5%') : wp('5%'),
     fontWeight: 'bold',
-    marginBottom: isTablet ? hp('1%') : hp('1.5%'),
     color: colors.dashboardStatsBorder,
   },
   lineChartStyle: {
@@ -158,7 +163,7 @@ export const createStyles = (isTablet: boolean) => StyleSheet.create({
   },
   pieChartCard: {
     backgroundColor: colors.card,
-    margin: isTablet ? wp('3%') : wp('5%'),
+    marginVertical: isTablet ? wp('3%') : wp('5%'),
     marginBottom: isTablet ? hp('4%') : hp('5%'),
     padding: isTablet ? wp('4%') : wp('5%'),
     borderRadius: isTablet ? 20 : 16,
@@ -171,7 +176,6 @@ export const createStyles = (isTablet: boolean) => StyleSheet.create({
   pieChartTitle: {
     fontSize: isTablet ? wp('4.5%') : wp('5%'),
     fontWeight: 'bold',
-    marginBottom: isTablet ? hp('1%') : hp('1.5%'),
     color: colors.dashboardStatsBorder,
   },
   pieChartStyle: {
@@ -241,3 +245,4 @@ export const createStyles = (isTablet: boolean) => StyleSheet.create({
     color: colors.chartLegend,
   },
 });
+};
